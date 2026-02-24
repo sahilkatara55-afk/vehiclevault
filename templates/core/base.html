@@ -1,0 +1,33 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>VehicleVault</title>
+
+    <!-- CSS Link -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+
+</head>
+<body>
+
+
+<!-- Navbar -->
+{% if user.is_authenticated %}
+    {% include 'core/navbar.html' %}
+{% endif %}
+
+
+<!-- Page Content -->
+<div class="content">
+
+    {% block content %}
+    {% endblock %}
+
+</div>
+
+
+</body>
+</html>
