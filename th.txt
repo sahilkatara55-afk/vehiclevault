@@ -1,0 +1,36 @@
+terminal
+python -m virtualenv virtualenv ----> automatic venv
+
+cmd(vs terminal)
+venv\scripts\activate
+pip install django
+pip install psycopg2-binary
+
+make vehiclevault in pgadmin
+then
+auth :
+custome auth module
+cd vehiclevault
+make core app (in vs)
+django-admin startapp core
+make urls.py in core app
+install app-----> registore (in vehiclevault\setting.py)
+
+include to main urls.py 
+give core path 
+
+model ma class 
+(1)USER MANAGER
+(2) USER MODEL
+AUTH_USER_MODEL = 'core.User' ----->(setting.py)
+python manage.py makemigration
+python manage.py migrate
+python manage.py createsuperuser ----> email,passworld
+python manage.py runserver
+ 
+ singup form...
+ (1)form.py ---> from class
+ (2)views.py---> def signupfunction
+
+ templates folder---->core folder
+ signup.html

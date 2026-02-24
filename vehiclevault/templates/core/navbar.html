@@ -1,0 +1,36 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<nav class="navbar">
+    <div class="logo">
+        <a href="/">VehicleVault</a>
+    </div>
+
+    <div class="menu">
+
+        {% if user.is_authenticated %}
+
+            {% if user.is_superuser %}
+                <!-- ADMIN MENU -->
+                <a href="/dashboard/">Dashboard</a>
+                <a href="/admin/">Admin Panel</a>
+                <a href="/vehicles/">Vehicles</a>
+                <a href="/logout/" class="btn logout">Logout</a>
+
+            {% else %}
+                <!-- USER MENU -->
+                <a href="/">Home</a>
+                <a href="/profile/">Profile</a>
+                <a href="/mycars/">My Cars</a>
+                <a href="/logout/" class="btn logout">Logout</a>
+            {% endif %}
+
+        {% else %}
+            <!-- GUEST -->
+            <a href="/login/">Login</a>
+            <a href="/signup/" class="btn signup">Signup</a>
+        {% endif %}
+
+    </div>
+</nav>

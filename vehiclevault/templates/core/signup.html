@@ -1,0 +1,31 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="signup-container">
+
+    <div class="signup-card">
+
+        <h2>Create Account</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button type="submit" class="signup-btn">
+                Signup
+            </button>
+        </form>
+
+        <div class="login-link">
+            Already have account?
+            <a href="/login/">Login</a>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
