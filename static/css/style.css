@@ -181,5 +181,55 @@
     text-decoration: underline;
 }
 
-/* ---->home page */
+/* ---->login page */
 
+/* Background */
+.auth-bg {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #2196f3, #90caf9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Card */
+.auth-card {
+    background: #fff;
+    width: 100%;
+    max-width: 420px;
+    padding: 35px 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    text-align: center;
+}
+
+/* Button */
+.auth-btn {
+    width: 100%;
+    padding: 12px;
+    background: #264653;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Input */
+.auth-card input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* Error */
+.error-msg {
+    background: #ffe5e5;
+    color: red;
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}

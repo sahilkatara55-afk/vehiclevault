@@ -1,0 +1,14 @@
+body {
+    background: linear-gradient(135deg, #43cea2, #185a9d);
+}
+
+.auth-card {
+    width: 400px;
+    background: white;
+
+    padding: 35px;
+    margin: 90px auto;
+
+    border-radius: 12px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+}

@@ -1,0 +1,45 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <title>{% block title %}My App{% endblock %}</title>
+
+    <!-- Common CSS -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
+
+    <!-- Page Specific CSS -->
+    {% block css %} {% endblock %}
+  </head>
+
+  <body>
+    <!-- Entire Dashboard Layout Wrapper -->
+    <div class="dashboard">
+      <!-- Left Sidebar Component -->
+      {% include 'core/sidebar.html' %}
+
+      <!-- Main Content Area -->
+      <div class="main">
+        <!-- Top Navbar Component -->
+        {% include 'core/topnavbar.html' %}
+
+        <!-- Actual Page Content -->
+        <div class="content">{% block content %} {% endblock %}</div>
+
+        <!-- Footer Component -->
+        {% include 'core/footer.html' %}
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("sidebarToggle")
+        .addEventListener("click", function () {
+          var sidebar = document.getElementById("mySidebar");
+          sidebar.classList.toggle("active");
+        });
+    </script>
+  </body>
+</html>

@@ -1,10 +1,19 @@
-from django.contrib import admin
-from django.urls import include,path 
-from .import views
+from django.urls import path
+from . import views
 
 urlpatterns = [
-    path('', views.home, name='home'),      # Homepage
-    path('home/', views.home, name='home'), # /home/
+
+    path('', views.home, name='home'),
+
     path('signup/', views.Usersignupview, name='signup'),
 
+    path('login/', views.userloginform, name='login'),
+
+    path('user-dashboard/', views.user_dashboard, name='user_dashboard'),
+
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('logout/', views.logout_user, name='logout'),
+
+    path('dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('dashboard/', views.user_dashboard, name='user_dashboard'),
 ]
