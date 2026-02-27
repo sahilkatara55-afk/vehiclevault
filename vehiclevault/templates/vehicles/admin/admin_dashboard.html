@@ -1,0 +1,42 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Admin Dashboard |
+VehicleVault{% endblock %} {% block css %}
+<link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}" />
+{% endblock %} {% block content %}
+<div class="card admin-dashboard-card">
+  <div class="admin-dashboard-header">
+    <div>
+      <h1 class="admin-dashboard-title">Admin Dashboard</h1>
+      <p class="admin-dashboard-subtitle">System Management & Overview</p>
+    </div>
+    <div class="admin-avatar">A</div>
+  </div>
+
+  <div class="admin-profile-info">
+    <div class="admin-info-row">
+      <span class="admin-info-label">Admin Email</span>
+      <span class="admin-info-value">{{ request.user.email }}</span>
+    </div>
+
+    <div class="admin-info-row">
+      <span class="admin-info-label">Assigned Role</span>
+      <span class="badge-admin-role">{{ request.user.role }}</span>
+    </div>
+
+    <div class="admin-info-row">
+      <span class="admin-info-label">Superuser Permissions</span>
+      {% if request.user.is_superuser %}
+      <span class="badge-success">Granted</span>
+      {% else %}
+      <span class="badge-danger">Denied</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Quick Stats Mockup -->
+  <h3 class="admin-actions-title">Quick Actions</h3>
+  <div class="admin-actions-grid">
+    <a href="/admin/" class="admin-action-btn"> Manage Users </a>
+    <a href="/admin/" class="admin-action-btn"> Manage Vehicles </a>
+  </div>
+</div>
+{% endblock %}

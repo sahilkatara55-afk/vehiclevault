@@ -1,0 +1,38 @@
+{% extends 'base.html' %} {% load static %} {% block title %}User Dashboard |
+VehicleVault{% endblock %} {% block css %}
+<link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}" />
+{% endblock %} {% block content %}
+<div class="card user-dashboard-card">
+  <div class="user-dashboard-header">
+    <h1 class="user-dashboard-title">User Dashboard</h1>
+    <p class="user-dashboard-subtitle">
+      Welcome back! Here is your profile overview.
+    </p>
+  </div>
+
+  <div class="user-profile-info">
+    <div class="user-info-row">
+      <span class="user-info-label">Email Address</span>
+      <span class="user-info-value">{{ request.user.email }}</span>
+    </div>
+
+    <div class="user-info-row">
+      <span class="user-info-label">Account Role</span>
+      <span class="badge-role">{{ request.user.role }}</span>
+    </div>
+
+    <div class="user-info-row">
+      <span class="user-info-label">Admin Status</span>
+      {% if request.user.is_superuser %}
+      <span class="badge-success">Yes</span>
+      {% else %}
+      <span class="badge-danger">No</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="user-dashboard-actions">
+    <a href="{% url 'home' %}" class="btn-browse">Browse Vehicles</a>
+  </div>
+</div>
+{% endblock %}

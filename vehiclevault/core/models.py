@@ -50,10 +50,23 @@ class User(AbstractBaseUser):
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-
     created_at = models.DateTimeField(auto_now_add=True)
-
-
+    # updated_at = models.DateTimeField(auto_now=True)
+    # phone = models.CharField(max_length=15, blank=True, null=True)
+    #first_name = models.CharField(max_length=100, blank=True, null=True)
+    #last_name = models.CharField(max_length=100, blank=True, null=True)
+    #address = models.CharField(max_length=255, blank=True, null=True)
+    #city = models.CharField(max_length=100, blank=True, null=True)
+    #state = models.CharField(max_length=100, blank=True, null=True)
+    #zip_code = models.CharField(max_length=10, blank=True, null=True)
+    #country = models.CharField(max_length=100, blank=True, null=True)
+    #profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    #is_verified = models.BooleanField(default=False)
+    #is_deleted = models.BooleanField(default=False)
+    #deleted_at = models.DateTimeField(null=True, blank=True)
+    #last_login = models.DateTimeField(null=True, blank=True)
+    #last_logout = models.DateTimeField(null=True, blank=True)
+    
     objects = UserManager()
 
 

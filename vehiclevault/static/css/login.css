@@ -1,0 +1,40 @@
+body {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.auth-card {
+    width: 380px;
+    background: white;
+    padding: 30px;
+
+    margin: 100px auto;
+
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.auth-card h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.auth-card input {
+    width: 100%;
+    padding: 12px;
+
+    margin-bottom: 15px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.auth-card button {
+    width: 100%;
+    padding: 12px;
+
+    background: #4a4aff;
+    color: white;
+
+    border: none;
+    border-radius: 6px;
+}

@@ -1,0 +1,160 @@
+/* =============== DASHBOARD LAYOUT =============== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Layout */
+.dashboard {
+    display: flex;
+    min-height: 100vh;
+    background: #f1f5f9;
+}
+
+/* ========== SIDEBAR ========== */
+.sidebar {
+    width: 70px; /* Initially collapsed width */
+    background: #0f172a;
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    
+    transition: width 0.3s ease;
+    overflow: hidden; /* Hide text when collapsed */
+    white-space: nowrap;
+}
+
+.toggle-btn {
+    padding: 15px 23px; /* Align centrally within the 70px width */
+    cursor: pointer;
+    font-size: 24px;
+    color: white;
+}
+
+.sidebar.active {
+    width: 250px; /* Expanded width */
+}
+
+/* Logo */
+.sidebar h2.sidebar-logo {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 22px;
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.3s;
+}
+
+.sidebar.active h2.sidebar-logo {
+    opacity: 1; /* Visible when active */
+}
+
+/* Links */
+.sidebar a {
+    padding: 15px 25px;
+
+    text-decoration: none;
+    color: #cbd5f5;
+
+    font-size: 15px;
+
+    display: block;
+
+    transition: 0.3s;
+}
+
+.sidebar a:hover,
+.sidebar a.active-link {
+    background: #1e293b;
+    color: #38bdf8;
+}
+
+/* ========== MAIN AREA ========== */
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Topbar */
+.topbar {
+    height: 70px;
+    background: white;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0 35px;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.topbar .user-box {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* User */
+.user-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-box img {
+    width: 35px;
+    height: 35px;
+
+    border-radius: 50%;
+}
+
+/* Content */
+.content {
+    padding: 25px;
+}
+
+/* Cards */
+.card-box {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+
+    border-radius: 12px;
+
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+}
+
+/* Mobile Responsive */
+@media(max-width: 768px){
+
+    .sidebar {
+        width: 65px;
+    }
+
+    .sidebar h2 {
+        display: none;
+    }
+
+    .sidebar a {
+        text-align: center;
+        padding: 12px 0;
+        font-size: 13px;
+    }
+
+}

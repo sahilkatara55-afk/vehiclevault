@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .forms import UsersignupForm
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 
@@ -58,16 +58,22 @@ def userloginform(request):
                 'error': 'Invalid Email or Password'
             })
 
+
     return render(request, 'core/login.html')
 
 
 # User Dashboard
 @login_required
 def user_dashboard(request):
-    return render(request, 'core/user_dashboard.html')
+    return render(request, 'vehicles/user/user_dashboard.html')
 
 
 # Admin Dashboard
 @login_required
 def admin_dashboard(request):
-    return render(request, 'core/admin_dashboard.html')
+    return render(request, 'vehicles/admin/admin_dashboard.html')
+
+# Logout View
+def logout_user(request):
+    logout(request)
+    return redirect('login')
