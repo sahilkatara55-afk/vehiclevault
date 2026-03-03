@@ -126,9 +126,19 @@ USE_TZ = True
 STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'core.User'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 LOGIN_URL = '/core/login/'
+
+#email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'sahilkatara55@gmail.com'
+EMAIL_HOST_PASSWORD = 'tbvz qcdz rzup uwzb'

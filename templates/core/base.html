@@ -1,31 +1,21 @@
 {% load static %}
 
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-
+  <head>
     <title>VehicleVault</title>
 
-    <!-- CSS Link -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
+    <!-- CSS Links -->
+    <link rel="stylesheet" href="{% static 'css/base_styles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
 
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body>
+    <!-- Navbar -->
+    {% if user.is_authenticated %} {% include 'core/navbar.html' %} {% endif %}
 
-<!-- Navbar -->
-{% if user.is_authenticated %}
-    {% include 'core/navbar.html' %}
-{% endif %}
-
-
-<!-- Page Content -->
-<div class="content">
-
-    {% block content %}
-    {% endblock %}
-
-</div>
-
-
-</body>
+    <!-- Page Content -->
+    <div class="content">{% block content %} {% endblock %}</div>
+  </body>
 </html>

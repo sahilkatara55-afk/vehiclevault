@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}VehicleVault | Compare Cars Before You Buy{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/home.css' %}?v=3" />
+{% endblock %}
+
+{% block content %}
+<div class="home-page-wrapper">
+
+  <!-- 1. HERO SECTION -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">Compare Cars Before You Buy</h1>
+      <p class="hero-subtitle">Make the right choice. Compare prices, specs, features, and expert reviews of top cars in India side-by-side.</p>
+      <div class="hero-actions">
+        <a href="#" class="btn-hero btn-hero-primary">
+          <span>🔍</span> Search Cars
+        </a>
+        <a href="#" class="btn-hero btn-hero-secondary">
+          <span>⚖️</span> Compare Now
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. WEBSITE STATISTICS -->
+  <section class="section-container">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">500+</div>
+        <div class="stat-label">Cars Available</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">40+</div>
+        <div class="stat-label">Top Brands</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">10k+</div>
+        <div class="stat-label">Comparisons Done</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. HOW IT WORKS -->
+  <section class="section-container">
+    <div class="section-header">
+      <h2 class="section-title">How VehicleVault Works</h2>
+      <p class="section-subtitle">Three simple steps to find your dream car.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-icon">🚗</div>
+        <h3 class="step-title">1. Select Cars</h3>
+        <p class="step-desc">Search and select up to 4 cars you want to compare from our extensive database.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">⚖️</div>
+        <h3 class="step-title">2. Compare Specs</h3>
+        <p class="step-desc">Analyze prices, mileage, safety features, and engine performance side-by-side.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">🎯</div>
+        <h3 class="step-title">3. Decide &amp; Buy</h3>
+        <p class="step-desc">Read expert reviews and make a confident decision on your next big purchase.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. POPULAR COMPARISONS -->
+  <section class="section-container">
+    <div class="section-header">
+      <h2 class="section-title">Popular Comparisons</h2>
+      <p class="section-subtitle">See what others are comparing right now.</p>
+    </div>
+    <div class="comparisons-grid">
+      
+      <!-- Compare Card 1 -->
+      <div class="compare-card">
+        <div class="vs-row">
+          <div class="car-side">
+            <div class="car-icon">🏎️</div>
+            <div class="car-name">Tata Punch</div>
+          </div>
+          <div class="vs-badge">VS</div>
+          <div class="car-side">
+            <div class="car-icon">🚙</div>
+            <div class="car-name">Maruti Swift</div>
+          </div>
+        </div>
+        <a href="#" class="btn-compare-now">View Comparison</a>
+      </div>
+
+      <!-- Compare Card 2 -->
+      <div class="compare-card">
+        <div class="vs-row">
+          <div class="car-side">
+            <div class="car-icon">🚘</div>
+            <div class="car-name">Kia Seltos</div>
+          </div>
+          <div class="vs-badge">VS</div>
+          <div class="car-side">
+            <div class="car-icon">🚙</div>
+            <div class="car-name">Hyundai Creta</div>
+          </div>
+        </div>
+        <a href="#" class="btn-compare-now">View Comparison</a>
+      </div>
+
+      <!-- Compare Card 3 -->
+      <div class="compare-card">
+        <div class="vs-row">
+          <div class="car-side">
+            <div class="car-icon">🚗</div>
+            <div class="car-name">Tata Nexon</div>
+          </div>
+          <div class="vs-badge">VS</div>
+          <div class="car-side">
+            <div class="car-icon">🏎️</div>
+            <div class="car-name">Brezza</div>
+          </div>
+        </div>
+        <a href="#" class="btn-compare-now">View Comparison</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 5. KEY FEATURES -->
+  <section class="section-container">
+    <div class="section-header">
+      <h2 class="section-title">Why Use VehicleVault?</h2>
+      <p class="section-subtitle">Everything you need to make the right car buying decision.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-box">
+        <div class="feature-icon">📊</div>
+        <h3 class="feature-title">Smart Comparison</h3>
+        <p class="feature-desc">Compare up to 4 cars simultaneously with visually highlighted differences.</p>
+      </div>
+      <div class="feature-box">
+        <div class="feature-icon">📑</div>
+        <h3 class="feature-title">Detailed Reports</h3>
+        <p class="feature-desc">Get comprehensive spec sheets, pros &amp; cons, and cost-of-ownership analysis.</p>
+      </div>
+      <div class="feature-box">
+        <div class="feature-icon">🛠️</div>
+        <h3 class="feature-title">Accessory Suggestions</h3>
+        <p class="feature-desc">Find the best compatible accessories tailored for your chosen vehicle.</p>
+      </div>
+      <div class="feature-box">
+        <div class="feature-icon">⭐</div>
+        <h3 class="feature-title">Expert Ratings</h3>
+        <p class="feature-desc">Read unbiased reviews and ratings from top automotive experts in the industry.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

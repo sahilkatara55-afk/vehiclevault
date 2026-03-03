@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.hashers import make_password
 
 
 # USER MANAGER
@@ -53,17 +54,24 @@ class User(AbstractBaseUser):
     created_at = models.DateTimeField(auto_now_add=True)
     # updated_at = models.DateTimeField(auto_now=True)
     # phone = models.CharField(max_length=15, blank=True, null=True)
-    #first_name = models.CharField(max_length=100, blank=True, null=True)
-    #last_name = models.CharField(max_length=100, blank=True, null=True)
-    #address = models.CharField(max_length=255, blank=True, null=True)
-    #city = models.CharField(max_length=100, blank=True, null=True)
-    #state = models.CharField(max_length=100, blank=True, null=True)
-    #zip_code = models.CharField(max_length=10, blank=True, null=True)
-    #country = models.CharField(max_length=100, blank=True, null=True)
-    #profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
-    #is_verified = models.BooleanField(default=False)
-    #is_deleted = models.BooleanField(default=False)
-    #deleted_at = models.DateTimeField(null=True, blank=True)
+    first_name = models.CharField(max_length=100, blank=True, null=True)
+    last_name = models.CharField(max_length=100, blank=True, null=True)
+    
+    GENDER_CHOICE = (
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('other', 'Other'),
+    )
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICE, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    state = models.CharField(max_length=100, blank=True, null=True)
+    zip_code = models.CharField(max_length=10, blank=True, null=True)
+    country = models.CharField(max_length=100, blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    is_verified = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
     #last_login = models.DateTimeField(null=True, blank=True)
     #last_logout = models.DateTimeField(null=True, blank=True)
     
@@ -86,3 +94,43 @@ class User(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return self.is_admin
+
+
+# ADMIN SIGNUP REQUEST MODEL
+
+class AdminSignupRequest(models.Model):
+
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    )
+
+    GENDER_CHOICE = (
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('other', 'Other'),
+    )
+
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICE, blank=True, null=True)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=255)  # stored hashed
+
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
+    requested_at = models.DateTimeField(auto_now_add=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.email} ({self.status})"
+
+    class Meta:
+        ordering = ['-requested_at']
+        verbose_name = 'Admin Signup Request'
+        verbose_name_plural = 'Admin Signup Requests'

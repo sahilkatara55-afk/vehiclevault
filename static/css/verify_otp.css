@@ -1,0 +1,165 @@
+/* ============================================
+   verify_otp.css  —  OTP Verification Page
+   ============================================ */
+
+/* ── Outer wrapper ── */
+.otp-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  padding: 20px;
+}
+
+/* ── Card ── */
+.otp-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+  padding: 48px 40px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+}
+
+/* ── Icon circle ── */
+.otp-icon {
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, #ebf8ff, #bee3f8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 2rem;
+}
+
+/* ── Title ── */
+.otp-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 8px;
+}
+
+/* ── Subtitle ── */
+.otp-subtitle {
+  color: #718096;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.otp-email-highlight {
+  font-weight: 600;
+  color: #3182ce;
+}
+
+/* ── OTP input field ── */
+.otp-input-wrap {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.otp-input-wrap label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.otp-input-wrap input {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 8px;
+  text-align: center;
+  color: #1a202c;
+  background: #f7fafc;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.otp-input-wrap input:focus {
+  outline: none;
+  border-color: #3182ce;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+}
+
+/* ── Errors ── */
+.otp-errors {
+  color: #c53030;
+  font-size: 0.8rem;
+  margin-top: 6px;
+  text-align: left;
+}
+
+/* ── Submit button ── */
+.otp-btn {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, #3182ce, #2b6cb0);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  margin-bottom: 16px;
+}
+
+.otp-btn:hover  { opacity: 0.9; }
+.otp-btn:active { transform: scale(0.98); }
+
+/* ── Expiry note ── */
+.otp-expiry {
+  font-size: 0.78rem;
+  color: #a0aec0;
+  margin-bottom: 20px;
+}
+
+/* ── Resend section ── */
+.otp-resend {
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+.otp-resend a {
+  color: #3182ce;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.otp-resend a:hover { text-decoration: underline; }
+
+/* ── Messages ── */
+.otp-msg {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.otp-msg.error {
+  background: #fff5f5;
+  border: 1px solid #fc8181;
+  border-left: 4px solid #e53e3e;
+  color: #9b2c2c;
+}
+
+.otp-msg.success {
+  background: #f0fff4;
+  border: 1px solid #9ae6b4;
+  border-left: 4px solid #38a169;
+  color: #276749;
+}

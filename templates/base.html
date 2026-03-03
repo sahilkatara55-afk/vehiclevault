@@ -7,8 +7,11 @@
     <title>{% block title %}My App{% endblock %}</title>
 
     <!-- Common CSS -->
-    <link rel="stylesheet" href="{% static 'css/base.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/base_styles.css' %}?v=2" />
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=5" />
+
+    <!-- Google Fonts: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Page Specific CSS -->
     {% block css %} {% endblock %}
@@ -17,9 +20,6 @@
   <body>
     <!-- Entire Dashboard Layout Wrapper -->
     <div class="dashboard">
-      <!-- Left Sidebar Component -->
-      {% include 'core/sidebar.html' %}
-
       <!-- Main Content Area -->
       <div class="main">
         <!-- Top Navbar Component -->
@@ -32,14 +32,5 @@
         {% include 'core/footer.html' %}
       </div>
     </div>
-
-    <script>
-      document
-        .getElementById("sidebarToggle")
-        .addEventListener("click", function () {
-          var sidebar = document.getElementById("mySidebar");
-          sidebar.classList.toggle("active");
-        });
-    </script>
   </body>
 </html>

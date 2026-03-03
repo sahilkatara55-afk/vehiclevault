@@ -1,0 +1,154 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Admin Requests |VehicleVault{% endblock %} 
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/admin_requests.css' %}" />
+{% endblock %} 
+{% block content %}
+<div class="ar-page">
+  <!-- Header -->
+  <div class="ar-header">
+    <div>
+      <h1 class="ar-title">Admin Signup Requests</h1>
+      <p class="ar-subtitle">
+        Review and manage people who have requested admin access.
+      </p>
+    </div>
+    <a href="{% url 'admin_dashboard' %}" class="ar-back-btn"
+      >← Back to Dashboard</a
+    >
+  </div>
+
+  <!-- Status Filter Tabs -->
+  <div class="ar-tabs">
+    <a
+      href="?status=pending"
+      class="ar-tab {% if status_filter == 'pending' %}active-pending{% endif %}"
+    >
+      Pending {% if pending_count > 0 and status_filter != 'pending' %}
+      <span class="ar-tab-badge">{{ pending_count }}</span>
+      {% endif %}
+    </a>
+    <a
+      href="?status=approved"
+      class="ar-tab {% if status_filter == 'approved' %}active-approved{% endif %}"
+    >
+      Approved
+    </a>
+    <a
+      href="?status=rejected"
+      class="ar-tab {% if status_filter == 'rejected' %}active-rejected{% endif %}"
+    >
+      Rejected
+    </a>
+  </div>
+
+  <!-- Django Messages -->
+  {% if messages %}
+  <div class="ar-messages">
+    {% for message in messages %}
+    <div class="ar-msg {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Requests Table / Empty State -->
+  {% if requests %}
+  <div class="ar-table-card">
+    <table class="ar-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Gender</th>
+          <th>Requested</th>
+          <th>Status</th>
+          {% if status_filter == 'pending' %}
+          <th class="center">Actions</th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in requests %}
+        <tr>
+          <td>
+            <div class="ar-user-cell">
+              <div class="ar-avatar">{{ req.first_name|first|upper }}</div>
+              <span class="ar-name"
+                >{{ req.first_name }} {{ req.last_name }}</span
+              >
+            </div>
+          </td>
+          <td>{{ req.email }}</td>
+          <td class="capitalize">{{ req.gender|default:"—" }}</td>
+          <td>{{ req.requested_at|date:"d M Y, H:i" }}</td>
+          <td>
+            {% if req.status == 'pending' %}
+            <span class="ar-badge pending">Pending</span>
+            {% elif req.status == 'approved' %}
+            <span class="ar-badge approved">Approved</span>
+            {% else %}
+            <span class="ar-badge rejected">Rejected</span>
+            {% endif %}
+          </td>
+          {% if status_filter == 'pending' %}
+          <td class="center">
+            <div class="ar-actions">
+              <!-- Approve -->
+              <form
+                class="ar-form-inline"
+                method="post"
+                action="{% url 'approve_admin_request' req.pk %}"
+              >
+                {% csrf_token %}
+                <button
+                  type="submit"
+                  class="ar-btn approve"
+                  onclick="return confirm('Approve admin access for {{ req.email }}?')"
+                >
+                  ✓ Approve
+                </button>
+              </form>
+
+              <!-- Reject -->
+              <form
+                class="ar-form-inline"
+                method="post"
+                action="{% url 'reject_admin_request' req.pk %}"
+              >
+                {% csrf_token %}
+                <button
+                  type="submit"
+                  class="ar-btn reject"
+                  onclick="return confirm('Reject admin request from {{ req.email }}?')"
+                >
+                  ✗ Reject
+                </button>
+              </form>
+            </div>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+  <!-- Empty State -->
+  <div class="ar-empty">
+    <div class="ar-empty-icon">
+      {% if status_filter == 'pending' %} Approval request pending at admin ✅
+      {% else %} 🚫 {% endif %}
+    </div>
+    <h3 class="ar-empty-title">No {{ status_filter }} requests</h3>
+    <p class="ar-empty-text">
+      {% if status_filter == 'pending' %} No admin requests are waiting for
+      review right now. {% elif status_filter == 'approved' %} No admin requests
+      have been approved yet. {% else %} No admin requests have been rejected.
+      {% endif %}
+    </p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

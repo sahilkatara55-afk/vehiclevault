@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %} 
+{% block title %}My Account | VehicleVault{% endblock %} 
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/my_account.css' %}" />
+{% endblock %} 
+{% block content %}
+<div class="profile-page-container">
+  <div class="profile-header-card">
+    {% if request.user.profile_picture %}
+    <div
+      class="profile-avatar-large"
+      style="background-image: url('{{ request.user.profile_picture.url }}'); background-size: cover; background-position: center; cursor: pointer;"
+      onclick="openImageModal('{{ request.user.profile_picture.url }}')"
+    ></div>
+    {% else %}
+    <div class="profile-avatar-large">
+      {{ request.user.email|make_list|first|upper }}
+    </div>
+    {% endif %}
+
+    <h2>{{ request.user.first_name|default:request.user.email|title }}</h2>
+    <p>{{ request.user.email }}</p>
+
+    <!-- Custom File Input UI -->
+    <form method="POST" enctype="multipart/form-data" class="profile-pic-form">
+      {% csrf_token %}
+      <div class="file-upload-wrapper">
+        <label
+          for="{{ form.profile_picture.id_for_label }}"
+          class="custom-file-upload"
+        >
+          Select New Picture
+        </label>
+        {{ form.profile_picture }}
+        <span id="file-chosen">No file chosen</span>
+      </div>
+      <button type="submit" class="btn-upload-pic">Upload</button>
+    </form>
+
+    <a href="#" class="link-account">Link your e-mail or social account</a>
+  </div>
+
+  <div class="profile-links-card">
+    <a href="{% url 'user_dashboard' %}" class="profile-list-item">
+      <span class="icon">📊</span> Dashboard
+      <span class="chevron">&rsaquo;</span>
+    </a>
+    <a href="#" class="profile-list-item">
+      <span class="icon">🚗</span> Compare History
+      <span class="chevron">&rsaquo;</span>
+    </a>
+    <a href="#" class="profile-list-item">
+      <span class="icon">❤️</span> Favorite Vehicles
+      <span class="chevron">&rsaquo;</span>
+    </a>
+    <a href="#" class="profile-list-item">
+      <span class="icon">🔍</span> Recently Viewed
+      <span class="chevron">&rsaquo;</span>
+    </a>
+    <a href="#" class="profile-list-item">
+      <span class="icon">🛠</span> Suggested Accessories
+      <span class="chevron">&rsaquo;</span>
+    </a>
+    <a href="#" class="profile-list-item">
+      <span class="icon">📂</span> Documents & Reminders
+      <span class="chevron">&rsaquo;</span>
+    </a>
+    <a href="#" class="profile-list-item">
+      <span class="icon">⚙</span> Settings
+      <span class="chevron">&rsaquo;</span>
+    </a>
+
+    <div class="profile-logout-container">
+      <a href="{% url 'logout' %}" class="btn-profile-logout">Logout</a>
+    </div>
+  </div>
+</div>
+
+<!-- Full Image Modal -->
+<div id="imageModal" class="modal" onclick="closeImageModal()">
+  <span class="close-modal" onclick="closeImageModal()">&times;</span>
+  <img class="modal-content" id="fullImage" />
+</div>
+
+<script>
+  // Open Modal function
+  function openImageModal(imgUrl) {
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("fullImage");
+    modal.style.display = "block";
+    modalImg.src = imgUrl;
+  }
+
+  // Close Modal function
+  function closeImageModal() {
+    const modal = document.getElementById("imageModal");
+    modal.style.display = "none";
+  }
+
+  // Update file name display
+  document.addEventListener("DOMContentLoaded", function () {
+    const actualBtn = document.querySelector('input[type="file"]');
+    const fileChosen = document.getElementById("file-chosen");
+
+    if (actualBtn && fileChosen) {
+      actualBtn.addEventListener("change", function () {
+        fileChosen.textContent = this.files[0]
+          ? this.files[0].name
+          : "No file chosen";
+      });
+    }
+  });
+</script>
+{% endblock %}

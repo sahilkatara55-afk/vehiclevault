@@ -1,0 +1,71 @@
+/* NAVBAR */
+.navbar {
+    background: linear-gradient(90deg, #5da6c4, #203a43, #5498ba);
+    color: white;
+    padding: 15px 40px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    box-shadow: 0 3px 10px rgba(105, 186, 208, 0.3);
+}
+
+/* LOGO */
+.logo a {
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+/* MENU */
+.menu {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+}
+
+.menu a {
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+
+    padding: 6px 12px;
+    border-radius: 5px;
+
+    transition: all 0.3s ease;
+}
+
+/* HOVER */
+.menu a:hover {
+    background: rgba(65, 204, 228, 0.929);
+}
+
+/* BUTTON */
+.btn {
+    padding: 7px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* LOGOUT */
+.logout {
+    background: #ff4b4b;
+    color: white;
+}
+
+.logout:hover {
+    background: #ff0000;
+}
+
+/* SIGNUP */
+.signup {
+    background: #00c853;
+    color: white;
+}
+
+.signup:hover {
+    background: #00a844;
+}

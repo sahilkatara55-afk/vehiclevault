@@ -1,37 +1,46 @@
-{% extends 'core/base.html' %}
-{% load static %}
-
+{% extends 'base.html' %} 
+{% load static %} 
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}" />
+{% endblock %}
 {% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card-simple">
+    <h2 class="auth-title">Sign in to VehicleVault</h2>
 
-<div class="auth-bg">
+    {% if error %}
+    <div class="error-msg">{{ error }}</div>
+    {% endif %}
 
-    <div class="auth-card">
+    <form method="POST">
+      {% csrf_token %}
 
-        <h2>Login</h2>
+      <div class="input-group">
+        <label>Email Address</label>
+        <input
+          type="email"
+          name="username"
+          placeholder="Enter Email"
+          required
+        />
+      </div>
 
-        {% if error %}
-            <div class="error-msg">{{ error }}</div>
-        {% endif %}
+      <div class="input-group">
+        <label>Password</label>
+        <input
+          type="password"
+          name="password"
+          placeholder="Enter Password"
+          required
+        />
+      </div>
 
-        <form method="POST">
-            {% csrf_token %}
+      <button type="submit" class="auth-btn">Login</button>
+    </form>
 
-            <label>Email</label>
-            <input type="text" name="username" placeholder="Enter Email" required>
-
-            <label>Password</label>
-            <input type="password" name="password" placeholder="Enter Password" required>
-
-            <button type="submit" class="auth-btn">Login</button>
-        </form>
-
-        <p>
-            Don’t have an account?
-            <a href="{% url 'signup' %}">Signup</a>
-        </p>
-
-    </div>
-
+    <p class="auth-footer">
+      Don't have an account? <a href="{% url 'signup' %}">Sign Up</a>
+    </p>
+  </div>
 </div>
-
 {% endblock %}

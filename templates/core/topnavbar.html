@@ -1,45 +1,72 @@
 <!-- TOP NAVBAR -->
 <div class="topbar">
-  <div style="font-weight: 600; font-size: 18px; color: #0f172a">
-    VehicleVault
+  <!-- Left Side: Logo -->
+  <div class="topbar-left">
+    <a href="{% url 'home' %}" class="topbar-logo">VehicleVault</a>
   </div>
 
-  <div class="user-box" style="gap: 15px">
-    <a
-      href="{% url 'login' %}"
-      style="
-        text-decoration: none;
-        color: #333;
-        font-weight: 500;
-        font-size: 14px;
-      "
-      >Login</a
-    >
-    <a
-      href="{% url 'signup' %}"
-      style="
-        text-decoration: none;
-        color: #333;
-        font-weight: 500;
-        font-size: 14px;
-      "
-      >Signup</a
-    >
+  <!-- Center/Right: Main Menu -->
+  <div class="topbar-menu">
+    <a href="{% url 'home' %}">Home</a>
+    <a href="#">Search Cars</a>
+    <a href="#">Compare Cars</a>
+    <a href="#">Brands</a>
+    <a href="{% if user.is_authenticated %}{% if user.is_superuser %}{% url 'admin_dashboard' %}{% else %}{% url 'user_dashboard' %}{% endif %}{% else %}{% url 'login' %}{% endif %}">Dashboard</a>
+  </div>
 
+  <!-- Right Side: User Actions -->
+  <div class="topbar-right">
     {% if user.is_authenticated %}
-    <a
-      href="{% url 'logout' %}"
-      style="
-        text-decoration: none;
-        background: #ef4444;
-        color: white;
-        padding: 6px 12px;
-        border-radius: 4px;
-        font-weight: 500;
-        font-size: 13px;
-      "
-      >Logout</a
-    >
+    <div class="profile-dropdown-container">
+      <button class="profile-icon-btn" onclick="toggleProfileDropdown(event)">
+        {% if user.profile_picture %}
+        <div
+          class="profile-avatar"
+          style="background-image: url('{{ user.profile_picture.url }}'); background-size: cover; background-position: center; border-radius: 50%; border: 2px solid white;"
+        ></div>
+        {% else %}
+        <div class="profile-avatar">
+          {{ user.email|make_list|first|upper }}
+        </div>
+        {% endif %}
+      </button>
+
+      <!-- Dropdown Content -->
+      <div class="profile-dropdown-menu" id="profileDropdown">
+        <div class="dropdown-links">
+          <a href="{% url 'my_account' %}">
+            <span class="dropdown-icon">⚙️</span> Profile
+            <span class="dropdown-chevron">&rsaquo;</span>
+          </a>
+        </div>
+        <div class="dropdown-footer">
+          <a href="{% url 'logout' %}" class="dropdown-logout-btn">Logout</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Script to handle clicking outside dropdown -->
+    <script>
+      function toggleProfileDropdown(event) {
+        event.stopPropagation();
+        const dropdown = document.getElementById("profileDropdown");
+        dropdown.classList.toggle("show");
+      }
+
+      window.addEventListener("click", function (e) {
+        const dropdown = document.getElementById("profileDropdown");
+        const btn = document.querySelector(".profile-icon-btn");
+        if (dropdown && dropdown.classList.contains("show")) {
+          if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+            dropdown.classList.remove("show");
+          }
+        }
+      });
+    </script>
+
+    {% else %}
+    <a href="{% url 'login' %}" class="topbar-link">Login</a>
+    <a href="{% url 'signup' %}" class="btn-topbar btn-signup">Signup</a>
     {% endif %}
   </div>
 </div>

@@ -1,38 +1,204 @@
-{% extends 'base.html' %} {% load static %} {% block title %}User Dashboard |
-VehicleVault{% endblock %} {% block css %}
-<link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}" />
-{% endblock %} {% block content %}
-<div class="card user-dashboard-card">
-  <div class="user-dashboard-header">
-    <h1 class="user-dashboard-title">User Dashboard</h1>
-    <p class="user-dashboard-subtitle">
-      Welcome back! Here is your profile overview.
-    </p>
-  </div>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}User Dashboard | Vehicle Vault{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}?v=8" />
+  <!-- Google Fonts: Outfit -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{% endblock %}
 
-  <div class="user-profile-info">
-    <div class="user-info-row">
-      <span class="user-info-label">Email Address</span>
-      <span class="user-info-value">{{ request.user.email }}</span>
+{% block content %}
+<div class="uv-dash-wrapper">
+  
+  <!-- Welcome Header -->
+  <div class="uv-hero-panel">
+    <div class="uv-hero-content">
+      <h1 class="uv-hero-title">Welcome back, {{ request.user.first_name|default:request.user.email }}! 🚀</h1>
+      <p class="uv-hero-subtitle">Search, compare, and manage your dream cars in your personal dashboard.</p>
     </div>
-
-    <div class="user-info-row">
-      <span class="user-info-label">Account Role</span>
-      <span class="badge-role">{{ request.user.role }}</span>
-    </div>
-
-    <div class="user-info-row">
-      <span class="user-info-label">Admin Status</span>
-      {% if request.user.is_superuser %}
-      <span class="badge-success">Yes</span>
-      {% else %}
-      <span class="badge-danger">No</span>
-      {% endif %}
+    <div class="uv-hero-actions">
+      <a href="#" class="uv-btn uv-btn-solid">🔍 Search Cars</a>
+      <a href="#" class="uv-btn uv-btn-outline-white">⚖️ Compare</a>
     </div>
   </div>
 
-  <div class="user-dashboard-actions">
-    <a href="{% url 'home' %}" class="btn-browse">Browse Vehicles</a>
+  <!-- Top Stat Cards (Comparisons, Saved Cars, Documents, Reminders) side-by-side -->
+  <div class="uv-stats-row">
+    <div class="uv-stat-box">
+      <div class="stat-icon-wrapper bg-blue-light"><span class="icon">⚖️</span></div>
+      <div class="stat-details">
+        <span class="stat-label">Comparisons</span>
+        <h3 class="stat-number">12</h3>
+      </div>
+    </div>
+    <div class="uv-stat-box">
+      <div class="stat-icon-wrapper bg-pink-light"><span class="icon">❤️</span></div>
+      <div class="stat-details">
+        <span class="stat-label">Saved Cars</span>
+        <h3 class="stat-number">5</h3>
+      </div>
+    </div>
+    <!-- Documents & Reminders next to them -->
+    <div class="uv-stat-box">
+      <div class="stat-icon-wrapper bg-indigo-light"><span class="icon">📄</span></div>
+      <div class="stat-details">
+        <span class="stat-label">Documents</span>
+        <h3 class="stat-number">3</h3>
+      </div>
+    </div>
+    <div class="uv-stat-box">
+      <div class="stat-icon-wrapper bg-orange-light"><span class="icon">🔔</span></div>
+      <div class="stat-details">
+        <span class="stat-label">Reminders</span>
+        <h3 class="stat-number">2</h3>
+      </div>
+    </div>
   </div>
+
+  <!-- Main 2-Column Section -->
+  <div class="uv-bento-grid">
+    
+    <!-- LEFT SIDE: Comparisons & Saved Cars -->
+    <div class="uv-col left-col">
+      
+      <!-- Recent Comparisons -->
+      <div class="uv-card">
+        <div class="uv-card-header">
+          <h2 class="uv-card-title">Recent Comparisons</h2>
+          <a href="#" class="uv-link">View All</a>
+        </div>
+        <div class="uv-list-group">
+          <div class="uv-list-item">
+            <div class="list-icon bg-blue-fade">⚖️</div>
+            <div class="list-text">
+              <h4>Hyundai Creta <span class="badge-vs">VS</span> Kia Seltos</h4>
+              <p>Compared 2 days ago</p>
+            </div>
+            <button class="uv-btn-small uv-btn-light">View</button>
+          </div>
+          <div class="uv-list-item">
+            <div class="list-icon bg-blue-fade">⚖️</div>
+            <div class="list-text">
+              <h4>Tata Nexon <span class="badge-vs">VS</span> Maruti Brezza</h4>
+              <p>Compared last week</p>
+            </div>
+            <button class="uv-btn-small uv-btn-light">View</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saved Cars -->
+      <div class="uv-card">
+        <div class="uv-card-header">
+          <h2 class="uv-card-title">Saved Cars</h2>
+          <a href="#" class="uv-link">Explore More</a>
+        </div>
+        <div class="uv-grid-inner">
+          <div class="uv-pill-card">
+            <div class="pill-img">🚙</div>
+            <div class="pill-info">
+              <h4>Tata Harrier</h4>
+              <p>Top Model</p>
+            </div>
+            <button class="btn-heart active">❤️</button>
+          </div>
+          <div class="uv-pill-card">
+            <div class="pill-img">🏎️</div>
+            <div class="pill-info">
+              <h4>Mahindra XUV700</h4>
+              <p>AX7 Luxury</p>
+            </div>
+            <button class="btn-heart active">❤️</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suggested Accessories -->
+      <div class="uv-card">
+        <div class="uv-card-header">
+          <h2 class="uv-card-title">Suggested Accessories</h2>
+          <a href="#" class="uv-link">Shop</a>
+        </div>
+        <div class="uv-list-group">
+          <div class="uv-list-item">
+            <div class="list-icon bg-teal-fade">🛠️</div>
+            <div class="list-text">
+              <h4>Premium Dashcam (Front + Rear)</h4>
+              <p>Matches Tata Harrier</p>
+            </div>
+            <button class="uv-btn-small uv-btn-light">View</button>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- RIGHT SIDE: Profile, Documents & Reminders (Next to comparisons physically in layout) -->
+    <div class="uv-col right-col">
+
+      <!-- Compact Profile -->
+      <div class="uv-card uv-profile-bento">
+        <div class="bento-cover"></div>
+        <div class="bento-avatar">
+          {% if request.user.profile_picture %}
+            <img src="{{ request.user.profile_picture.url }}" alt="Profile" />
+          {% else %}
+            <span>{{ request.user.email|make_list|first|upper }}</span>
+          {% endif %}
+        </div>
+        <div class="bento-user-info">
+          <h3>{{ request.user.first_name|default:"User" }} {{ request.user.last_name|default:"" }}</h3>
+          <p>{{ request.user.email }}</p>
+        </div>
+        <div class="bento-actions">
+          <a href="{% url 'my_account' %}" class="uv-btn uv-btn-full uv-btn-gray">Manage Account</a>
+        </div>
+      </div>
+
+      <!-- Documents (Placed next to/beside the left column) -->
+      <div class="uv-card">
+        <div class="uv-card-header">
+          <h2 class="uv-card-title">My Documents</h2>
+        </div>
+        <div class="uv-action-menu">
+          <a href="#" class="uv-menu-row">
+            <div class="menu-icon">📄</div>
+            <div class="menu-text">Vehicle RC &amp; Insurance</div>
+            <div class="menu-arrow">→</div>
+          </a>
+          <a href="#" class="uv-menu-row">
+            <div class="menu-icon">🧑‍🔧</div>
+            <div class="menu-text">Service Records</div>
+            <div class="menu-arrow">→</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Reminders -->
+      <div class="uv-card">
+        <div class="uv-card-header">
+          <h2 class="uv-card-title">Reminders</h2>
+        </div>
+        <div class="uv-alerts-list">
+          <div class="uv-alert danger">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-content">
+              <h4>Insurance Expiring</h4>
+              <p>Harrier insurance expires in 5 days</p>
+            </div>
+          </div>
+          <div class="uv-alert warning">
+            <div class="alert-icon">🔧</div>
+            <div class="alert-content">
+              <h4>Service Due</h4>
+              <p>Next service due in 20 days</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 {% endblock %}
