@@ -1,0 +1,232 @@
+.profile-page-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+/* Header Section */
+.profile-header-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.profile-avatar-large {
+  width: 80px;
+  height: 80px;
+  background: #EFF6FF;
+  color: #3B82F6;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 15px auto;
+}
+
+.profile-header-card h2 {
+  color: #0F172A;
+  margin: 0 0 5px 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.profile-header-card p {
+  color: #64748B;
+  margin: 0 0 15px 0;
+  font-size: 15px;
+}
+
+.profile-pic-form {
+  margin-bottom: 20px;
+}
+
+.profile-pic-form input[type="file"] {
+    display: none;
+}
+
+.file-upload-wrapper {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.custom-file-upload {
+    border: 1px solid #CBD5E1;
+    display: inline-block;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #334155;
+    background-color: #F8FAFC;
+    transition: all 0.2s;
+}
+
+.custom-file-upload:hover {
+    background-color: #F1F5F9;
+    border-color: #94A3B8;
+}
+
+#file-chosen {
+    font-size: 12px;
+    color: #64748B;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-upload-pic {
+  background-color: #3B82F6;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-upload-pic:hover {
+  background-color: #2563EB;
+}
+
+.link-account {
+  color: #3B82F6;
+  font-size: 14px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.link-account:hover {
+  text-decoration: underline;
+}
+
+/* Links Section */
+.profile-links-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.profile-list-item {
+  display: flex;
+  align-items: center;
+  padding: 20px 25px;
+  text-decoration: none;
+  color: #1E293B;
+  font-size: 16px;
+  font-weight: 600;
+  border-bottom: 1px solid #F1F5F9;
+  transition: background 0.2s;
+}
+
+.profile-list-item:hover {
+  background: #F8FAFC;
+  color: #3B82F6;
+}
+
+.profile-list-item .icon {
+  margin-right: 20px;
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+}
+
+.profile-list-item .chevron {
+  margin-left: auto;
+  color: #94a3b8;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.profile-logout-container {
+  padding: 25px;
+  display: flex;
+  justify-content: center;
+  background: #ffffff;
+}
+
+.btn-profile-logout {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  padding: 14px;
+  text-align: center;
+  background: #fff5f8;
+  color: #e31b54;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.2s;
+}
+
+.btn-profile-logout:hover {
+    background: #ffd6e4;
+    color: #e31b54;
+}
+
+/* The Modal (background) */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    padding-top: 100px; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.9); 
+}
+
+/* Modal Content (image) */
+.modal-content {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 80vh;
+    object-fit: contain;
+}
+
+/* Add Animation */
+.modal-content {  
+    animation-name: zoom;
+    animation-duration: 0.3s;
+}
+
+@keyframes zoom {
+    from {transform:scale(0.8)} 
+    to {transform:scale(1)}
+}
+
+/* The Close Button */
+.close-modal {
+    position: absolute;
+    top: 30px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}

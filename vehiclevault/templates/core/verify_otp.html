@@ -1,0 +1,47 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Verify OTP | VehicleVault{% endblock %} 
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/verify_otp.css' %}" />
+{% endblock %} 
+{% block content %}
+<div class="otp-wrapper">
+  <div class="otp-card">
+    <!-- Icon -->
+    <div class="otp-icon">📧</div>
+
+    <h1 class="otp-title">Verify Your Email</h1>
+    <p class="otp-subtitle">
+      We've sent a 6-digit OTP to<br />
+      <span class="otp-email-highlight">{{ email }}</span>
+    </p>
+
+    <!-- Django Messages -->
+    {% if messages %} {% for message in messages %}
+    <div class="otp-msg {{ message.tags }}">{{ message }}</div>
+    {% endfor %} {% endif %}
+
+    <!-- OTP Form -->
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="otp-input-wrap">
+        <label for="id_otp">Enter OTP</label>
+        {{ form.otp }} {% if form.otp.errors %}
+        <div class="otp-errors">{{ form.otp.errors }}</div>
+        {% endif %}
+      </div>
+
+      <p class="otp-expiry">⏱ OTP expires in 10 minutes</p>
+
+      <button type="submit" class="otp-btn">Verify OTP</button>
+    </form>
+
+    <!-- Resend OTP -->
+    <p class="otp-resend">
+      Didn't receive it?
+      <a href="{% url 'resend_otp' %}">Resend OTP</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

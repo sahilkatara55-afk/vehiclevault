@@ -1,0 +1,117 @@
+/* ============================================
+   admin_request_pending.css  —  Pending Page
+   ============================================ */
+
+/* ── Full-page center wrapper ── */
+.pending-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  padding: 20px;
+}
+
+/* ── Card ── */
+.pending-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+  padding: 48px 40px;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+}
+
+/* ── Icon circle ── */
+.pending-icon {
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, #ebf8ff, #bee3f8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 2rem;
+}
+
+/* ── Heading ── */
+.pending-title {
+  font-size: 1.6rem;
+  color: #1a202c;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+/* ── Description ── */
+.pending-desc {
+  color: #718096;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+/* ── Status steps box ── */
+.pending-steps {
+  background: #f7fafc;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+
+.pending-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pending-step:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Step badge ── */
+.step-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.step-badge.done    { background: #38a169; }
+.step-badge.current { background: #ed8936; }
+.step-badge.todo    { background: #e2e8f0; color: #a0aec0; }
+
+/* ── Step text ── */
+.step-text {
+  font-size: 0.9rem;
+  color: #2d3748;
+}
+
+.step-text.muted { color: #718096; }
+.step-text.light { color: #a0aec0; }
+
+/* ── CTA button ── */
+.pending-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #3182ce, #2b6cb0);
+  color: white;
+  padding: 12px 32px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: opacity 0.2s;
+}
+
+.pending-btn:hover {
+  opacity: 0.9;
+  color: white;
+}

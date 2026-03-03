@@ -1,40 +1,107 @@
-body {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+/* Auth Wrapper (Centered simple card for Dashboard layout) */
+.auth-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 120px); /* Adjust height since there's top navbar */
 }
 
-.auth-card {
-    width: 380px;
-    background: white;
-    padding: 30px;
-
-    margin: 100px auto;
-
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+/* Simple Card */
+.auth-card-simple {
+    background: #fff;
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
 
-.auth-card h2 {
+.auth-title {
+    font-size: 26px;
+    color: #333;
+    margin-bottom: 25px;
     text-align: center;
+    font-weight: 700;
+}
+
+/* Inputs */
+.input-group {
     margin-bottom: 20px;
 }
 
-.auth-card input {
-    width: 100%;
-    padding: 12px;
-
-    margin-bottom: 15px;
-
-    border: 1px solid #ccc;
-    border-radius: 6px;
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 500;
+    font-size: 14px;
 }
 
-.auth-card button {
+.auth-card-simple input,
+.auth-card-simple select {
     width: 100%;
-    padding: 12px;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #fdfdfd;
+    transition: all 0.3s ease;
+}
 
-    background: #4a4aff;
+.auth-card-simple input:focus,
+.auth-card-simple select:focus {
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    outline: none;
+    background: #fff;
+}
+
+/* Button */
+.auth-btn {
+    width: 100%;
+    padding: 14px;
+    background: #3B82F6;
     color: white;
-
     border: none;
     border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background 0.3s ease, transform 0.2s;
+}
+
+.auth-btn:hover {
+    background: #2563EB;
+    transform: translateY(-2px);
+}
+
+/* Footer Links */
+.auth-footer {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+}
+
+.auth-footer a {
+    color: #3B82F6;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Error */
+.error-msg {
+    background: #fee;
+    color: #d9534f;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    text-align: center;
+    border: 1px solid #fcc;
+    font-size: 13px;
 }

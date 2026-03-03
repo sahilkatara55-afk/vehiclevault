@@ -34,3 +34,14 @@ python manage.py runserver
 
  templates folder---->core folder
  signup.html
+
+27-02-2026
+ email config
+ 2step verification
+
+ (1)setting.py
+ (2)views.py
+
+ page design
+attechment:
+  

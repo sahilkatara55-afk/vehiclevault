@@ -1,14 +1,112 @@
-body {
-    background: linear-gradient(135deg, #43cea2, #185a9d);
+/* ============================================
+   signup.css  —  Signup Page Styles
+   ============================================ */
+
+/* ── Form field wrapper ── */
+.form-field {
+  margin-bottom: 14px;
 }
 
-.auth-card {
-    width: 400px;
-    background: white;
+.form-field label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748B;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-    padding: 35px;
-    margin: 90px auto;
+.form-field input,
+.form-field select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: #F1F5F9;
+  color: #1E293B;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
 
-    border-radius: 12px;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+.form-field input:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: #3B82F6;
+  background: #fff;
+}
+
+/* ── Two-column row ── */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ── Validation errors ── */
+.form-errors {
+  color: #c53030;
+  font-size: 0.78rem;
+  margin-top: 4px;
+}
+
+/* ── Django messages ── */
+.messages-container {
+  margin-bottom: 16px;
+}
+
+.msg-success {
+  background: #f0fff4;
+  border: 1px solid #9ae6b4;
+  border-left: 4px solid #38a169;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #276749;
+  font-size: 0.85rem;
+}
+
+.msg-error {
+  background: #fff5f5;
+  border: 1px solid #fc8181;
+  border-left: 4px solid #e53e3e;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #9b2c2c;
+  font-size: 0.85rem;
+}
+
+/* ── Admin request checkbox ── */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #1E293B;
+  font-weight: 600;
+  padding: 10px 0;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #3B82F6;
+  cursor: pointer;
+}
+
+.admin-request-note {
+  background: #F1F5F9;
+  border: 1px solid #3B82F6;
+  border-left: 4px solid #3B82F6;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  color: #3B82F6;
+  margin-top: 6px;
+  display: none;
+}
+
+.admin-request-note.visible {
+  display: block;
 }

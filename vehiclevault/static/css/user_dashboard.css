@@ -1,90 +1,577 @@
-/* userdashboard.css */
+/* ============================================
+   user_dashboard.css  —  Premium Dashboard Theme
+   ============================================ */
 
-.user-dashboard-card {
-    max-width: 600px;
-    margin: 0 auto;
-    margin-top: 20px;
+/* ── Base Reset & Font ── */
+body {
+  background-color: #f4f7fe;
+}
+.uv-dash-wrapper {
+  padding: 30px;
+  max-width: 1240px;
+  margin: 0 auto;
+  font-family: 'Outfit', sans-serif;
+  color: #1E293B;
 }
 
-.user-dashboard-header {
-    border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
+/* ─────────────────────────────────────────────
+   HERO / WELCOME PANEL
+───────────────────────────────────────────── */
+.uv-hero-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FFFFFF;
+  border-radius: 24px;
+  padding: 35px 45px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  color: #1E293B;
+  position: relative;
+  overflow: hidden;
 }
 
-.user-dashboard-title {
-    font-size: 24px;
-    color: #0f172a;
-    margin-bottom: 5px;
+.uv-hero-panel::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  background: #F1F5F9;
+  border-radius: 50%;
+  filter: blur(40px);
 }
 
-.user-dashboard-subtitle {
-    color: #64748b;
-    font-size: 14px;
+.uv-hero-content {
+  z-index: 2;
+  max-width: 600px;
 }
 
-.user-profile-info {
-    display: flex;
+.uv-hero-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+  letter-spacing: -0.5px;
+  color: #0F172A;
+}
+
+.uv-hero-subtitle {
+  font-size: 1.1rem;
+  color: #64748B;
+  margin: 0;
+}
+
+.uv-hero-actions {
+  z-index: 2;
+  display: flex;
+  gap: 16px;
+}
+
+.uv-btn {
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+}
+
+.uv-btn-solid {
+  background: #3B82F6;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+.uv-btn-solid:hover {
+  background: #2563EB;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+}
+
+.uv-btn-outline-white {
+  background: transparent;
+  color: #3B82F6;
+  border: 1.5px solid #3B82F6;
+}
+
+.uv-btn-outline-white:hover {
+  background: #3B82F6;
+  color: #FFFFFF;
+  transform: translateY(-2px);
+}
+
+/* ─────────────────────────────────────────────
+   STAT CARDS (4 Columns)
+───────────────────────────────────────────── */
+.uv-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.uv-stat-box {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s ease;
+}
+
+.uv-stat-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+}
+
+.stat-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.bg-blue-light { background: #EFF6FF; color: #3B82F6; }
+.bg-pink-light { background: #FEF2F2; color: #EF4444; }
+.bg-indigo-light { background: #EEF2FF; color: #6366F1; }
+.bg-orange-light { background: #FFF7ED; color: #F97316; }
+
+.stat-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #64748B;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.stat-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #3B82F6;
+  margin: 0;
+  line-height: 1;
+}
+
+/* ─────────────────────────────────────────────
+   BENTO GRID (Main & Sidebar)
+───────────────────────────────────────────── */
+.uv-bento-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+.uv-col {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* ─────────────────────────────────────────────
+   SHARED CARD STYLES
+───────────────────────────────────────────── */
+.uv-card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  padding-bottom: 10px;
+}
+
+.uv-card-header {
+  padding: 24px 28px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.uv-card-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+}
+
+.uv-link {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #3B82F6;
+  text-decoration: none;
+  background: #EFF6FF;
+  padding: 6px 14px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.uv-link:hover {
+  background: #DBEAFE;
+}
+
+/* ─────────────────────────────────────────────
+   LIST UI (Comparisons, Accessories)
+───────────────────────────────────────────── */
+.uv-list-group {
+  padding: 10px 24px 20px;
+}
+
+.uv-list-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  transition: background 0.2s;
+}
+
+.uv-list-item:hover {
+  background: #f8fafc;
+}
+
+.list-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.bg-blue-fade { background: #EFF6FF; color: #3B82F6; }
+.bg-teal-fade { background: #F0FDFA; color: #14B8A6; }
+
+.list-text {
+  flex: 1;
+}
+
+.list-text h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1E293B;
+  margin: 0 0 6px;
+}
+
+.badge-vs {
+  background: #ffe0eb;
+  color: #e31b54;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 3px 6px;
+  border-radius: 6px;
+  margin: 0 6px;
+}
+
+.list-text p {
+  font-size: 0.85rem;
+  color: #64748B;
+  margin: 0;
+}
+
+.uv-btn-small {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.uv-btn-light {
+  background: #F1F5F9;
+  color: #3B82F6;
+}
+.uv-btn-light:hover {
+  background: #DBEAFE;
+}
+
+/* ─────────────────────────────────────────────
+   SAVED CARS PILLS
+───────────────────────────────────────────── */
+.uv-grid-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 10px 24px 24px;
+}
+
+.uv-pill-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.uv-pill-card:hover {
+  border-color: #3B82F6;
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.08);
+}
+
+.pill-img {
+  width: 56px;
+  height: 56px;
+  background: #F1F5F9;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+}
+
+.pill-info {
+  flex: 1;
+}
+
+.pill-info h4 {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.pill-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748B;
+}
+
+.btn-heart {
+  background: transparent;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+.btn-heart.active, .btn-heart:hover {
+  opacity: 1;
+  color: #e31b54;
+}
+
+/* ─────────────────────────────────────────────
+   PROFILE BENTO CARD
+───────────────────────────────────────────── */
+.uv-profile-bento {
+  padding: 0;
+}
+
+.bento-cover {
+  height: 110px;
+  background: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' viewBox='0 0 800 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%230F172A' d='M0,0 L800,0 L800,400 L0,400 Z'/%3E%3Cpath fill='%231E293B' d='M200,400 C300,300 300,100 400,0 L0,0 L0,400 Z'/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.bento-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 20px;
+  border: 4px solid #fff;
+  background: #F1F5F9;
+  margin: -50px auto 16px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.bento-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bento-avatar span {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.bento-user-info {
+  text-align: center;
+  padding: 0 20px 20px;
+}
+
+.bento-user-info h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1E293B;
+  margin: 0 0 6px;
+}
+
+.bento-user-info p {
+  font-size: 0.95rem;
+  color: #64748B;
+  margin: 0;
+}
+
+.bento-actions {
+  padding: 0 24px 24px;
+}
+
+.uv-btn-full {
+  width: 100%;
+}
+.uv-btn-gray {
+  background: #F1F5F9;
+  color: #1E293B;
+}
+.uv-btn-gray:hover {
+  background: #E2E8F0;
+  color: #3B82F6;
+}
+
+/* ─────────────────────────────────────────────
+   MENU LISTS (DOCUMENTS)
+───────────────────────────────────────────── */
+.uv-action-menu {
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px 16px;
+}
+
+.uv-menu-row {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  text-decoration: none;
+  border-radius: 16px;
+  transition: all 0.2s;
+}
+
+.uv-menu-row:hover {
+  background: #f8fafc;
+  transform: translateX(4px);
+}
+
+.menu-icon {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  background: #F1F5F9;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+}
+
+.menu-text {
+  flex: 1;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1E293B;
+}
+
+.uv-menu-row:hover .menu-text {
+  color: #3B82F6;
+}
+
+.menu-arrow {
+  color: #94A3B8;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.uv-menu-row:hover .menu-arrow {
+  color: #3B82F6;
+}
+
+/* ─────────────────────────────────────────────
+   REMINDERS (ALERTS)
+───────────────────────────────────────────── */
+.uv-alerts-list {
+  padding: 0 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.uv-alert {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+}
+
+.uv-alert.danger {
+  background: #fff5f8;
+  border-color: #ffd6e4;
+}
+.uv-alert.danger .alert-icon { color: #e31b54; }
+.uv-alert.danger h4 { color: #d11242; }
+
+.uv-alert.warning {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+.uv-alert.warning .alert-icon { color: #d97706; }
+.uv-alert.warning h4 { color: #b45309; }
+
+.alert-icon {
+  font-size: 1.6rem;
+}
+
+.alert-content h4 {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.alert-content p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #8f9bba;
+}
+
+/* ─────────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .uv-stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .uv-bento-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .uv-hero-panel {
     flex-direction: column;
-    gap: 15px;
-}
-
-.user-info-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background: #f8fafc;
-    border-radius: 6px;
-}
-
-.user-info-label {
-    font-weight: 600;
-    color: #475569;
-}
-
-.user-info-value {
-    color: #0f172a;
-}
-
-.badge-role {
-    background: #38bdf8;
-    color: white;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.badge-success {
-    color: #10b981;
-    font-weight: 600;
-}
-
-.badge-danger {
-    color: #ef4444;
-    font-weight: 600;
-}
-
-.user-dashboard-actions {
-    margin-top: 30px;
-    display: flex;
-    gap: 15px;
-}
-
-.btn-browse {
-    padding: 10px 20px;
-    background: #0f172a;
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
     text-align: center;
-    flex: 1;
-}
-
-.btn-browse:hover {
-    background: #1e293b;
+    padding: 30px 20px;
+    gap: 20px;
+  }
+  .uv-stats-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .uv-grid-inner {
+    grid-template-columns: 1fr;
+  }
 }

@@ -1,0 +1,42 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Request Submitted |VehicleVault{% endblock %} 
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/admin_request_pending.css' %}" />
+{% endblock %} 
+{% block content %}
+<div class="pending-wrapper">
+  <div class="pending-card">
+    <!-- Icon -->
+    <div class="pending-icon">⏳</div>
+
+    <h1 class="pending-title">Request Submitted!</h1>
+
+    <p class="pending-desc">
+      Your <strong>admin access request</strong> has been submitted
+      successfully. A superadmin will review it shortly. You'll receive an email
+      once a decision is made.
+    </p>
+
+    <!-- Status Steps -->
+    <div class="pending-steps">
+      <div class="pending-step">
+        <span class="step-badge done">✓</span>
+        <span class="step-text">Request submitted</span>
+      </div>
+
+      <div class="pending-step">
+        <span class="step-badge current">2</span>
+        <span class="step-text muted">Superadmin review (pending)</span>
+      </div>
+
+      <div class="pending-step">
+        <span class="step-badge todo">3</span>
+        <span class="step-text light">Get notified via email</span>
+      </div>
+    </div>
+
+    <a href="{% url 'login' %}" class="pending-btn">Go to Login</a>
+  </div>
+</div>
+{% endblock %}

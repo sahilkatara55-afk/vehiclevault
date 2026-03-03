@@ -1,31 +1,108 @@
-{% extends 'core/base.html' %}
-{% load static %}
-
+{% extends 'base.html' %} 
+{% load static %} 
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}" />
+<link rel="stylesheet" href="{% static 'css/signup.css' %}" />
+{% endblock %} 
 {% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card-simple">
+    <h2 class="auth-title">Create Account</h2>
 
-<div class="signup-container">
-
-    <div class="signup-card">
-
-        <h2>Create Account</h2>
-
-        <form method="post">
-            {% csrf_token %}
-
-            {{ form.as_p }}
-
-            <button type="submit" class="signup-btn">
-                Signup
-            </button>
-        </form>
-
-        <div class="login-link">
-            Already have account?
-            <a href="{% url 'login' %}">Login</a>
-        </div>
-
+    <!-- Django Messages -->
+    {% if messages %}
+    <div class="messages-container">
+      {% for message in messages %}
+      <div class="msg-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
     </div>
+    {% endif %}
 
+    <form method="post" id="signupForm">
+      {% csrf_token %}
+
+      <!-- Non-field errors -->
+      {% if form.non_field_errors %}
+      <div class="form-errors">
+        {% for error in form.non_field_errors %}
+        <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="id_first_name">First Name</label>
+          {{ form.first_name }} {% if form.first_name.errors %}
+          <div class="form-errors">{{ form.first_name.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="form-field">
+          <label for="id_last_name">Last Name</label>
+          {{ form.last_name }} {% if form.last_name.errors %}
+          <div class="form-errors">{{ form.last_name.errors }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="id_gender">Gender</label>
+        {{ form.gender }} {% if form.gender.errors %}
+        <div class="form-errors">{{ form.gender.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-field">
+        <label for="id_email">Email</label>
+        {{ form.email }} {% if form.email.errors %}
+        <div class="form-errors">{{ form.email.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-field">
+        <label for="id_password1">Password</label>
+        {{ form.password1 }} {% if form.password1.errors %}
+        <div class="form-errors">{{ form.password1.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-field">
+        <label for="id_password2">Confirm Password</label>
+        {{ form.password2 }} {% if form.password2.errors %}
+        <div class="form-errors">{{ form.password2.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Role Selection -->
+      <div class="form-field">
+        <label for="id_role">Role</label>
+        {{ form.role }} {% if form.role.errors %}
+        <div class="form-errors">{{ form.role.errors }}</div>
+        {% endif %}
+        <div class="admin-request-note" id="adminNote">
+          🔒 Selecting Admin will send your request to a superadmin for
+          approval. You won't be able to login until approved.
+        </div>
+      </div>
+
+      <button type="submit" class="auth-btn">Create Account</button>
+    </form>
+
+    <p class="auth-footer">
+      Already have an account? <a href="{% url 'login' %}">Login here</a>
+    </p>
+  </div>
 </div>
 
+<script>
+  const roleSelect = document.getElementById("id_role");
+  const note = document.getElementById("adminNote");
+  if (roleSelect) {
+    roleSelect.addEventListener("change", function () {
+      note.classList.toggle("visible", this.value === "admin");
+    });
+    // Show note if Admin is pre-selected (e.g. on form re-render with error)
+    note.classList.toggle("visible", roleSelect.value === "admin");
+  }
+</script>
 {% endblock %}

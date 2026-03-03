@@ -1,114 +1,419 @@
-/* admindashboard.css */
+/* ============================================
+   admin_dashboard.css  —  Admin Dashboard Page
+   ============================================ */
 
-.admin-dashboard-card {
-    max-width: 600px;
-    margin: 0 auto;
-    margin-top: 20px;
-    border-top: 4px solid #ef4444;
+/* ── Page wrapper ── */
+.adm-page {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.admin-dashboard-header {
-    border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* ─────────────────────────────────────────────
+   PAGE HEADER
+───────────────────────────────────────────── */
+.adm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  background: #0F172A;
+  border-radius: 16px;
+  padding: 24px 32px;
+  gap: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.admin-dashboard-title {
-    font-size: 24px;
-    color: #0f172a;
-    margin-bottom: 5px;
+.adm-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-.admin-dashboard-subtitle {
-    color: #64748b;
-    font-size: 14px;
+.adm-header-icon {
+  width: 52px;
+  height: 52px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
 }
 
-.admin-avatar {
-    background: #ef4444;
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    font-size: 18px;
+.adm-header-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px;
 }
 
-.admin-profile-info {
-    display: flex;
+.adm-header-sub {
+  font-size: 0.875rem;
+  color: #CBD5E1;
+  margin: 0;
+}
+
+.adm-live-badge {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ─────────────────────────────────────────────
+   STATS GRID
+───────────────────────────────────────────── */
+.adm-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.adm-stat-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-left: 4px solid transparent;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.adm-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.adm-stat-blue   { border-left-color: #3B82F6; }
+.adm-stat-green  { border-left-color: #10B981; }
+.adm-stat-orange { border-left-color: #F59E0B; }
+.adm-stat-purple { border-left-color: #6366F1; }
+
+.adm-stat-icon {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.adm-stat-blue   .adm-stat-icon { background: #EFF6FF; color: #3B82F6; }
+.adm-stat-green  .adm-stat-icon { background: #ECFDF5; color: #10B981; }
+.adm-stat-orange .adm-stat-icon { background: #FFFBEB; color: #F59E0B; }
+.adm-stat-purple .adm-stat-icon { background: #EEF2FF; color: #6366F1; }
+
+.adm-stat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.adm-stat-label {
+  font-size: 0.78rem;
+  color: #718096;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.adm-stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1E293B;
+  line-height: 1;
+}
+
+/* ─────────────────────────────────────────────
+   MAIN CONTENT GRID — 2 columns
+───────────────────────────────────────────── */
+.adm-content-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ─────────────────────────────────────────────
+   CARD BASE
+───────────────────────────────────────────── */
+.adm-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+}
+
+.adm-card-header {
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.adm-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────────
+   PROFILE CARD (left column)
+───────────────────────────────────────────── */
+.adm-profile-card {
+  text-align: center;
+}
+
+.adm-profile-avatar-wrap {
+  padding: 24px 20px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.adm-avatar-img,
+.adm-avatar-initials {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid #e2e8f0;
+}
+
+.adm-avatar-img {
+  background-size: cover;
+  background-position: center;
+}
+
+.adm-avatar-initials {
+  background: #3B82F6;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.adm-role-badge {
+  background: #3B82F6;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.adm-profile-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1E293B;
+  padding: 0 20px 2px;
+}
+
+.adm-profile-email {
+  font-size: 0.82rem;
+  color: #64748B;
+  padding: 0 20px 16px;
+}
+
+.adm-divider {
+  height: 1px;
+  background: #edf2f7;
+  margin: 0 0 8px;
+}
+
+/* ── Info rows inside profile card ── */
+.adm-info-list {
+  padding: 8px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.adm-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #f7fafc;
+  border-radius: 8px;
+}
+
+.adm-info-label {
+  font-size: 0.82rem;
+  color: #4a5568;
+  font-weight: 600;
+}
+
+/* ── Badges ── */
+.adm-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.adm-badge-blue   { background: #ebf8ff; color: #2b6cb0; }
+.adm-badge-green  { background: #f0fff4; color: #276749; }
+.adm-badge-red    { background: #fff5f5; color: #9b2c2c; }
+
+/* ─────────────────────────────────────────────
+   RIGHT COLUMN
+───────────────────────────────────────────── */
+.adm-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Quick Actions Grid ── */
+.adm-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 16px 20px 20px;
+}
+
+.adm-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  border: 1.5px solid transparent;
+}
+
+.adm-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.adm-action-icon  { font-size: 1.2rem; }
+.adm-action-label { flex: 1; display: flex; align-items: center; gap: 6px; }
+.adm-action-arrow { font-size: 1rem; opacity: 0.5; }
+
+.adm-action-blue   { background: #EFF6FF; border-color: #BFDBFE; color: #3B82F6; }
+.adm-action-green  { background: #ECFDF5; border-color: #A7F3D0; color: #10B981; }
+.adm-action-orange { background: #FFFBEB; border-color: #FDE68A; color: #F59E0B; }
+.adm-action-purple { background: #EEF2FF; border-color: #C7D2FE; color: #6366F1; }
+.adm-action-teal   { background: #F0FDFA; border-color: #99F6E4; color: #14B8A6; }
+.adm-action-red    { background: #FEF2F2; border-color: #FECACA; color: #EF4444; }
+
+/* Badge inside action button (for pending count) */
+.adm-action-badge {
+  background: #e53e3e;
+  color: #fff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+
+
+.adm-system-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 16px 20px 20px;
+}
+
+.adm-system-item {
+  background: #f7fafc;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.adm-system-label {
+  font-size: 0.72rem;
+  color: #718096;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.adm-system-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.adm-system-orange { color: #c05621; }
+
+.adm-system-link {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #3B82F6;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.adm-system-link:hover {
+  color: #2563EB;
+}
+
+/* ─────────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .adm-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .adm-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .adm-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .adm-page {
+    padding: 16px;
+  }
+
+  .adm-header {
     flex-direction: column;
-    gap: 15px;
-}
+    align-items: flex-start;
+    padding: 20px;
+  }
 
-.admin-info-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background: #f8fafc;
-    border-radius: 6px;
-}
-
-.admin-info-label {
-    font-weight: 600;
-    color: #475569;
-}
-
-.admin-info-value {
-    color: #0f172a;
-}
-
-.badge-admin-role {
-    background: #ef4444;
-    color: white;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.badge-success {
-    color: #10b981;
-    font-weight: 600;
-}
-
-.badge-danger {
-    color: #ef4444;
-    font-weight: 600;
-}
-
-.admin-actions-title {
-    margin-top: 30px;
-    margin-bottom: 15px;
-    font-size: 16px;
-    color: #334155;
-}
-
-.admin-actions-grid {
-    display: grid;
+  .adm-stats-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
+  }
 
-.admin-action-btn {
-    padding: 15px;
-    background: #f1f5f9;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    text-decoration: none;
-    color: #0f172a;
-    text-align: center;
-    font-weight: 500;
-    transition: background 0.2s;
-}
+  .adm-actions-grid {
+    grid-template-columns: 1fr;
+  }
 
-.admin-action-btn:hover {
-    background: #e2e8f0;
+  .adm-system-grid {
+    grid-template-columns: 1fr;
+  }
 }

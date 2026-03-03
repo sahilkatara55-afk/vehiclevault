@@ -1,42 +1,172 @@
-{% extends 'base.html' %} {% load static %} {% block title %}Admin Dashboard |
-VehicleVault{% endblock %} {% block css %}
-<link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}" />
-{% endblock %} {% block content %}
-<div class="card admin-dashboard-card">
-  <div class="admin-dashboard-header">
-    <div>
-      <h1 class="admin-dashboard-title">Admin Dashboard</h1>
-      <p class="admin-dashboard-subtitle">System Management & Overview</p>
-    </div>
-    <div class="admin-avatar">A</div>
-  </div>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Admin Dashboard | VehicleVault{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=1" />
+{% endblock %}
+{% block content %}
+<div class="adm-page">
 
-  <div class="admin-profile-info">
-    <div class="admin-info-row">
-      <span class="admin-info-label">Admin Email</span>
-      <span class="admin-info-value">{{ request.user.email }}</span>
+  <div class="adm-header">
+    <div class="adm-header-left">
+      <div class="adm-header-icon">🛡️</div>
+      <div>
+        <h1 class="adm-header-title">Admin Dashboard</h1>
+        <p class="adm-header-sub">Welcome back, {{ request.user.first_name|default:request.user.email }} — System Management &amp; Overview</p>
+      </div>
     </div>
-
-    <div class="admin-info-row">
-      <span class="admin-info-label">Assigned Role</span>
-      <span class="badge-admin-role">{{ request.user.role }}</span>
-    </div>
-
-    <div class="admin-info-row">
-      <span class="admin-info-label">Superuser Permissions</span>
-      {% if request.user.is_superuser %}
-      <span class="badge-success">Granted</span>
-      {% else %}
-      <span class="badge-danger">Denied</span>
-      {% endif %}
+    <div class="adm-header-right">
+      <span class="adm-live-badge">● Live</span>
     </div>
   </div>
 
-  <!-- Quick Stats Mockup -->
-  <h3 class="admin-actions-title">Quick Actions</h3>
-  <div class="admin-actions-grid">
-    <a href="/admin/" class="admin-action-btn"> Manage Users </a>
-    <a href="/admin/" class="admin-action-btn"> Manage Vehicles </a>
+  <div class="adm-stats-grid">
+    <div class="adm-stat-card adm-stat-blue">
+      <div class="adm-stat-icon">👥</div>
+      <div class="adm-stat-info">
+        <span class="adm-stat-label">Total Users</span>
+        <span class="adm-stat-value">—</span>
+      </div>
+    </div>
+    <div class="adm-stat-card adm-stat-green">
+      <div class="adm-stat-icon">🚗</div>
+      <div class="adm-stat-info">
+        <span class="adm-stat-label">Total Vehicles</span>
+        <span class="adm-stat-value">—</span>
+      </div>
+    </div>
+    <div class="adm-stat-card adm-stat-orange">
+      <div class="adm-stat-icon">⏳</div>
+      <div class="adm-stat-info">
+        <span class="adm-stat-label">Pending Requests</span>
+        <span class="adm-stat-value">{{ pending_count }}</span>
+      </div>
+    </div>
+    <div class="adm-stat-card adm-stat-purple">
+      <div class="adm-stat-icon">📄</div>
+      <div class="adm-stat-info">
+        <span class="adm-stat-label">Documents</span>
+        <span class="adm-stat-value">—</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="adm-content-grid">
+
+    <div class="adm-card adm-profile-card">
+      <div class="adm-card-header">
+        <h2 class="adm-card-title">Admin Profile</h2>
+      </div>
+      <div class="adm-profile-avatar-wrap">
+        {% if request.user.profile_picture %}
+        <div class="adm-avatar-img" style="background-image: url('{{ request.user.profile_picture.url }}');"></div>
+        {% else %}
+        <div class="adm-avatar-initials">{{ request.user.email|make_list|first|upper }}</div>
+        {% endif %}
+        {% if request.user.is_superuser %}
+        <span class="adm-role-badge">Super Admin</span>
+        {% else %}
+        <span class="adm-role-badge">Admin</span>
+        {% endif %}
+      </div>
+      <div class="adm-profile-name">{{ request.user.first_name|default:"" }} {{ request.user.last_name|default:"" }}</div>
+      <div class="adm-profile-email">{{ request.user.email }}</div>
+      <div class="adm-divider"></div>
+      <div class="adm-info-list">
+        <div class="adm-info-row">
+          <span class="adm-info-label">Role</span>
+          <span class="adm-badge adm-badge-blue">{{ request.user.role|upper|default:"ADMIN" }}</span>
+        </div>
+        <div class="adm-info-row">
+          <span class="adm-info-label">Superuser</span>
+          {% if request.user.is_superuser %}
+          <span class="adm-badge adm-badge-green">✓ Granted</span>
+          {% else %}
+          <span class="adm-badge adm-badge-red">✗ Not Granted</span>
+          {% endif %}
+        </div>
+        <div class="adm-info-row">
+          <span class="adm-info-label">Staff Status</span>
+          {% if request.user.is_staff %}
+          <span class="adm-badge adm-badge-green">✓ Active</span>
+          {% else %}
+          <span class="adm-badge adm-badge-red">✗ Inactive</span>
+          {% endif %}
+        </div>
+        <div class="adm-info-row">
+          <span class="adm-info-label">Account Status</span>
+          <span class="adm-badge adm-badge-green">✓ Active</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="adm-right-col">
+
+      <div class="adm-card">
+        <div class="adm-card-header">
+          <h2 class="adm-card-title">Quick Actions</h2>
+        </div>
+        <div class="adm-actions-grid">
+          <a href="/admin/" class="adm-action-btn adm-action-blue">
+            <span class="adm-action-icon">👤</span>
+            <span class="adm-action-label">Manage Users</span>
+            <span class="adm-action-arrow">→</span>
+          </a>
+          <a href="/admin/" class="adm-action-btn adm-action-green">
+            <span class="adm-action-icon">🚗</span>
+            <span class="adm-action-label">Manage Vehicles</span>
+            <span class="adm-action-arrow">→</span>
+          </a>
+          <a href="{% url 'admin_requests_list' %}" class="adm-action-btn adm-action-orange">
+            <span class="adm-action-icon">📋</span>
+            <span class="adm-action-label">Admin Requests
+              {% if pending_count > 0 %}<span class="adm-action-badge">{{ pending_count }}</span>{% endif %}
+            </span>
+            <span class="adm-action-arrow">→</span>
+          </a>
+          <a href="/admin/" class="adm-action-btn adm-action-purple">
+            <span class="adm-action-icon">📊</span>
+            <span class="adm-action-label">View Reports</span>
+            <span class="adm-action-arrow">→</span>
+          </a>
+          <a href="/admin/" class="adm-action-btn adm-action-teal">
+            <span class="adm-action-icon">📄</span>
+            <span class="adm-action-label">Documents</span>
+            <span class="adm-action-arrow">→</span>
+          </a>
+          <a href="/admin/" class="adm-action-btn adm-action-red">
+            <span class="adm-action-icon">⚙️</span>
+            <span class="adm-action-label">System Settings</span>
+            <span class="adm-action-arrow">→</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="adm-card">
+        <div class="adm-card-header">
+          <h2 class="adm-card-title">System Info</h2>
+        </div>
+        <div class="adm-system-grid">
+          <div class="adm-system-item">
+            <span class="adm-system-label">Platform</span>
+            <span class="adm-system-value">VehicleVault v1.0</span>
+          </div>
+          <div class="adm-system-item">
+            <span class="adm-system-label">Framework</span>
+            <span class="adm-system-value">Django</span>
+          </div>
+          <div class="adm-system-item">
+            <span class="adm-system-label">Pending Requests</span>
+            <span class="adm-system-value adm-system-orange">{{ pending_count }} pending</span>
+          </div>
+          <div class="adm-system-item">
+            <span class="adm-system-label">Admin Panel</span>
+            <a href="/admin/" class="adm-system-link">Open Django Admin →</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
 {% endblock %}

@@ -1,2 +1,2 @@
 <h1>User Dashboard</h1>
-<p>Welcome {{ request.user.username }}</p>
+<p>Welcome {{ request.user.first_name|default:request.user.email }}</p>
