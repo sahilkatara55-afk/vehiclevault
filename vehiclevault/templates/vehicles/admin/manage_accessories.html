@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Manage Accessories | VehicleVault Admin{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}?v=9" />
+  <link rel="stylesheet" href="{% static 'css/manage_cars.css' %}?v=1" />
+{% endblock %}
+
+{% block content %}
+<div class="sidebar-overlay" onclick="toggleSidebar(event)"></div>
+<aside class="uv-sidebar">
+  <div class="uv-sidebar-menu">
+    <a href="{% url 'admin_dashboard' %}" class="uv-nav-link"><span>🏠</span> Dashboard</a>
+    <a href="{% url 'manage_cars' %}" class="uv-nav-link"><span>🚗</span> Manage Cars</a>
+    <a href="{% url 'manage_users' %}" class="uv-nav-link"><span>👥</span> Manage Users</a>
+    <a href="{% url 'manage_accessories' %}" class="uv-nav-link active"><span>🔧</span> Accessories</a>
+    <a href="{% url 'admin_notifications' %}" class="uv-nav-link"><span>🔔</span> Notifications</a>
+    <a href="{% url 'admin_reports' %}" class="uv-nav-link"><span>📊</span> Reports</a>
+    <a href="{% url 'admin_settings' %}" class="uv-nav-link"><span>⚙️</span> Settings</a>
+  </div>
+</aside>
+
+<div class="admin-main">
+  <div class="mc-page">
+
+    <div class="mc-header">
+      <div class="mc-header-left">
+        <div class="mc-header-icon">🔧</div>
+        <div>
+          <h1 class="mc-title">Manage Accessories</h1>
+          <p class="mc-subtitle">Add, edit and delete accessories</p>
+        </div>
+      </div>
+      <button class="mc-btn mc-btn-primary" onclick="openAddModal()">+ Add Accessory</button>
+    </div>
+
+    {% if messages %}
+    <div class="mc-alerts">
+      {% for msg in messages %}
+      <div class="mc-alert mc-alert-{{ msg.tags }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="mc-card">
+      <div class="mc-card-header">
+        <h2 class="mc-card-title">All Accessories <span class="mc-badge">{{ accessories|length }}</span></h2>
+      </div>
+      <div class="mc-table-wrap">
+        {% if accessories %}
+        <table class="mc-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Compatible Car</th>
+              <th>Price (₹)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for acc in accessories %}
+            <tr>
+              <td class="mc-td-num">{{ forloop.counter }}</td>
+              <td>
+                {% if acc.image %}
+                  <img src="{{ acc.image.url }}" class="mc-car-thumb" alt="{{ acc.name }}">
+                {% else %}
+                  <div class="mc-no-img">🔧</div>
+                {% endif %}
+              </td>
+              <td><div class="mc-car-name">{{ acc.name }}</div></td>
+              <td>{{ acc.compatible_car|default:"—" }}</td>
+              <td class="mc-price">₹{{ acc.price|floatformat:0 }}</td>
+              <td>
+                <div class="mc-actions">
+                  <button class="mc-btn mc-btn-edit"
+                    onclick="openEditModal({{ acc.pk }}, '{{ acc.name|escapejs }}', '{{ acc.compatible_car|escapejs }}', '{{ acc.price }}', `{{ acc.description|default:''|escapejs }}`)">
+                    ✏️ Edit
+                  </button>
+                  <form method="post" action="{% url 'accessory_delete' acc.pk %}" style="display:inline;"
+                        onsubmit="return confirm('Delete {{ acc.name }}?')">
+                    {% csrf_token %}
+                    <button type="submit" class="mc-btn mc-btn-delete">🗑 Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="mc-empty">
+          <div class="mc-empty-icon">🔧</div>
+          <p>No accessories found. Add your first accessory!</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="mc-modal-overlay" id="addModal">
+  <div class="mc-modal">
+    <div class="mc-modal-header">
+      <h3>Add New Accessory</h3>
+      <button class="mc-modal-close" onclick="closeModal('addModal')">✕</button>
+    </div>
+    <form method="post" action="{% url 'accessory_add' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mc-modal-body">
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Accessory Name</label>
+            <input type="text" name="name" placeholder="e.g. Car Seat Cover" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Compatible Car</label>
+            <input type="text" name="compatible_car" placeholder="e.g. Tata Nexon">
+          </div>
+        </div>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Price (₹)</label>
+            <input type="number" name="price" placeholder="e.g. 2500" step="1" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Image</label>
+            <input type="file" name="image" accept="image/*">
+          </div>
+        </div>
+        <div class="mc-form-row">
+          <div class="mc-form-group" style="flex:1;">
+            <label>Description</label>
+            <textarea name="description" rows="2" style="width:100%;padding:8px;border:1.5px solid #E2E8F0;border-radius:8px;font-family:inherit;font-size:0.9rem;" placeholder="Short description..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="mc-modal-footer">
+        <button type="button" class="mc-btn mc-btn-gray" onclick="closeModal('addModal')">Cancel</button>
+        <button type="submit" class="mc-btn mc-btn-primary">Save Accessory</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="mc-modal-overlay" id="editModal">
+  <div class="mc-modal">
+    <div class="mc-modal-header">
+      <h3>Edit Accessory</h3>
+      <button class="mc-modal-close" onclick="closeModal('editModal')">✕</button>
+    </div>
+    <form method="post" id="editForm" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mc-modal-body">
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Accessory Name</label>
+            <input type="text" name="name" id="edit_name" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Compatible Car</label>
+            <input type="text" name="compatible_car" id="edit_compatible">
+          </div>
+        </div>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Price (₹)</label>
+            <input type="number" name="price" id="edit_price" step="1" required>
+          </div>
+          <div class="mc-form-group">
+            <label>New Image (optional)</label>
+            <input type="file" name="image" accept="image/*">
+          </div>
+        </div>
+        <div class="mc-form-row">
+          <div class="mc-form-group" style="flex:1;">
+            <label>Description</label>
+            <textarea name="description" id="edit_description" rows="2" style="width:100%;padding:8px;border:1.5px solid #E2E8F0;border-radius:8px;font-family:inherit;font-size:0.9rem;"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="mc-modal-footer">
+        <button type="button" class="mc-btn mc-btn-gray" onclick="closeModal('editModal')">Cancel</button>
+        <button type="submit" class="mc-btn mc-btn-primary">Update Accessory</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function openAddModal() { document.getElementById('addModal').classList.add('active'); }
+  function openEditModal(pk, name, compatible, price, description) {
+    const base = "{% url 'accessory_edit' 0 %}".replace('/0/', '/' + pk + '/');
+    document.getElementById('editForm').action = base;
+    document.getElementById('edit_name').value        = name;
+    document.getElementById('edit_compatible').value  = compatible;
+    document.getElementById('edit_price').value       = price;
+    document.getElementById('edit_description').value = description;
+    document.getElementById('editModal').classList.add('active');
+  }
+  function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+  document.querySelectorAll('.mc-modal-overlay').forEach(o => {
+    o.addEventListener('click', function(e){ if(e.target === o) o.classList.remove('active'); });
+  });
+</script>
+{% endblock %}

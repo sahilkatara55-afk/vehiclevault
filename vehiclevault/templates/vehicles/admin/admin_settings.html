@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Admin Settings | VehicleVault{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}?v=9" />
+  <link rel="stylesheet" href="{% static 'css/manage_cars.css' %}?v=1" />
+  <style>
+    .as-grid { display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px; }
+    .as-card { background:#fff;border-radius:14px;padding:28px;box-shadow:0 4px 14px rgba(0,0,0,.06); }
+    .as-card-title { font-size:1.08rem;font-weight:800;color:#0F172A;margin:0 0 20px;padding-bottom:12px;border-bottom:2px solid #EFF6FF; }
+    .as-label { font-size:.8rem;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px; }
+    .as-input { width:100%;padding:11px 14px;border:1.5px solid #E2E8F0;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.95rem;color:#1E293B;background:#F8FAFC;box-sizing:border-box;transition:border .2s; }
+    .as-input:focus { outline:none;border-color:#3B82F6;background:#fff; }
+    .as-btn { padding:12px 22px;background:#3B82F6;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:1rem;cursor:pointer;width:100%;margin-top:6px; }
+    .as-btn:hover { background:#2563EB; }
+    .as-btn-danger { background:#EF4444; }
+    .as-btn-danger:hover { background:#DC2626; }
+    .as-alert { padding:12px 16px;border-radius:8px;margin-bottom:16px;font-weight:600;color:#1E293B; }
+    .as-alert-success { background:#DCFCE7; }
+    .as-alert-error   { background:#FEE2E2; }
+    @media(max-width:700px){.as-grid{grid-template-columns:1fr;}}
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="sidebar-overlay" onclick="toggleSidebar(event)"></div>
+<aside class="uv-sidebar">
+  <div class="uv-sidebar-menu">
+    <a href="{% url 'admin_dashboard' %}" class="uv-nav-link"><span>🏠</span> Dashboard</a>
+    <a href="{% url 'manage_cars' %}" class="uv-nav-link"><span>🚗</span> Manage Cars</a>
+    <a href="{% url 'manage_users' %}" class="uv-nav-link"><span>👥</span> Manage Users</a>
+    <a href="{% url 'manage_accessories' %}" class="uv-nav-link"><span>🔧</span> Accessories</a>
+    <a href="{% url 'admin_notifications' %}" class="uv-nav-link"><span>🔔</span> Notifications</a>
+    <a href="{% url 'admin_reports' %}" class="uv-nav-link"><span>📊</span> Reports</a>
+    <a href="{% url 'admin_settings' %}" class="uv-nav-link active"><span>⚙️</span> Settings</a>
+  </div>
+</aside>
+
+<div class="admin-main">
+  <div class="mc-page">
+
+    <div class="mc-header" style="margin-bottom:24px;">
+      <div class="mc-header-left">
+        <div class="mc-header-icon">⚙️</div>
+        <div>
+          <h1 class="mc-title">Admin Settings</h1>
+          <p class="mc-subtitle">Manage your admin profile and account security</p>
+        </div>
+      </div>
+    </div>
+
+    {% if messages %}
+    <div class="mc-alerts">
+      {% for msg in messages %}
+      <div class="as-alert as-alert-{{ msg.tags }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="as-grid">
+
+      <!-- Profile Update -->
+      <div class="as-card">
+        <div class="as-card-title">👤 Profile Information</div>
+        <form method="POST" action="{% url 'admin_settings' %}" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="profile">
+
+          <div style="margin-bottom:14px;">
+            <label class="as-label">First Name</label>
+            <input type="text" name="first_name" class="as-input" value="{{ request.user.first_name|default:'' }}" placeholder="First Name">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label class="as-label">Last Name</label>
+            <input type="text" name="last_name" class="as-input" value="{{ request.user.last_name|default:'' }}" placeholder="Last Name">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label class="as-label">Email</label>
+            <input type="email" class="as-input" value="{{ request.user.email }}" disabled style="opacity:.6;" title="Email cannot be changed">
+            <small style="color:#94A3B8;font-size:.75rem;">Email cannot be changed.</small>
+          </div>
+          <div style="margin-bottom:14px;">
+            <label class="as-label">Profile Picture</label>
+            {% if request.user.profile_picture %}
+              <img src="{{ request.user.profile_picture.url }}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px;display:block;">
+            {% endif %}
+            <input type="file" name="profile_picture" class="as-input" accept="image/*">
+          </div>
+          <button type="submit" class="as-btn">💾 Save Changes</button>
+        </form>
+      </div>
+
+      <!-- Password Change -->
+      <div class="as-card">
+        <div class="as-card-title">🔐 Change Password</div>
+        <form method="POST" action="{% url 'admin_settings' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="password">
+          <div style="margin-bottom:14px;">
+            <label class="as-label">Current Password</label>
+            <input type="password" name="old_password" class="as-input" placeholder="Enter current password" required>
+          </div>
+          <div style="margin-bottom:14px;">
+            <label class="as-label">New Password</label>
+            <input type="password" name="new_password" class="as-input" placeholder="Min 6 characters" required>
+          </div>
+          <div style="margin-bottom:14px;">
+            <label class="as-label">Confirm New Password</label>
+            <input type="password" name="confirm_password" class="as-input" placeholder="Repeat new password" required>
+          </div>
+          <button type="submit" class="as-btn as-btn-danger">🔐 Change Password</button>
+        </form>
+
+        <div style="margin-top:28px;padding-top:20px;border-top:1px solid #F1F5F9;">
+          <div class="as-card-title" style="margin-bottom:10px;font-size:1rem;">🚪 Logout</div>
+          <p style="font-size:.88rem;color:#64748B;margin:0 0 12px;">Sign out from your admin account.</p>
+          <a href="{% url 'logout' %}" class="as-btn as-btn-danger" style="display:block;text-decoration:none;text-align:center;">Logout Now</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

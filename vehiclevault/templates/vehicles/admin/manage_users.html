@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}User Management | VehicleVault Admin{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}?v=9" />
+  <link rel="stylesheet" href="{% static 'css/manage_users.css' %}?v=1" />
+{% endblock %}
+
+{% block content %}
+<div class="sidebar-overlay" onclick="toggleSidebar(event)"></div>
+
+<!-- Admin Sidebar -->
+<aside class="uv-sidebar">
+  <div class="uv-sidebar-menu">
+    <a href="{% url 'admin_dashboard' %}" class="uv-nav-link"><span>🏠</span> Dashboard</a>
+    <a href="{% url 'manage_cars' %}" class="uv-nav-link"><span>🚗</span> Manage Cars</a>
+    <a href="{% url 'manage_users' %}" class="uv-nav-link active"><span>👥</span> Manage Users</a>
+    <a href="{% url 'manage_accessories' %}" class="uv-nav-link"><span>🔧</span> Accessories</a>
+    <a href="{% url 'admin_notifications' %}" class="uv-nav-link"><span>🔔</span> Notifications</a>
+    <a href="{% url 'admin_reports' %}" class="uv-nav-link"><span>📊</span> Reports</a>
+    <a href="{% url 'admin_settings' %}" class="uv-nav-link"><span>⚙️</span> Settings</a>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<div class="admin-main">
+  <div class="mu-page">
+
+    <!-- Page Header -->
+    <div class="mu-header">
+      <div class="mu-header-left">
+        <div class="mu-header-icon">👥</div>
+        <div>
+          <h1 class="mu-title">User Management</h1>
+          <p class="mu-subtitle">View, block and manage registered users</p>
+        </div>
+      </div>
+      <!-- Search Bar -->
+      <form method="get" class="mu-search-form" action="{% url 'manage_users' %}">
+        <div class="mu-search-wrap">
+          <span class="mu-search-icon">🔍</span>
+          <input type="text" name="q" value="{{ q }}" placeholder="Search by name or email..." class="mu-search-input">
+          {% if q %}<a href="{% url 'manage_users' %}" class="mu-search-clear">✕</a>{% endif %}
+        </div>
+        <button type="submit" class="mu-btn mu-btn-primary">Search</button>
+      </form>
+    </div>
+
+    <!-- Flash Messages -->
+    {% if messages %}
+    <div class="mu-alerts">
+      {% for msg in messages %}
+      <div class="mu-alert mu-alert-{{ msg.tags }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Stats Row -->
+    <div class="mu-stats-row">
+      <div class="mu-stat">
+        <span class="mu-stat-icon">👥</span>
+        <div>
+          <div class="mu-stat-val">{{ users|length }}</div>
+          <div class="mu-stat-label">{{ q|yesno:"Matching,Total" }} Users</div>
+        </div>
+      </div>
+      <div class="mu-stat mu-stat-green">
+        <span class="mu-stat-icon">✅</span>
+        <div>
+          <div class="mu-stat-val">{{ users|length }}</div>
+          <div class="mu-stat-label">Active Accounts</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="mu-card">
+      <div class="mu-card-header">
+        <h2 class="mu-card-title">Registered Users
+          {% if q %}<span class="mu-card-sub">— results for "{{ q }}"</span>{% endif %}
+        </h2>
+      </div>
+      <div class="mu-table-wrap">
+        {% if users %}
+        <table class="mu-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>User</th>
+              <th>Email</th>
+              <th>Joined</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td class="mu-td-num">{{ user.pk }}</td>
+              <td>
+                <div class="mu-user-cell">
+                  <div class="mu-avatar">
+                    {% if user.profile_picture %}
+                      <img src="{{ user.profile_picture.url }}" alt="{{ user.email }}">
+                    {% else %}
+                      {{ user.email|make_list|first|upper }}
+                    {% endif %}
+                  </div>
+                  <div>
+                    <div class="mu-user-name">{{ user.first_name|default:"—" }} {{ user.last_name|default:"" }}</div>
+                    <div class="mu-user-id">ID #{{ user.pk }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="mu-email">{{ user.email }}</td>
+              <td class="mu-date">{{ user.created_at|date:"d M Y" }}</td>
+              <td>
+                <span class="mu-role-badge mu-role-{{ user.role }}">{{ user.role|capfirst }}</span>
+              </td>
+              <td>
+                {% if user.is_active %}
+                  <span class="mu-status mu-status-active">● Active</span>
+                {% else %}
+                  <span class="mu-status mu-status-blocked">● Blocked</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="mu-actions">
+                  <!-- Block / Unblock -->
+                  <form method="post" action="{% url 'user_toggle_block' user.pk %}" style="display:inline;">
+                    {% csrf_token %}
+                    {% if user.is_active %}
+                      <button type="submit" class="mu-btn mu-btn-warn" title="Block this user">🚫 Block</button>
+                    {% else %}
+                      <button type="submit" class="mu-btn mu-btn-success" title="Unblock this user">✅ Unblock</button>
+                    {% endif %}
+                  </form>
+                  <!-- Delete -->
+                  <form method="post" action="{% url 'user_delete_admin' user.pk %}" style="display:inline;"
+                        onsubmit="return confirm('Permanently delete {{ user.email }}?')">
+                    {% csrf_token %}
+                    <button type="submit" class="mu-btn mu-btn-delete">🗑 Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="mu-empty">
+          <div class="mu-empty-icon">👥</div>
+          <p>{% if q %}No users match "{{ q }}". <a href="{% url 'manage_users' %}">Clear search</a>{% else %}No registered users found.{% endif %}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

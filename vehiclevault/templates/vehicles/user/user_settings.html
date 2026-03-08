@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Settings | VehicleVault{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}?v=9" />
+  <style>
+    .settings-page { min-height: 100vh; background: #F1F5F9; padding: 32px 24px; font-family: 'Outfit', sans-serif; }
+    .settings-inner { max-width: 900px; margin: 0 auto; }
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; }
+    .settings-card { background: #fff; border-radius: 14px; padding: 28px; box-shadow: 0 4px 16px rgba(0,0,0,.06); }
+    .settings-card-title { font-size: 1.1rem; font-weight: 800; color: #0F172A; margin: 0 0 20px; border-bottom: 2px solid #EFF6FF; padding-bottom: 12px; }
+    .settings-form { display: flex; flex-direction: column; gap: 14px; }
+    .settings-label { font-size: 0.82rem; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px; }
+    .settings-input {
+      width: 100%; padding: 11px 14px; border: 1.5px solid #E2E8F0; border-radius: 8px;
+      font-family: 'Outfit', sans-serif; font-size: 0.95rem; color: #1E293B;
+      background: #F8FAFC; box-sizing: border-box; transition: border 0.2s;
+    }
+    .settings-input:focus { outline: none; border-color: #3B82F6; background: #fff; }
+    .settings-btn { padding: 12px 24px; background: #3B82F6; color: #fff; border: none;
+      border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
+    .settings-btn:hover { background: #2563EB; }
+    .settings-btn-danger { background: #EF4444; }
+    .settings-btn-danger:hover { background: #DC2626; }
+    .alert-box { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-weight: 600; color: #1E293B; }
+    .alert-success { background: #DCFCE7; }
+    .alert-error { background: #FEE2E2; }
+    @media (max-width: 700px) { .settings-grid { grid-template-columns: 1fr; } }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="sidebar-overlay" onclick="toggleSidebar(event)"></div>
+<aside class="uv-sidebar">
+  <div class="uv-sidebar-menu">
+    <a href="{% url 'user_dashboard' %}" class="uv-nav-link"><span>🏠</span> Dashboard</a>
+    <a href="{% url 'compare_history' %}" class="uv-nav-link"><span>🚗</span> Compare History</a>
+    <a href="{% url 'favorites' %}" class="uv-nav-link"><span>❤️</span> Favorites</a>
+    <a href="{% url 'recently_viewed' %}" class="uv-nav-link"><span>🔍</span> Recently Viewed</a>
+    <a href="{% url 'documents_reminders' %}" class="uv-nav-link"><span>📂</span> Documents</a>
+    <a href="{% url 'user_settings' %}" class="uv-nav-link active"><span>⚙️</span> Settings</a>
+    <a href="{% url 'my_account' %}" class="uv-nav-link"><span>👤</span> My Account</a>
+  </div>
+</aside>
+
+<div class="settings-page">
+  <div class="settings-inner">
+
+    <div style="margin-bottom:8px;">
+      <a href="{% url 'my_account' %}" style="color:#3B82F6;text-decoration:none;font-weight:600;">← My Account</a>
+    </div>
+    <h1 style="font-size:2rem;font-weight:800;color:#0F172A;margin:0 0 4px;">⚙️ Settings</h1>
+    <p style="color:#64748B;margin:0 0 4px;">Manage your profile and account security.</p>
+
+    {% if messages %}
+      {% for msg in messages %}
+      <div class="alert-box {% if msg.tags == 'error' %}alert-error{% else %}alert-success{% endif %}" style="margin-top:16px;">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="settings-grid">
+
+      <!-- ── Profile Update ── -->
+      <div class="settings-card">
+        <div class="settings-card-title">👤 Profile Information</div>
+        <form method="POST" action="{% url 'user_settings' %}" enctype="multipart/form-data" class="settings-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="profile">
+
+          <div>
+            <label class="settings-label">First Name</label>
+            <input type="text" name="first_name" class="settings-input" value="{{ request.user.first_name|default:'' }}" placeholder="First Name">
+          </div>
+          <div>
+            <label class="settings-label">Last Name</label>
+            <input type="text" name="last_name" class="settings-input" value="{{ request.user.last_name|default:'' }}" placeholder="Last Name">
+          </div>
+          <div>
+            <label class="settings-label">Email</label>
+            <input type="email" class="settings-input" value="{{ request.user.email }}" disabled style="opacity:0.6;" title="Email cannot be changed here">
+            <small style="color:#94A3B8;font-size:0.78rem;">Email cannot be changed.</small>
+          </div>
+          <div>
+            <label class="settings-label">Profile Picture</label>
+            {% if request.user.profile_picture %}
+              <img src="{{ request.user.profile_picture.url }}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px;display:block;">
+            {% endif %}
+            <input type="file" name="profile_picture" class="settings-input" accept="image/*">
+          </div>
+          <button type="submit" class="settings-btn">💾 Save Changes</button>
+        </form>
+      </div>
+
+      <!-- ── Password Change ── -->
+      <div class="settings-card">
+        <div class="settings-card-title">🔐 Change Password</div>
+        <form method="POST" action="{% url 'user_settings' %}" class="settings-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="password">
+
+          <div>
+            <label class="settings-label">Current Password</label>
+            <input type="password" name="old_password" class="settings-input" placeholder="Enter current password" required>
+          </div>
+          <div>
+            <label class="settings-label">New Password</label>
+            <input type="password" name="new_password" class="settings-input" placeholder="Min 6 characters" required>
+          </div>
+          <div>
+            <label class="settings-label">Confirm New Password</label>
+            <input type="password" name="confirm_password" class="settings-input" placeholder="Repeat new password" required>
+          </div>
+
+          <button type="submit" class="settings-btn settings-btn-danger" style="margin-top:8px;">🔐 Change Password</button>
+        </form>
+
+        <div style="margin-top:28px;padding-top:20px;border-top:1px solid #F1F5F9;">
+          <div class="settings-card-title" style="margin-bottom:12px;font-size:1rem;">🚪 Logout</div>
+          <p style="font-size:0.88rem;color:#64748B;margin:0 0 12px;">Sign out from your account on this device.</p>
+          <a href="{% url 'logout' %}" class="settings-btn settings-btn-danger" style="display:inline-block;text-decoration:none;text-align:center;">Logout Now</a>
+        </div>
+      </div>
+
+    </div><!-- end grid -->
+  </div>
+</div>
+{% endblock %}

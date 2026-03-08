@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Car Brands | VehicleVault{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}?v=9" />
+  <link rel="stylesheet" href="{% static 'css/cars.css' %}?v=1" />
+{% endblock %}
+
+{% block content %}
+
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" onclick="toggleSidebar(event)"></div>
+  <aside class="uv-sidebar">
+    <div class="uv-sidebar-menu">
+      {% if user.is_authenticated %}
+        <a href="{% url 'user_dashboard' %}" class="uv-nav-link"><span>🏠</span> Dashboard</a>
+        <a href="{% url 'search_cars' %}" class="uv-nav-link"><span>🔍</span> Search Cars</a>
+        <a href="{% url 'brands' %}" class="uv-nav-link active"><span>🏷️</span> Brands</a>
+        <a href="{% url 'compare_cars' %}" class="uv-nav-link"><span>⚖️</span> Compare</a>
+        <a href="{% url 'my_account' %}" class="uv-nav-link"><span>⚙️</span> My Account</a>
+      {% else %}
+        <a href="{% url 'search_cars' %}" class="uv-nav-link"><span>🔍</span> Search Cars</a>
+        <a href="{% url 'brands' %}" class="uv-nav-link active"><span>🏷️</span> Brands</a>
+        <a href="{% url 'compare_cars' %}" class="uv-nav-link"><span>⚖️</span> Compare</a>
+        <a href="{% url 'login' %}" class="uv-nav-link"><span>🔑</span> Login</a>
+      {% endif %}
+    </div>
+  </aside>
+
+  <div class="cars-page">
+    <div class="cars-inner">
+
+      <!-- Page Header -->
+      <div class="cars-page-header">
+        <h1 class="cars-page-title">🏷️ Car Brands</h1>
+        <p class="cars-page-subtitle">Explore all available car brands in our database. Click a brand to see its cars.</p>
+      </div>
+
+      {% if brands_data %}
+      <div class="brands-grid">
+        {% for brand in brands_data %}
+        <a href="{% url 'brand_cars' brand.make %}" class="brand-card">
+          <div class="brand-emoji">🚗</div>
+          <div class="brand-name">{{ brand.make }}</div>
+          <div class="brand-count">{{ brand.car_count }} car{{ brand.car_count|pluralize }}</div>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state" style="padding: 80px 24px;">
+        <div class="empty-state-icon">🏷️</div>
+        <h3>No Brands Yet</h3>
+        <p>Cars will appear here once added by an admin.</p>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Search Cars | VehicleVault{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}?v=9" />
+  <link rel="stylesheet" href="{% static 'css/cars.css' %}?v=1" />
+{% endblock %}
+
+{% block content %}
+
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" onclick="toggleSidebar(event)"></div>
+  <aside class="uv-sidebar">
+    <div class="uv-sidebar-menu">
+      {% if user.is_authenticated %}
+        <a href="{% url 'user_dashboard' %}" class="uv-nav-link"><span>🏠</span> Dashboard</a>
+        <a href="{% url 'search_cars' %}" class="uv-nav-link active"><span>🔍</span> Search Cars</a>
+        <a href="{% url 'brands' %}" class="uv-nav-link"><span>🏷️</span> Brands</a>
+        <a href="{% url 'compare_cars' %}" class="uv-nav-link"><span>⚖️</span> Compare</a>
+        <a href="{% url 'my_account' %}" class="uv-nav-link"><span>⚙️</span> My Account</a>
+      {% else %}
+        <a href="{% url 'search_cars' %}" class="uv-nav-link active"><span>🔍</span> Search Cars</a>
+        <a href="{% url 'brands' %}" class="uv-nav-link"><span>🏷️</span> Brands</a>
+        <a href="{% url 'compare_cars' %}" class="uv-nav-link"><span>⚖️</span> Compare</a>
+        <a href="{% url 'login' %}" class="uv-nav-link"><span>🔑</span> Login</a>
+      {% endif %}
+    </div>
+  </aside>
+
+  <div class="cars-page">
+    <div class="cars-inner">
+
+      <!-- Page Header -->
+      <div class="cars-page-header">
+        <h1 class="cars-page-title">🔍 Search Cars</h1>
+        <p class="cars-page-subtitle">Find your perfect car by brand, price, fuel type, and more.</p>
+      </div>
+
+      <div class="search-layout">
+
+        <!-- Filter Panel -->
+        <form method="GET" action="{% url 'search_cars' %}">
+          <aside class="filter-panel">
+            <div class="filter-title">🎛️ Filters</div>
+
+            <!-- Search -->
+            <div class="filter-group">
+              <label class="filter-label">Keyword</label>
+              <input type="text" name="q" class="filter-input" placeholder="e.g. Creta, Swift…" value="{{ query }}">
+            </div>
+
+            <!-- Brand -->
+            <div class="filter-group">
+              <label class="filter-label">Brand</label>
+              <select name="brand" class="filter-select">
+                <option value="">All Brands</option>
+                {% for b in brands %}
+                  <option value="{{ b }}" {% if b == selected_brand %}selected{% endif %}>{{ b }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Fuel Type -->
+            <div class="filter-group">
+              <label class="filter-label">Fuel Type</label>
+              <select name="fuel" class="filter-select">
+                <option value="">All Fuels</option>
+                <option value="petrol" {% if selected_fuel == 'petrol' %}selected{% endif %}>Petrol</option>
+                <option value="diesel" {% if selected_fuel == 'diesel' %}selected{% endif %}>Diesel</option>
+                <option value="electric" {% if selected_fuel == 'electric' %}selected{% endif %}>Electric</option>
+                <option value="hybrid" {% if selected_fuel == 'hybrid' %}selected{% endif %}>Hybrid</option>
+                <option value="cng" {% if selected_fuel == 'cng' %}selected{% endif %}>CNG</option>
+              </select>
+            </div>
+
+            <!-- Transmission -->
+            <div class="filter-group">
+              <label class="filter-label">Transmission</label>
+              <select name="transmission" class="filter-select">
+                <option value="">All</option>
+                <option value="manual" {% if selected_transmission == 'manual' %}selected{% endif %}>Manual</option>
+                <option value="automatic" {% if selected_transmission == 'automatic' %}selected{% endif %}>Automatic</option>
+              </select>
+            </div>
+
+            <!-- Price Range -->
+            <div class="filter-group">
+              <label class="filter-label">Price Range (₹)</label>
+              <div class="price-range-row">
+                <input type="number" name="price_min" class="filter-input" placeholder="Min" value="{{ price_min }}">
+                <input type="number" name="price_max" class="filter-input" placeholder="Max" value="{{ price_max }}">
+              </div>
+            </div>
+
+            <button type="submit" class="filter-btn">Apply Filters</button>
+            <a href="{% url 'search_cars' %}" class="filter-reset">✕ Clear Filters</a>
+          </aside>
+        </form>
+
+        <!-- Results -->
+        <div>
+          <p class="results-count">Showing <strong>{{ total }}</strong> car{{ total|pluralize }}</p>
+
+          <div class="cars-grid">
+            {% for car in cars %}
+            <div class="car-card">
+              {% if car.image %}
+                <img src="{{ car.image.url }}" alt="{{ car.make }} {{ car.model }}" class="car-card-img">
+              {% else %}
+                <div class="car-card-img-placeholder">🚗</div>
+              {% endif %}
+              <div class="car-card-body">
+                <div class="car-card-make">{{ car.make }}</div>
+                <div class="car-card-name">{{ car.model }} ({{ car.year }})</div>
+                <div class="car-card-specs">
+                  <span class="spec-badge">⛽ {{ car.get_engine_display }}</span>
+                  <span class="spec-badge">🔧 {{ car.get_transmission_display }}</span>
+                  {% if car.mileage %}<span class="spec-badge">📏 {{ car.mileage }}</span>{% endif %}
+                  <span class="spec-badge">⭐ {{ car.safety_rating }} Star</span>
+                </div>
+                <div class="car-card-price">
+                  ₹{{ car.price|floatformat:0 }} <span>lakh</span>
+                </div>
+                <div class="car-card-footer">
+                  <a href="{% url 'compare_cars' %}?ids={{ car.id }}" class="btn-view-details">View Details</a>
+                  {% if user.is_authenticated %}
+                  <a href="{% url 'toggle_favorite' car.id %}?next={{ request.get_full_path|urlencode }}"
+                     class="btn-add-compare"
+                     style="{% if car.id in fav_ids %}background:#FEE2E2;color:#EF4444;border-color:#FECACA;{% endif %}"
+                     title="{% if car.id in fav_ids %}Remove from favorites{% else %}Add to favorites{% endif %}">
+                     {% if car.id in fav_ids %}❤️{% else %}🤍{% endif %}
+                  </a>
+                  {% else %}
+                  <a href="{% url 'compare_cars' %}?ids={{ car.id }}" class="btn-add-compare">⚖️</a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+              <div class="empty-state-icon">🔍</div>
+              <h3>No Cars Found</h3>
+              <p>Try adjusting your filters or <a href="{% url 'search_cars' %}">clear all filters</a>.</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
