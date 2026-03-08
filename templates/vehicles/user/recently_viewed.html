@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Recently Viewed | VehicleVault{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}?v=9" />
+  <link rel="stylesheet" href="{% static 'css/cars.css' %}?v=1" />
+{% endblock %}
+
+{% block content %}
+<div class="sidebar-overlay" onclick="toggleSidebar(event)"></div>
+<aside class="uv-sidebar">
+  <div class="uv-sidebar-menu">
+    <a href="{% url 'user_dashboard' %}" class="uv-nav-link"><span>🏠</span> Dashboard</a>
+    <a href="{% url 'compare_history' %}" class="uv-nav-link"><span>🚗</span> Compare History</a>
+    <a href="{% url 'favorites' %}" class="uv-nav-link"><span>❤️</span> Favorites</a>
+    <a href="{% url 'recently_viewed' %}" class="uv-nav-link active"><span>🔍</span> Recently Viewed</a>
+    <a href="{% url 'documents_reminders' %}" class="uv-nav-link"><span>📂</span> Documents</a>
+    <a href="{% url 'user_settings' %}" class="uv-nav-link"><span>⚙️</span> Settings</a>
+    <a href="{% url 'my_account' %}" class="uv-nav-link"><span>👤</span> My Account</a>
+  </div>
+</aside>
+
+<div class="cars-page">
+  <div class="cars-inner">
+    <div class="cars-page-header">
+      <a href="{% url 'my_account' %}" style="color:#3B82F6;text-decoration:none;font-weight:600;">← My Account</a>
+      <h1 class="cars-page-title" style="margin-top:8px;">🔍 Recently Viewed</h1>
+      <p class="cars-page-subtitle">Last {{ viewed|length }} car{{ viewed|length|pluralize }} you visited.</p>
+    </div>
+
+    {% if viewed %}
+    <div class="cars-grid">
+      {% for rv in viewed %}
+      <div class="car-card">
+        {% if rv.car.image %}
+          <img src="{{ rv.car.image.url }}" alt="{{ rv.car.make }} {{ rv.car.model }}" class="car-card-img">
+        {% else %}
+          <div class="car-card-img-placeholder">🚗</div>
+        {% endif %}
+        <div class="car-card-body">
+          <div class="car-card-make">{{ rv.car.make }}</div>
+          <div class="car-card-name">{{ rv.car.model }} ({{ rv.car.year }})</div>
+          <div class="car-card-specs">
+            <span class="spec-badge">⛽ {{ rv.car.get_engine_display }}</span>
+            <span class="spec-badge">🔧 {{ rv.car.get_transmission_display }}</span>
+          </div>
+          <div class="car-card-price">₹{{ rv.car.price|floatformat:0 }} <span>lakh</span></div>
+          <div style="font-size:0.78rem;color:#94A3B8;margin-bottom:10px;">Viewed {{ rv.viewed_at|date:"d M Y" }}</div>
+          <div class="car-card-footer">
+            <a href="{% url 'compare_cars' %}?ids={{ rv.car.id }}" class="btn-view-details">View Details</a>
+            <a href="{% url 'toggle_favorite' rv.car.id %}?next={% url 'recently_viewed' %}" class="btn-add-compare" title="Add to favorites">❤️</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">🔍</div>
+      <h3>Nothing Viewed Yet</h3>
+      <p>Cars you view will appear here automatically.</p>
+      <a href="{% url 'search_cars' %}" class="btn-view-details" style="display:inline-block;margin-top:16px;padding:12px 28px;">Browse Cars</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

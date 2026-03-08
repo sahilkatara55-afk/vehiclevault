@@ -2,15 +2,22 @@
 <div class="topbar">
   <!-- Left Side: Logo -->
   <div class="topbar-left">
+    {% if user.is_authenticated %}
+    <button class="hamburger-menu-btn" onclick="toggleSidebar(event)" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; margin-right: 15px; padding: 5px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+    {% endif %}
     <a href="{% url 'home' %}" class="topbar-logo">VehicleVault</a>
   </div>
 
   <!-- Center/Right: Main Menu -->
   <div class="topbar-menu">
     <a href="{% url 'home' %}">Home</a>
-    <a href="#">Search Cars</a>
-    <a href="#">Compare Cars</a>
-    <a href="#">Brands</a>
+    <a href="{% url 'search_cars' %}">Search Cars</a>
+    <a href="{% url 'compare_cars' %}">Compare Cars</a>
+    <a href="{% url 'brands' %}">Brands</a>
     <a href="{% if user.is_authenticated %}{% if user.is_superuser %}{% url 'admin_dashboard' %}{% else %}{% url 'user_dashboard' %}{% endif %}{% else %}{% url 'login' %}{% endif %}">Dashboard</a>
   </div>
 
@@ -47,6 +54,18 @@
 
     <!-- Script to handle clicking outside dropdown -->
     <script>
+      function toggleSidebar(event) {
+        if (event) event.stopPropagation();
+        const sidebar = document.querySelector(".admin-sidebar") || document.querySelector(".uv-sidebar") || document.querySelector(".user-sidebar") || document.querySelector(".sidebar");
+        const overlay = document.querySelector(".sidebar-overlay");
+        if (sidebar) {
+            sidebar.classList.toggle("active");
+        }
+        if (overlay) {
+            overlay.classList.toggle("active");
+        }
+      }
+
       function toggleProfileDropdown(event) {
         event.stopPropagation();
         const dropdown = document.getElementById("profileDropdown");
@@ -54,13 +73,15 @@
       }
 
       window.addEventListener("click", function (e) {
-        const dropdown = document.getElementById("profileDropdown");
-        const btn = document.querySelector(".profile-icon-btn");
-        if (dropdown && dropdown.classList.contains("show")) {
-          if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
-            dropdown.classList.remove("show");
+        const profileDropdown = document.getElementById("profileDropdown");
+        const profileBtn = document.querySelector(".profile-icon-btn");
+        if (profileDropdown && profileDropdown.classList.contains("show")) {
+          if (!profileDropdown.contains(e.target) && (!profileBtn || !profileBtn.contains(e.target))) {
+            profileDropdown.classList.remove("show");
           }
         }
+        
+        // Code to click outside sidebar to close it on mobile could go here if needed
       });
     </script>
 

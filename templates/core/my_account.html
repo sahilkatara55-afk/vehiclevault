@@ -1,12 +1,17 @@
 {% extends 'base.html' %}
-{% load static %} 
-{% block title %}My Account | VehicleVault{% endblock %} 
+{% load static %}
+{% block title %}My Account | VehicleVault{% endblock %}
+
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/my_account.css' %}" />
-{% endblock %} 
+{% endblock %}
+
 {% block content %}
 <div class="profile-page-container">
+
+  <!-- Profile Header -->
   <div class="profile-header-card">
+
     {% if request.user.profile_picture %}
     <div
       class="profile-avatar-large"
@@ -19,97 +24,123 @@
     </div>
     {% endif %}
 
-    <h2>{{ request.user.first_name|default:request.user.email|title }}</h2>
+    <h2>
+      {{ request.user.first_name|default:request.user.email|title }}
+    </h2>
+
     <p>{{ request.user.email }}</p>
 
-    <!-- Custom File Input UI -->
+    {% if request.user.is_superuser %}
+    <span style="color:red;font-weight:600;">Admin Account</span>
+    {% else %}
+    <span style="color:green;font-weight:600;">User Account</span>
+    {% endif %}
+
+    <!-- Upload Profile Picture -->
     <form method="POST" enctype="multipart/form-data" class="profile-pic-form">
       {% csrf_token %}
       <div class="file-upload-wrapper">
-        <label
-          for="{{ form.profile_picture.id_for_label }}"
-          class="custom-file-upload"
-        >
+        <label for="{{ form.profile_picture.id_for_label }}" class="custom-file-upload">
           Select New Picture
         </label>
         {{ form.profile_picture }}
         <span id="file-chosen">No file chosen</span>
       </div>
+
       <button type="submit" class="btn-upload-pic">Upload</button>
     </form>
 
-    <a href="#" class="link-account">Link your e-mail or social account</a>
   </div>
 
+  <!-- Menu Links -->
   <div class="profile-links-card">
+
+    {% if request.user.is_superuser %}
+
+    <!-- ADMIN MENU -->
+
+    <a href="{% url 'admin_dashboard' %}" class="profile-list-item">
+      <span class="icon">📊</span> Admin Dashboard
+      <span class="chevron">&rsaquo;</span>
+    </a>
+
+    <a href="{% url 'manage_cars' %}" class="profile-list-item">
+      <span class="icon">🚗</span> Manage Cars
+      <span class="chevron">&rsaquo;</span>
+    </a>
+
+    <a href="{% url 'manage_users' %}" class="profile-list-item">
+      <span class="icon">👥</span> Manage Users
+      <span class="chevron">&rsaquo;</span>
+    </a>
+
+    <a href="{% url 'manage_accessories' %}" class="profile-list-item">
+      <span class="icon">🛠</span> Manage Accessories
+      <span class="chevron">&rsaquo;</span>
+    </a>
+
+    <a href="{% url 'admin_reports' %}" class="profile-list-item">
+      <span class="icon">📈</span> Comparison Reports
+      <span class="chevron">&rsaquo;</span>
+    </a>
+
+    <a href="{% url 'admin_notifications' %}" class="profile-list-item">
+      <span class="icon">🔔</span> Notifications
+      <span class="chevron">&rsaquo;</span>
+    </a>
+
+    <a href="{% url 'admin_settings' %}" class="profile-list-item">
+      <span class="icon">⚙</span> Admin Settings
+      <span class="chevron">&rsaquo;</span>
+    </a>
+
+    {% else %}
+
+    <!-- USER MENU -->
+
     <a href="{% url 'user_dashboard' %}" class="profile-list-item">
       <span class="icon">📊</span> Dashboard
       <span class="chevron">&rsaquo;</span>
     </a>
-    <a href="#" class="profile-list-item">
+
+    <a href="{% url 'compare_history' %}" class="profile-list-item">
       <span class="icon">🚗</span> Compare History
       <span class="chevron">&rsaquo;</span>
     </a>
-    <a href="#" class="profile-list-item">
+
+    <a href="{% url 'favorites' %}" class="profile-list-item">
       <span class="icon">❤️</span> Favorite Vehicles
       <span class="chevron">&rsaquo;</span>
     </a>
-    <a href="#" class="profile-list-item">
+
+    <a href="{% url 'recently_viewed' %}" class="profile-list-item">
       <span class="icon">🔍</span> Recently Viewed
       <span class="chevron">&rsaquo;</span>
     </a>
-    <a href="#" class="profile-list-item">
+
+    <a href="{% url 'suggested_accessories' %}" class="profile-list-item">
       <span class="icon">🛠</span> Suggested Accessories
       <span class="chevron">&rsaquo;</span>
     </a>
-    <a href="#" class="profile-list-item">
-      <span class="icon">📂</span> Documents & Reminders
+
+    <a href="{% url 'documents_reminders' %}" class="profile-list-item">
+      <span class="icon">📂</span> Documents &amp; Reminders
       <span class="chevron">&rsaquo;</span>
     </a>
-    <a href="#" class="profile-list-item">
+
+    <a href="{% url 'user_settings' %}" class="profile-list-item">
       <span class="icon">⚙</span> Settings
       <span class="chevron">&rsaquo;</span>
     </a>
 
+    {% endif %}
+
+    <!-- Logout -->
     <div class="profile-logout-container">
       <a href="{% url 'logout' %}" class="btn-profile-logout">Logout</a>
     </div>
+
   </div>
 </div>
 
-<!-- Full Image Modal -->
-<div id="imageModal" class="modal" onclick="closeImageModal()">
-  <span class="close-modal" onclick="closeImageModal()">&times;</span>
-  <img class="modal-content" id="fullImage" />
-</div>
-
-<script>
-  // Open Modal function
-  function openImageModal(imgUrl) {
-    const modal = document.getElementById("imageModal");
-    const modalImg = document.getElementById("fullImage");
-    modal.style.display = "block";
-    modalImg.src = imgUrl;
-  }
-
-  // Close Modal function
-  function closeImageModal() {
-    const modal = document.getElementById("imageModal");
-    modal.style.display = "none";
-  }
-
-  // Update file name display
-  document.addEventListener("DOMContentLoaded", function () {
-    const actualBtn = document.querySelector('input[type="file"]');
-    const fileChosen = document.getElementById("file-chosen");
-
-    if (actualBtn && fileChosen) {
-      actualBtn.addEventListener("change", function () {
-        fileChosen.textContent = this.files[0]
-          ? this.files[0].name
-          : "No file chosen";
-      });
-    }
-  });
-</script>
 {% endblock %}

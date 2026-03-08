@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Compare History | VehicleVault{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}?v=9" />
+  <link rel="stylesheet" href="{% static 'css/cars.css' %}?v=1" />
+{% endblock %}
+
+{% block content %}
+<div class="sidebar-overlay" onclick="toggleSidebar(event)"></div>
+<aside class="uv-sidebar">
+  <div class="uv-sidebar-menu">
+    <a href="{% url 'user_dashboard' %}" class="uv-nav-link"><span>🏠</span> Dashboard</a>
+    <a href="{% url 'compare_history' %}" class="uv-nav-link active"><span>🚗</span> Compare History</a>
+    <a href="{% url 'favorites' %}" class="uv-nav-link"><span>❤️</span> Favorites</a>
+    <a href="{% url 'recently_viewed' %}" class="uv-nav-link"><span>🔍</span> Recently Viewed</a>
+    <a href="{% url 'documents_reminders' %}" class="uv-nav-link"><span>📂</span> Documents</a>
+    <a href="{% url 'user_settings' %}" class="uv-nav-link"><span>⚙️</span> Settings</a>
+    <a href="{% url 'my_account' %}" class="uv-nav-link"><span>👤</span> My Account</a>
+  </div>
+</aside>
+
+<div class="cars-page">
+  <div class="cars-inner">
+    <div class="cars-page-header">
+      <a href="{% url 'my_account' %}" style="color:#3B82F6;text-decoration:none;font-weight:600;">← My Account</a>
+      <h1 class="cars-page-title" style="margin-top:8px;">🚗 Compare History</h1>
+      <p class="cars-page-subtitle">All your previous car comparisons.</p>
+    </div>
+
+    {% if messages %}
+      {% for msg in messages %}
+      <div style="background:{% if msg.tags == 'error' %}#FEE2E2{% else %}#DCFCE7{% endif %};padding:12px 16px;border-radius:8px;margin-bottom:16px;color:#1E293B;font-weight:600;">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+
+    {% if history %}
+    <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.06);">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;">#</th>
+            <th style="text-align:left;">Date</th>
+            <th style="text-align:left;">Cars Compared</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in history %}
+          <tr>
+            <td style="text-align:left;color:#94A3B8;font-weight:700;">{{ forloop.counter }}</td>
+            <td style="text-align:left;">{{ entry.compared_at|date:"d M Y, H:i" }}</td>
+            <td style="text-align:left;">
+              {% for car in entry.cars.all %}
+                <span class="spec-badge">🚗 {{ car.make }} {{ car.model }} ({{ car.year }})</span>
+              {% empty %}
+                <span style="color:#94A3B8;">—</span>
+              {% endfor %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">🚗</div>
+      <h3>No Compare History Yet</h3>
+      <p>Start comparing cars to see your history here.</p>
+      <a href="{% url 'compare_cars' %}" class="btn-view-details" style="display:inline-block;margin-top:16px;padding:12px 28px;">Compare Cars Now</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

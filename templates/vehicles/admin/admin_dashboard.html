@@ -2,171 +2,155 @@
 {% load static %}
 {% block title %}Admin Dashboard | VehicleVault{% endblock %}
 {% block css %}
-  <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=1" />
+  <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}?v=9" />
+  <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}?v=5" />
 {% endblock %}
 {% block content %}
-<div class="adm-page">
+  <!-- Sidebar Overlay for mobile/toggle -->
+  <div class="sidebar-overlay" onclick="toggleSidebar(event)"></div>
 
-  <div class="adm-header">
-    <div class="adm-header-left">
-      <div class="adm-header-icon">🛡️</div>
-      <div>
-        <h1 class="adm-header-title">Admin Dashboard</h1>
-        <p class="adm-header-sub">Welcome back, {{ request.user.first_name|default:request.user.email }} — System Management &amp; Overview</p>
-      </div>
-    </div>
-    <div class="adm-header-right">
-      <span class="adm-live-badge">● Live</span>
-    </div>
+<aside class="uv-sidebar">
+  <div class="uv-sidebar-menu">
+    <a href="{% url 'admin_dashboard' %}" class="uv-nav-link active"><span>🏠</span> Dashboard</a>
+    <a href="{% url 'manage_cars' %}" class="uv-nav-link"><span>🚗</span> Manage Cars</a>
+    <a href="{% url 'manage_users' %}" class="uv-nav-link"><span>👥</span> Manage Users</a>
+    <a href="{% url 'manage_accessories' %}" class="uv-nav-link"><span>🔧</span> Accessories</a>
+    <a href="{% url 'admin_notifications' %}" class="uv-nav-link"><span>🔔</span> Notifications</a>
+    <a href="{% url 'admin_reports' %}" class="uv-nav-link"><span>📊</span> Reports</a>
+    <a href="{% url 'admin_settings' %}" class="uv-nav-link"><span>⚙️</span> Settings</a>
   </div>
+</aside>
 
-  <div class="adm-stats-grid">
-    <div class="adm-stat-card adm-stat-blue">
-      <div class="adm-stat-icon">👥</div>
-      <div class="adm-stat-info">
-        <span class="adm-stat-label">Total Users</span>
-        <span class="adm-stat-value">—</span>
-      </div>
-    </div>
-    <div class="adm-stat-card adm-stat-green">
-      <div class="adm-stat-icon">🚗</div>
-      <div class="adm-stat-info">
-        <span class="adm-stat-label">Total Vehicles</span>
-        <span class="adm-stat-value">—</span>
-      </div>
-    </div>
-    <div class="adm-stat-card adm-stat-orange">
-      <div class="adm-stat-icon">⏳</div>
-      <div class="adm-stat-info">
-        <span class="adm-stat-label">Pending Requests</span>
-        <span class="adm-stat-value">{{ pending_count }}</span>
-      </div>
-    </div>
-    <div class="adm-stat-card adm-stat-purple">
-      <div class="adm-stat-icon">📄</div>
-      <div class="adm-stat-info">
-        <span class="adm-stat-label">Documents</span>
-        <span class="adm-stat-value">—</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="adm-content-grid">
-
-    <div class="adm-card adm-profile-card">
-      <div class="adm-card-header">
-        <h2 class="adm-card-title">Admin Profile</h2>
-      </div>
-      <div class="adm-profile-avatar-wrap">
-        {% if request.user.profile_picture %}
-        <div class="adm-avatar-img" style="background-image: url('{{ request.user.profile_picture.url }}');"></div>
-        {% else %}
-        <div class="adm-avatar-initials">{{ request.user.email|make_list|first|upper }}</div>
-        {% endif %}
-        {% if request.user.is_superuser %}
-        <span class="adm-role-badge">Super Admin</span>
-        {% else %}
-        <span class="adm-role-badge">Admin</span>
-        {% endif %}
-      </div>
-      <div class="adm-profile-name">{{ request.user.first_name|default:"" }} {{ request.user.last_name|default:"" }}</div>
-      <div class="adm-profile-email">{{ request.user.email }}</div>
-      <div class="adm-divider"></div>
-      <div class="adm-info-list">
-        <div class="adm-info-row">
-          <span class="adm-info-label">Role</span>
-          <span class="adm-badge adm-badge-blue">{{ request.user.role|upper|default:"ADMIN" }}</span>
+  <!-- Main Content -->
+  <div class="admin-main">
+    <div class="adm-page">
+      <div class="adm-header">
+        <div class="adm-header-left">
+          <div class="adm-header-icon">🛡️</div>
+          <div>
+            <h1 class="adm-header-title">Admin Dashboard</h1>
+            <p class="adm-header-sub">Welcome back, {{ request.user.first_name|default:request.user.email }} — System Management &amp; Overview</p>
+          </div>
         </div>
-        <div class="adm-info-row">
-          <span class="adm-info-label">Superuser</span>
-          {% if request.user.is_superuser %}
-          <span class="adm-badge adm-badge-green">✓ Granted</span>
-          {% else %}
-          <span class="adm-badge adm-badge-red">✗ Not Granted</span>
-          {% endif %}
-        </div>
-        <div class="adm-info-row">
-          <span class="adm-info-label">Staff Status</span>
-          {% if request.user.is_staff %}
-          <span class="adm-badge adm-badge-green">✓ Active</span>
-          {% else %}
-          <span class="adm-badge adm-badge-red">✗ Inactive</span>
-          {% endif %}
-        </div>
-        <div class="adm-info-row">
-          <span class="adm-info-label">Account Status</span>
-          <span class="adm-badge adm-badge-green">✓ Active</span>
+        <div class="adm-header-right">
+          <span class="adm-live-badge">● Live</span>
         </div>
       </div>
-    </div>
 
-    <div class="adm-right-col">
+      <!-- Dashboard Overview Cards -->
+      <div class="adm-stats-grid">
+        <div class="adm-stat-card adm-stat-blue">
+          <div class="adm-stat-icon">🚗</div>
+          <div class="adm-stat-info">
+            <span class="adm-stat-label">Total Cars</span>
+            <span class="adm-stat-value">{{ total_cars|default:0 }}</span>
+          </div>
+        </div>
+        <div class="adm-stat-card adm-stat-green">
+          <div class="adm-stat-icon">👥</div>
+          <div class="adm-stat-info">
+            <span class="adm-stat-label">Total Users</span>
+            <span class="adm-stat-value">{{ total_users|default:0 }}</span>
+          </div>
+        </div>
+        <div class="adm-stat-card adm-stat-orange">
+          <div class="adm-stat-icon">⚖️</div>
+          <div class="adm-stat-info">
+            <span class="adm-stat-label">Total Comparisons</span>
+            <span class="adm-stat-value">{{ total_comparisons|default:0 }}</span>
+          </div>
+        </div>
+        <div class="adm-stat-card adm-stat-purple">
+          <div class="adm-stat-icon">🛠️</div>
+          <div class="adm-stat-info">
+            <span class="adm-stat-label">Total Accessories</span>
+            <span class="adm-stat-value">{{ total_accessories|default:0 }}</span>
+          </div>
+        </div>
+      </div>
 
-      <div class="adm-card">
+      <div class="adm-content-grid">
+        <!-- Management Sections (Full Width Now) -->
+        <div class="adm-right-col">
+
+          <div class="adm-card">
+            <div class="adm-card-header">
+              <h2 class="adm-card-title">Management Sections</h2>
+            </div>
+            <div class="mgt-sections-list">
+              <div class="mgt-section-item">
+                <div class="mgt-icon bg-blue">🚗</div>
+                <div class="mgt-details">
+                  <h4>Car Management</h4>
+                  <p>Add, Edit, Delete cars with specifications (price, mileage, engine, safety rating).</p>
+                </div>
+                <a href="{% url 'manage_cars' %}" class="mgt-btn">Manage</a>
+              </div>
+              <div class="mgt-section-item">
+                <div class="mgt-icon bg-green">👥</div>
+                <div class="mgt-details">
+                  <h4>User Management</h4>
+                  <p>View users, block or delete user accounts.</p>
+                </div>
+                <a href="{% url 'manage_users' %}" class="mgt-btn">Manage</a>
+              </div>
+              <div class="mgt-section-item">
+                <div class="mgt-icon bg-purple">🛠️</div>
+                <div class="mgt-details">
+                  <h4>Accessories Management</h4>
+                  <p>Add and manage accessories for specific cars.</p>
+                </div>
+                <a href="{% url 'manage_accessories' %}" class="mgt-btn">Manage</a>
+              </div>
+              <div class="mgt-section-item">
+                <div class="mgt-icon bg-orange">🔔</div>
+                <div class="mgt-details">
+                  <h4>Notifications Management</h4>
+                  <p>Post updates about new cars, price changes, or system alerts.</p>
+                </div>
+                <a href="{% url 'admin_notifications' %}" class="mgt-btn">Manage</a>
+              </div>
+            </div>
+          </div>
+        </div> <!-- End right col -->
+      </div> <!-- End content grid -->
+
+      <!-- Reports Section (Full Width Bottom) -->
+      <div class="adm-card" style="margin-top: 20px;">
         <div class="adm-card-header">
-          <h2 class="adm-card-title">Quick Actions</h2>
+          <h2 class="adm-card-title">Reports Section</h2>
         </div>
-        <div class="adm-actions-grid">
-          <a href="/admin/" class="adm-action-btn adm-action-blue">
-            <span class="adm-action-icon">👤</span>
-            <span class="adm-action-label">Manage Users</span>
-            <span class="adm-action-arrow">→</span>
-          </a>
-          <a href="/admin/" class="adm-action-btn adm-action-green">
-            <span class="adm-action-icon">🚗</span>
-            <span class="adm-action-label">Manage Vehicles</span>
-            <span class="adm-action-arrow">→</span>
-          </a>
-          <a href="{% url 'admin_requests_list' %}" class="adm-action-btn adm-action-orange">
-            <span class="adm-action-icon">📋</span>
-            <span class="adm-action-label">Admin Requests
-              {% if pending_count > 0 %}<span class="adm-action-badge">{{ pending_count }}</span>{% endif %}
-            </span>
-            <span class="adm-action-arrow">→</span>
-          </a>
-          <a href="/admin/" class="adm-action-btn adm-action-purple">
-            <span class="adm-action-icon">📊</span>
-            <span class="adm-action-label">View Reports</span>
-            <span class="adm-action-arrow">→</span>
-          </a>
-          <a href="/admin/" class="adm-action-btn adm-action-teal">
-            <span class="adm-action-icon">📄</span>
-            <span class="adm-action-label">Documents</span>
-            <span class="adm-action-arrow">→</span>
-          </a>
-          <a href="/admin/" class="adm-action-btn adm-action-red">
-            <span class="adm-action-icon">⚙️</span>
-            <span class="adm-action-label">System Settings</span>
-            <span class="adm-action-arrow">→</span>
-          </a>
-        </div>
-      </div>
-
-      <div class="adm-card">
-        <div class="adm-card-header">
-          <h2 class="adm-card-title">System Info</h2>
-        </div>
-        <div class="adm-system-grid">
-          <div class="adm-system-item">
-            <span class="adm-system-label">Platform</span>
-            <span class="adm-system-value">VehicleVault v1.0</span>
+        <div class="reports-grid">
+          <!-- Most compared cars -->
+          <div class="report-block">
+            <h3>Most Compared Cars</h3>
+            <ul class="report-list">
+              <li><span>Tata Nexon vs Mahindra XUV300</span> <span class="badge">1.2K</span></li>
+              <li><span>Hyundai Creta vs Kia Seltos</span> <span class="badge">980</span></li>
+              <li><span>Maruti Swift vs Hyundai i20</span> <span class="badge">850</span></li>
+            </ul>
           </div>
-          <div class="adm-system-item">
-            <span class="adm-system-label">Framework</span>
-            <span class="adm-system-value">Django</span>
+          <!-- Popular vehicles -->
+          <div class="report-block">
+            <h3>Popular Vehicles</h3>
+            <ul class="report-list">
+              <li><span>Mahindra Thar</span> <span class="badge">Top Trending</span></li>
+              <li><span>Tata Punch</span> <span class="badge">Highly Searched</span></li>
+              <li><span>Toyota Fortuner</span> <span class="badge">Most Viewed</span></li>
+            </ul>
           </div>
-          <div class="adm-system-item">
-            <span class="adm-system-label">Pending Requests</span>
-            <span class="adm-system-value adm-system-orange">{{ pending_count }} pending</span>
-          </div>
-          <div class="adm-system-item">
-            <span class="adm-system-label">Admin Panel</span>
-            <a href="/admin/" class="adm-system-link">Open Django Admin →</a>
+          <!-- Recent comparisons -->
+          <div class="report-block">
+            <h3>Recent Comparisons</h3>
+            <ul class="report-list">
+              <li><span>Honda City vs Hyundai Verna</span> <span class="time-ago">2 mins ago</span></li>
+              <li><span>Tata Harrier vs MG Hector</span> <span class="time-ago">15 mins ago</span></li>
+              <li><span>Maruti Brezza vs Tata Nexon</span> <span class="time-ago">1 hr ago</span></li>
+            </ul>
           </div>
         </div>
       </div>
 
-    </div>
-  </div>
-</div>
+    </div> <!-- End adm-page -->
+  </div> <!-- End admin-main -->
 {% endblock %}

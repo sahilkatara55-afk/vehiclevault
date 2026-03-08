@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Car Management | VehicleVault Admin{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}?v=9" />
+  <link rel="stylesheet" href="{% static 'css/manage_cars.css' %}?v=1" />
+{% endblock %}
+
+{% block content %}
+<div class="sidebar-overlay" onclick="toggleSidebar(event)"></div>
+
+<!-- Admin Sidebar -->
+<aside class="uv-sidebar">
+  <div class="uv-sidebar-menu">
+    <a href="{% url 'admin_dashboard' %}" class="uv-nav-link"><span>🏠</span> Dashboard</a>
+    <a href="{% url 'manage_cars' %}" class="uv-nav-link active"><span>🚗</span> Manage Cars</a>
+    <a href="{% url 'manage_users' %}" class="uv-nav-link"><span>👥</span> Manage Users</a>
+    <a href="{% url 'manage_accessories' %}" class="uv-nav-link"><span>🔧</span> Accessories</a>
+    <a href="{% url 'admin_notifications' %}" class="uv-nav-link"><span>🔔</span> Notifications</a>
+    <a href="{% url 'admin_reports' %}" class="uv-nav-link"><span>📊</span> Reports</a>
+    <a href="{% url 'admin_settings' %}" class="uv-nav-link"><span>⚙️</span> Settings</a>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<div class="admin-main">
+  <div class="mc-page">
+
+    <!-- Page Header -->
+    <div class="mc-header">
+      <div class="mc-header-left">
+        <div class="mc-header-icon">🚗</div>
+        <div>
+          <h1 class="mc-title">Car Management</h1>
+          <p class="mc-subtitle">Add, edit and delete vehicle listings</p>
+        </div>
+      </div>
+      <button class="mc-btn mc-btn-primary" onclick="openAddModal()">+ Add New Car</button>
+    </div>
+
+    <!-- Flash Messages -->
+    {% if messages %}
+    <div class="mc-alerts">
+      {% for msg in messages %}
+      <div class="mc-alert mc-alert-{{ msg.tags }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Car Table -->
+    <div class="mc-card">
+      <div class="mc-card-header">
+        <h2 class="mc-card-title">All Vehicles <span class="mc-badge">{{ cars|length }}</span></h2>
+      </div>
+      <div class="mc-table-wrap">
+        {% if cars %}
+        <table class="mc-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Image</th>
+              <th>Make / Model</th>
+              <th>Year</th>
+              <th>Price (₹)</th>
+              <th>Mileage</th>
+              <th>Engine</th>
+              <th>Safety</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for car in cars %}
+            <tr>
+              <td class="mc-td-num">{{ forloop.counter }}</td>
+              <td>
+                {% if car.image %}
+                  <img src="{{ car.image.url }}" class="mc-car-thumb" alt="{{ car.make }} {{ car.model }}">
+                {% else %}
+                  <div class="mc-no-img">🚗</div>
+                {% endif %}
+              </td>
+              <td>
+                <div class="mc-car-name">{{ car.make }} {{ car.model }}</div>
+              </td>
+              <td>{{ car.year }}</td>
+              <td class="mc-price">₹{{ car.price|floatformat:0 }}</td>
+              <td>{{ car.mileage|default:"—" }}</td>
+              <td>
+                <span class="mc-engine-badge mc-engine-{{ car.engine }}">{{ car.get_engine_display }}</span>
+              </td>
+              <td>
+                <div class="mc-stars">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= car.safety_rating|add:0 %}⭐{% else %}☆{% endif %}
+                  {% endfor %}
+                </div>
+              </td>
+              <td>
+                <div class="mc-actions">
+                  <button class="mc-btn mc-btn-edit"
+                    onclick="openEditModal({{ car.pk }}, '{{ car.make }}', '{{ car.model }}', {{ car.year }}, '{{ car.price }}', '{{ car.mileage }}', '{{ car.engine }}', '{{ car.safety_rating }}', '{{ car.transmission }}', `{{ car.description|default:'' }}`)">
+                    ✏️ Edit
+                  </button>
+                  <form method="post" action="{% url 'car_delete' car.pk %}" style="display:inline;" onsubmit="return confirm('Delete {{ car.make }} {{ car.model }}?')">
+                    {% csrf_token %}
+                    <button type="submit" class="mc-btn mc-btn-delete">🗑 Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="mc-empty">
+          <div class="mc-empty-icon">🚗</div>
+          <p>No cars found. Add your first vehicle!</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ====== ADD MODAL ====== -->
+<div class="mc-modal-overlay" id="addModal">
+  <div class="mc-modal">
+    <div class="mc-modal-header">
+      <h3>Add New Car</h3>
+      <button class="mc-modal-close" onclick="closeModal('addModal')">✕</button>
+    </div>
+    <form method="post" action="{% url 'car_add' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mc-modal-body">
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Make (Brand)</label>
+            <input type="text" name="make" placeholder="e.g. Hyundai" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Model</label>
+            <input type="text" name="model" placeholder="e.g. Creta" required>
+          </div>
+        </div>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Year</label>
+            <input type="number" name="year" value="2024" min="1990" max="2030" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Price (₹)</label>
+            <input type="number" name="price" placeholder="e.g. 1500000" step="1000" required>
+          </div>
+        </div>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Mileage</label>
+            <input type="text" name="mileage" placeholder="e.g. 17 kmpl">
+          </div>
+          <div class="mc-form-group">
+            <label>Engine Type</label>
+            <select name="engine" required>
+              <option value="petrol">Petrol</option>
+              <option value="diesel">Diesel</option>
+              <option value="electric">Electric</option>
+              <option value="hybrid">Hybrid</option>
+              <option value="cng">CNG</option>
+            </select>
+          </div>
+        </div>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Transmission</label>
+            <select name="transmission" required>
+              <option value="manual">Manual</option>
+              <option value="automatic">Automatic</option>
+            </select>
+          </div>
+          <div class="mc-form-group">
+            <label>Safety Rating</label>
+            <select name="safety_rating" required>
+              <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+              <option value="4" selected>⭐⭐⭐⭐ 4 Stars</option>
+              <option value="3">⭐⭐⭐ 3 Stars</option>
+              <option value="2">⭐⭐ 2 Stars</option>
+              <option value="1">⭐ 1 Star</option>
+            </select>
+          </div>
+        </div>
+        <div class="mc-form-row">
+          <div class="mc-form-group" style="flex:1;">
+            <label>Description (optional)</label>
+            <textarea name="description" rows="2" style="width:100%;padding:8px;border:1.5px solid #E2E8F0;border-radius:8px;font-family:inherit;font-size:0.9rem;resize:vertical;" placeholder="Short description of the car..."></textarea>
+          </div>
+          <div class="mc-form-group">
+            <label>Car Image</label>
+            <input type="file" name="image" accept="image/*">
+          </div>
+        </div>
+      </div>
+      <div class="mc-modal-footer">
+        <button type="button" class="mc-btn mc-btn-gray" onclick="closeModal('addModal')">Cancel</button>
+        <button type="submit" class="mc-btn mc-btn-primary">Save Car</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ====== EDIT MODAL ====== -->
+<div class="mc-modal-overlay" id="editModal">
+  <div class="mc-modal">
+    <div class="mc-modal-header">
+      <h3>Edit Car</h3>
+      <button class="mc-modal-close" onclick="closeModal('editModal')">✕</button>
+    </div>
+    <form method="post" id="editForm" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mc-modal-body">
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Make (Brand)</label>
+            <input type="text" name="make" id="edit_make" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Model</label>
+            <input type="text" name="model" id="edit_model" required>
+          </div>
+        </div>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Year</label>
+            <input type="number" name="year" id="edit_year" min="1990" max="2030" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Price (₹)</label>
+            <input type="number" name="price" id="edit_price" step="1000" required>
+          </div>
+        </div>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Mileage</label>
+            <input type="text" name="mileage" id="edit_mileage">
+          </div>
+          <div class="mc-form-group">
+            <label>Engine Type</label>
+            <select name="engine" id="edit_engine" required>
+              <option value="petrol">Petrol</option>
+              <option value="diesel">Diesel</option>
+              <option value="electric">Electric</option>
+              <option value="hybrid">Hybrid</option>
+              <option value="cng">CNG</option>
+            </select>
+          </div>
+        </div>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Transmission</label>
+            <select name="transmission" id="edit_transmission" required>
+              <option value="manual">Manual</option>
+              <option value="automatic">Automatic</option>
+            </select>
+          </div>
+          <div class="mc-form-group">
+            <label>Safety Rating</label>
+            <select name="safety_rating" id="edit_safety" required>
+              <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+              <option value="4">⭐⭐⭐⭐ 4 Stars</option>
+              <option value="3">⭐⭐⭐ 3 Stars</option>
+              <option value="2">⭐⭐ 2 Stars</option>
+              <option value="1">⭐ 1 Star</option>
+            </select>
+          </div>
+        </div>
+        <div class="mc-form-row">
+          <div class="mc-form-group" style="flex:1;">
+            <label>Description (optional)</label>
+            <textarea name="description" id="edit_description" rows="2" style="width:100%;padding:8px;border:1.5px solid #E2E8F0;border-radius:8px;font-family:inherit;font-size:0.9rem;resize:vertical;"></textarea>
+          </div>
+          <div class="mc-form-group">
+            <label>New Image (optional)</label>
+            <input type="file" name="image" accept="image/*">
+          </div>
+        </div>
+      </div>
+      <div class="mc-modal-footer">
+        <button type="button" class="mc-btn mc-btn-gray" onclick="closeModal('editModal')">Cancel</button>
+        <button type="submit" class="mc-btn mc-btn-primary">Update Car</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function openAddModal() {
+    document.getElementById('addModal').classList.add('active');
+  }
+  function openEditModal(pk, make, model, year, price, mileage, engine, safety, transmission, description) {
+    const base = "{% url 'car_edit' 0 %}".replace('/0/', '/' + pk + '/');
+    document.getElementById('editForm').action = base;
+    document.getElementById('edit_make').value         = make;
+    document.getElementById('edit_model').value        = model;
+    document.getElementById('edit_year').value         = year;
+    document.getElementById('edit_price').value        = price;
+    document.getElementById('edit_mileage').value      = mileage;
+    document.getElementById('edit_engine').value       = engine;
+    document.getElementById('edit_safety').value       = safety;
+    document.getElementById('edit_transmission').value = transmission || 'manual';
+    document.getElementById('edit_description').value  = description || '';
+    document.getElementById('editModal').classList.add('active');
+  }
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+  }
+  // close on overlay click
+  document.querySelectorAll('.mc-modal-overlay').forEach(o => {
+    o.addEventListener('click', function(e){ if(e.target === o) o.classList.remove('active'); });
+  });
+</script>
+{% endblock %}
