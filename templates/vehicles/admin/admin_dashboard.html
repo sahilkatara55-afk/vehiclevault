@@ -15,6 +15,7 @@
     <a href="{% url 'manage_cars' %}" class="uv-nav-link"><span>🚗</span> Manage Cars</a>
     <a href="{% url 'manage_users' %}" class="uv-nav-link"><span>👥</span> Manage Users</a>
     <a href="{% url 'manage_accessories' %}" class="uv-nav-link"><span>🔧</span> Accessories</a>
+    <a href="{% url 'manage_brands' %}" class="uv-nav-link"><span>🏷️</span> Manage Brands</a>
     <a href="{% url 'admin_notifications' %}" class="uv-nav-link"><span>🔔</span> Notifications</a>
     <a href="{% url 'admin_reports' %}" class="uv-nav-link"><span>📊</span> Reports</a>
     <a href="{% url 'admin_settings' %}" class="uv-nav-link"><span>⚙️</span> Settings</a>
@@ -101,6 +102,14 @@
                   <p>Add and manage accessories for specific cars.</p>
                 </div>
                 <a href="{% url 'manage_accessories' %}" class="mgt-btn">Manage</a>
+              </div>
+              <div class="mgt-section-item">
+                <div class="mgt-icon" style="background:#FFF7ED;color:#EA580C;">🏷️</div>
+                <div class="mgt-details">
+                  <h4>Brands Management</h4>
+                  <p>Add brand logos and manage car brand information.</p>
+                </div>
+                <a href="{% url 'manage_brands' %}" class="mgt-btn">Manage</a>
               </div>
               <div class="mgt-section-item">
                 <div class="mgt-icon bg-orange">🔔</div>

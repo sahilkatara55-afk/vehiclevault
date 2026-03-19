@@ -40,20 +40,20 @@
       {% for car in suggested %}
       <div class="car-card">
         {% if car.image %}
-          <img src="{{ car.image.url }}" alt="{{ car.make }} {{ car.model }}" class="car-card-img">
+          <a href="{% url 'car_detail' car.id %}"><img src="{{ car.image.url }}" alt="{{ car.make }} {{ car.model }}" class="car-card-img"></a>
         {% else %}
-          <div class="car-card-img-placeholder">🚗</div>
+          <a href="{% url 'car_detail' car.id %}" style="text-decoration:none;"><div class="car-card-img-placeholder">🚗</div></a>
         {% endif %}
         <div class="car-card-body">
           <div class="car-card-make">{{ car.make }}</div>
-          <div class="car-card-name">{{ car.model }} ({{ car.year }})</div>
+          <div class="car-card-name"><a href="{% url 'car_detail' car.id %}">{{ car.model }} ({{ car.year }})</a></div>
           <div class="car-card-specs">
             <span class="spec-badge">⛽ {{ car.get_engine_display }}</span>
             <span class="spec-badge">🔧 {{ car.get_transmission_display }}</span>
           </div>
-          <div class="car-card-price">₹{{ car.price|floatformat:0 }} <span>lakh</span></div>
+          <div class="car-card-price">₹{{ car.min_price|floatformat:0 }} - ₹{{ car.max_price|floatformat:0 }} <span>lakh</span></div>
           <div class="car-card-footer">
-            <a href="{% url 'compare_cars' %}?ids={{ car.id }}" class="btn-view-details">View Details</a>
+            <a href="{% url 'car_detail' car.id %}" class="btn-view-details">View Details</a>
             <a href="{% url 'toggle_favorite' car.id %}?next={% url 'suggested_accessories' %}" class="btn-add-compare" title="Save to favorites">❤️</a>
           </div>
         </div>

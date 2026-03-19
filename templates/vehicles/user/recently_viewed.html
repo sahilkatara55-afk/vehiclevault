@@ -33,21 +33,21 @@
       {% for rv in viewed %}
       <div class="car-card">
         {% if rv.car.image %}
-          <img src="{{ rv.car.image.url }}" alt="{{ rv.car.make }} {{ rv.car.model }}" class="car-card-img">
+          <a href="{% url 'car_detail' rv.car.id %}"><img src="{{ rv.car.image.url }}" alt="{{ rv.car.make }} {{ rv.car.model }}" class="car-card-img"></a>
         {% else %}
-          <div class="car-card-img-placeholder">🚗</div>
+          <a href="{% url 'car_detail' rv.car.id %}" style="text-decoration:none;"><div class="car-card-img-placeholder">🚗</div></a>
         {% endif %}
         <div class="car-card-body">
           <div class="car-card-make">{{ rv.car.make }}</div>
-          <div class="car-card-name">{{ rv.car.model }} ({{ rv.car.year }})</div>
+          <div class="car-card-name"><a href="{% url 'car_detail' rv.car.id %}">{{ rv.car.model }} ({{ rv.car.year }})</a></div>
           <div class="car-card-specs">
             <span class="spec-badge">⛽ {{ rv.car.get_engine_display }}</span>
             <span class="spec-badge">🔧 {{ rv.car.get_transmission_display }}</span>
           </div>
-          <div class="car-card-price">₹{{ rv.car.price|floatformat:0 }} <span>lakh</span></div>
+          <div class="car-card-price">₹{{ rv.car.min_price|floatformat:0 }} - ₹{{ rv.car.max_price|floatformat:0 }} <span>lakh</span></div>
           <div style="font-size:0.78rem;color:#94A3B8;margin-bottom:10px;">Viewed {{ rv.viewed_at|date:"d M Y" }}</div>
           <div class="car-card-footer">
-            <a href="{% url 'compare_cars' %}?ids={{ rv.car.id }}" class="btn-view-details">View Details</a>
+            <a href="{% url 'car_detail' rv.car.id %}" class="btn-view-details">View Details</a>
             <a href="{% url 'toggle_favorite' rv.car.id %}?next={% url 'recently_viewed' %}" class="btn-add-compare" title="Add to favorites">❤️</a>
           </div>
         </div>

@@ -115,7 +115,7 @@
             <tr>
               <td>💰 Price</td>
               {% for car in compare_list %}
-              <td><strong>₹{{ car.price|floatformat:0 }}</strong> lakh</td>
+              <td><strong>₹{{ car.min_price|floatformat:0 }} - ₹{{ car.max_price|floatformat:0 }}</strong> lakh</td>
               {% endfor %}
             </tr>
             <tr>
@@ -150,6 +150,66 @@
               <td>{{ car.year }}</td>
               {% endfor %}
             </tr>
+            <tr>
+              <td>🚘 Body Type</td>
+              {% for car in compare_list %}
+              <td>{{ car.get_body_type_display|default:"—" }}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td>⚙️ Engine Displacement (cc)</td>
+              {% for car in compare_list %}
+              <td>{{ car.engine_displacement|default:"—" }}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td>⚡ Max Power</td>
+              {% for car in compare_list %}
+              <td>{{ car.max_power|default:"—" }}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td>🔄 Max Torque</td>
+              {% for car in compare_list %}
+              <td>{{ car.max_torque|default:"—" }}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td>⛽ Fuel Tank (L)</td>
+              {% for car in compare_list %}
+              <td>{{ car.fuel_tank_capacity|default:"—" }}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td>💺 Seating Capacity</td>
+              {% for car in compare_list %}
+              <td>{{ car.seating_capacity|default:"—" }}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td>🧳 Boot Space (L)</td>
+              {% for car in compare_list %}
+              <td>{{ car.boot_space|default:"—" }}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td>☀️ Sunroof</td>
+              {% for car in compare_list %}
+              <td>{% if car.has_sunroof %}✅ Yes{% else %}❌ No{% endif %}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td>🎈 Airbags</td>
+              {% for car in compare_list %}
+              <td>{% if car.has_airbags %}✅ Yes{% else %}❌ No{% endif %}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td>🛑 ABS</td>
+              {% for car in compare_list %}
+              <td>{% if car.has_abs %}✅ Yes{% else %}❌ No{% endif %}</td>
+              {% endfor %}
+            </tr>
             {% if compare_list.0.description or compare_list.1.description %}
             <tr>
               <td>📝 Description</td>
@@ -167,19 +227,22 @@
         {% for car in compare_list %}
         <div class="car-card">
           {% if car.image %}
-            <img src="{{ car.image.url }}" alt="{{ car.make }} {{ car.model }}" class="car-card-img">
+            <a href="{% url 'car_detail' car.id %}"><img src="{{ car.image.url }}" alt="{{ car.make }} {{ car.model }}" class="car-card-img"></a>
           {% else %}
-            <div class="car-card-img-placeholder">🚗</div>
+            <a href="{% url 'car_detail' car.id %}" style="text-decoration:none;"><div class="car-card-img-placeholder">🚗</div></a>
           {% endif %}
           <div class="car-card-body">
             <div class="car-card-make">{{ car.make }}</div>
-            <div class="car-card-name">{{ car.model }} ({{ car.year }})</div>
+            <div class="car-card-name"><a href="{% url 'car_detail' car.id %}">{{ car.model }} ({{ car.year }})</a></div>
             <div class="car-card-specs">
               <span class="spec-badge">⛽ {{ car.get_engine_display }}</span>
               <span class="spec-badge">🔧 {{ car.get_transmission_display }}</span>
               {% if car.mileage %}<span class="spec-badge">📏 {{ car.mileage }}</span>{% endif %}
             </div>
-            <div class="car-card-price">₹{{ car.price|floatformat:0 }} <span>lakh</span></div>
+            <div class="car-card-price">₹{{ car.min_price|floatformat:0 }} - ₹{{ car.max_price|floatformat:0 }} <span>lakh</span></div>
+            <div class="car-card-footer" style="padding-top:15px;">
+              <a href="{% url 'car_detail' car.id %}" class="btn-view-details" style="width:100%;">View Full Details</a>
+            </div>
           </div>
         </div>
         {% endfor %}

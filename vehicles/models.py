@@ -23,17 +23,46 @@ class Car(models.Model):
         ('4', '4 Stars'),
         ('5', '5 Stars'),
     ]
+    
+    BODY_CHOICES = [
+        ('suv', 'SUV'),
+        ('sedan', 'Sedan'),
+        ('hatchback', 'Hatchback'),
+        ('muv', 'MUV'),
+        ('coupe', 'Coupe'),
+        ('convertible', 'Convertible'),
+        ('wagon', 'Wagon'),
+        ('van', 'Van'),
+        ('jeep', 'Jeep'),
+    ]
 
+    # Basic Info
     image        = models.ImageField(upload_to='cars/', blank=True, null=True)
     make         = models.CharField(max_length=100)
     model        = models.CharField(max_length=100)
     year         = models.PositiveIntegerField(default=2024)
-    price        = models.DecimalField(max_digits=12, decimal_places=2)
+    min_price    = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, help_text="Minimum price in INR")
+    max_price    = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, help_text="Maximum price in INR")
     mileage      = models.CharField(max_length=30, blank=True)
     engine       = models.CharField(max_length=20, choices=ENGINE_CHOICES, default='petrol')
     transmission = models.CharField(max_length=20, choices=TRANSMISSION_CHOICES, default='manual')
     description  = models.TextField(blank=True, null=True)
     safety_rating = models.CharField(max_length=1, choices=SAFETY_CHOICES, default='4')
+    
+    # Technical Specifications
+    engine_displacement = models.PositiveIntegerField(null=True, blank=True, help_text="Engine displacement in cc")
+    max_power           = models.CharField(max_length=100, null=True, blank=True, help_text="e.g., 113.18 bhp @ 4000 rpm")
+    max_torque          = models.CharField(max_length=100, null=True, blank=True, help_text="e.g., 250 Nm @ 1500-2750 rpm")
+    fuel_tank_capacity  = models.PositiveIntegerField(null=True, blank=True, help_text="Fuel tank capacity in Liters")
+    seating_capacity    = models.PositiveIntegerField(null=True, blank=True, help_text="Number of seats")
+    boot_space          = models.PositiveIntegerField(null=True, blank=True, help_text="Boot space in Liters")
+    body_type           = models.CharField(max_length=20, choices=BODY_CHOICES, null=True, blank=True)
+    
+    # Features (Booleans)
+    has_sunroof         = models.BooleanField(default=False)
+    has_airbags         = models.BooleanField(default=True)
+    has_abs             = models.BooleanField(default=True)
+
     created_at   = models.DateTimeField(auto_now_add=True)
     updated_at   = models.DateTimeField(auto_now=True)
 
@@ -154,3 +183,16 @@ class AdminNotification(models.Model):
 
     def __str__(self):
         return self.title
+
+
+# ── Brand ──────────────────────────────────────────────────────
+class Brand(models.Model):
+    name       = models.CharField(max_length=100, unique=True)
+    logo       = models.ImageField(upload_to='brand_logos/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
