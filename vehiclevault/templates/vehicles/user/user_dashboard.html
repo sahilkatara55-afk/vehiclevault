@@ -16,16 +16,16 @@
       <a href="{% url 'user_dashboard' %}" class="uv-nav-link active">
         <span style="font-size:1.1rem;">🏠</span> Dashboard
       </a>
-      <a href="#" class="uv-nav-link">
+      <a href="{% url 'favorites' %}" class="uv-nav-link">
         <span style="font-size:1.1rem;">❤️</span> Saved Cars
       </a>
-      <a href="#" class="uv-nav-link">
+      <a href="{% url 'compare_history' %}" class="uv-nav-link">
         <span style="font-size:1.1rem;">⚖️</span> Comparisons
       </a>
-      <a href="#" class="uv-nav-link">
+      <a href="{% url 'my_account' %}" class="uv-nav-link">
         <span style="font-size:1.1rem;">📄</span> My Documents
       </a>
-      <a href="#" class="uv-nav-link">
+      <a href="{% url 'my_account' %}" class="uv-nav-link">
         <span style="font-size:1.1rem;">🔔</span> Reminders
       </a>
       <a href="{% url 'my_account' %}" class="uv-nav-link">
@@ -43,12 +43,12 @@
       <!-- Welcome Header -->
       <div class="uv-hero-panel">
         <div class="uv-hero-content">
-          <h1 class="uv-hero-title">Welcome back, {{ request.user.first_name|default:request.user.email }}! 🚀</h1>
+          <h1 class="uv-hero-title">Welcome back, {{ request.user.first_name|default:request.user.email }}</h1>
           <p class="uv-hero-subtitle">Search, compare, and manage your dream cars in your personal dashboard.</p>
         </div>
         <div class="uv-hero-actions">
-          <a href="#" class="uv-btn uv-btn-solid">🔍 Search Cars</a>
-          <a href="#" class="uv-btn uv-btn-outline-white">⚖️ Compare</a>
+          <a href="{% url 'search_cars' %}" class="uv-btn uv-btn-solid">🔍 Search Cars</a>
+          <a href="{% url 'compare_cars' %}" class="uv-btn uv-btn-outline-white">⚖️ Compare</a>
         </div>
       </div>
 
@@ -58,14 +58,14 @@
           <div class="stat-icon-wrapper bg-blue-light"><span class="icon">⚖️</span></div>
           <div class="stat-details">
             <span class="stat-label">Comparisons</span>
-            <h3 class="stat-number">12</h3>
+            <h3 class="stat-number">{{ comparisons_count|default:0 }}</h3>
           </div>
         </div>
         <div class="uv-stat-box">
           <div class="stat-icon-wrapper bg-pink-light"><span class="icon">❤️</span></div>
           <div class="stat-details">
             <span class="stat-label">Saved Cars</span>
-            <h3 class="stat-number">5</h3>
+            <h3 class="stat-number">{{ saved_cars_count|default:0 }}</h3>
           </div>
         </div>
         <!-- Documents & Reminders next to them -->
@@ -73,14 +73,14 @@
           <div class="stat-icon-wrapper bg-indigo-light"><span class="icon">📄</span></div>
           <div class="stat-details">
             <span class="stat-label">Documents</span>
-            <h3 class="stat-number">3</h3>
+            <h3 class="stat-number">{{ documents_count|default:0 }}</h3>
           </div>
         </div>
         <div class="uv-stat-box">
           <div class="stat-icon-wrapper bg-orange-light"><span class="icon">🔔</span></div>
           <div class="stat-details">
             <span class="stat-label">Reminders</span>
-            <h3 class="stat-number">2</h3>
+            <h3 class="stat-number">{{ reminders_count|default:0 }}</h3>
           </div>
         </div>
       </div>
@@ -95,25 +95,27 @@
           <div class="uv-card">
             <div class="uv-card-header">
               <h2 class="uv-card-title">Recent Comparisons</h2>
-              <a href="#" class="uv-link">View All</a>
+              <a href="{% url 'compare_history' %}" class="uv-link">View All</a>
             </div>
             <div class="uv-list-group">
+              {% for cmp in recent_comparisons %}
               <div class="uv-list-item">
                 <div class="list-icon bg-blue-fade">⚖️</div>
                 <div class="list-text">
-                  <h4>Hyundai Creta <span class="badge-vs">VS</span> Kia Seltos</h4>
-                  <p>Compared 2 days ago</p>
+                  <h4>
+                    {% for car in cmp.cars.all %}
+                      {{ car.make }} {{ car.model }}{% if not forloop.last %} <span class="badge-vs">VS</span> {% endif %}
+                    {% endfor %}
+                  </h4>
+                  <p>Compared {{ cmp.compared_at|timesince }} ago</p>
                 </div>
-                <button class="uv-btn-small uv-btn-light">View</button>
+                <a href="{% url 'compare_history' %}" class="uv-btn-small uv-btn-light">View</a>
               </div>
+              {% empty %}
               <div class="uv-list-item">
-                <div class="list-icon bg-blue-fade">⚖️</div>
-                <div class="list-text">
-                  <h4>Tata Nexon <span class="badge-vs">VS</span> Maruti Brezza</h4>
-                  <p>Compared last week</p>
-                </div>
-                <button class="uv-btn-small uv-btn-light">View</button>
+                <p>No recent comparisons.</p>
               </div>
+              {% endfor %}
             </div>
           </div>
 
@@ -121,25 +123,27 @@
           <div class="uv-card">
             <div class="uv-card-header">
               <h2 class="uv-card-title">Saved Cars</h2>
-              <a href="#" class="uv-link">Explore More</a>
+              <a href="{% url 'favorites' %}" class="uv-link">Explore More</a>
             </div>
             <div class="uv-grid-inner">
+              {% for fav in saved_cars %}
               <div class="uv-pill-card">
-                <div class="pill-img">🚙</div>
-                <div class="pill-info">
-                  <h4>Tata Harrier</h4>
-                  <p>Top Model</p>
+                <div class="pill-img">
+                  {% if fav.car.image %}
+                  <a href="{% url 'car_detail' fav.car.id %}"><img src="{{ fav.car.image.url }}" alt="{{ fav.car.model }}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;"></a>
+                  {% else %}
+                  <a href="{% url 'car_detail' fav.car.id %}" style="text-decoration:none;">🚙</a>
+                  {% endif %}
                 </div>
-                <button class="btn-heart active">❤️</button>
-              </div>
-              <div class="uv-pill-card">
-                <div class="pill-img">🏎️</div>
                 <div class="pill-info">
-                  <h4>Mahindra XUV700</h4>
-                  <p>AX7 Luxury</p>
+                  <h4><a href="{% url 'car_detail' fav.car.id %}" style="color:inherit;text-decoration:none;">{{ fav.car.make }} {{ fav.car.model }}</a></h4>
+                  <p>{{ fav.car.transmission|title }} | ₹{{ fav.car.min_price|floatformat:0 }} - ₹{{ fav.car.max_price|floatformat:0 }} lakh</p>
                 </div>
-                <button class="btn-heart active">❤️</button>
+                <a href="{% url 'toggle_favorite' fav.car.id %}" class="btn-heart active">❤️</a>
               </div>
+              {% empty %}
+              <p style="padding: 10px;">No saved cars yet.</p>
+              {% endfor %}
             </div>
           </div>
 
@@ -147,17 +151,29 @@
           <div class="uv-card">
             <div class="uv-card-header">
               <h2 class="uv-card-title">Suggested Accessories</h2>
-              <a href="#" class="uv-link">Shop</a>
+              <a href="{% url 'my_account' %}" class="uv-link">Shop</a>
             </div>
             <div class="uv-list-group">
+              {% for acc in suggested_accessories %}
               <div class="uv-list-item">
-                <div class="list-icon bg-teal-fade">🛠️</div>
-                <div class="list-text">
-                  <h4>Premium Dashcam (Front + Rear)</h4>
-                  <p>Matches Tata Harrier</p>
+                <div class="list-icon bg-teal-fade">
+                  {% if acc.image %}
+                  <img src="{{ acc.image.url }}" alt="{{ acc.name }}" style="width: 30px; height: 30px; border-radius: 4px; object-fit: cover;">
+                  {% else %}
+                  🛠️
+                  {% endif %}
                 </div>
-                <button class="uv-btn-small uv-btn-light">View</button>
+                <div class="list-text">
+                  <h4>{{ acc.name }}</h4>
+                  <p>Matches {{ acc.compatible_car|default:"Multiple Models" }}</p>
+                </div>
+                <span class="uv-btn-small uv-btn-light">₹{{ acc.price }}</span>
               </div>
+              {% empty %}
+              <div class="uv-list-item">
+                <p>No accessories suggested at the moment.</p>
+              </div>
+              {% endfor %}
             </div>
           </div>
           
@@ -191,16 +207,18 @@
               <h2 class="uv-card-title">My Documents</h2>
             </div>
             <div class="uv-action-menu">
-              <a href="#" class="uv-menu-row">
+              {% for doc in recent_documents %}
+              <a href="{{ doc.file.url }}" class="uv-menu-row" target="_blank">
                 <div class="menu-icon">📄</div>
-                <div class="menu-text">Vehicle RC &amp; Insurance</div>
-                <div class="menu-arrow">→</div>
+                <div class="menu-text">{{ doc.title }}</div>
+                <div class="menu-arrow">↓</div>
               </a>
-              <a href="#" class="uv-menu-row">
-                <div class="menu-icon">🧑‍🔧</div>
-                <div class="menu-text">Service Records</div>
-                <div class="menu-arrow">→</div>
-              </a>
+              {% empty %}
+              <p style="padding: 15px; color: #666; font-size: 0.9rem;">No documents uploaded. Go to My Account to upload.</p>
+              {% endfor %}
+            </div>
+            <div style="padding: 10px 20px;">
+                <a href="{% url 'my_account' %}" style="font-size: 0.85rem; color: #1a73e8; text-decoration: none;">+ Manage Documents</a>
             </div>
           </div>
 
@@ -210,20 +228,20 @@
               <h2 class="uv-card-title">Reminders</h2>
             </div>
             <div class="uv-alerts-list">
-              <div class="uv-alert danger">
-                <div class="alert-icon">⚠️</div>
+              {% for reminder in upcoming_reminders %}
+              <div class="uv-alert {% if reminder.type == 'insurance' or reminder.type == 'rc' %}danger{% else %}warning{% endif %}">
+                <div class="alert-icon">{% if reminder.type == 'insurance' or reminder.type == 'rc' %}⚠️{% else %}🔧{% endif %}</div>
                 <div class="alert-content">
-                  <h4>Insurance Expiring</h4>
-                  <p>Harrier insurance expires in 5 days</p>
+                  <h4>{{ reminder.get_type_display }}</h4>
+                  <p>{{ reminder.title }} - Due on {{ reminder.due_date|date:"M d, Y" }}</p>
                 </div>
               </div>
-              <div class="uv-alert warning">
-                <div class="alert-icon">🔧</div>
-                <div class="alert-content">
-                  <h4>Service Due</h4>
-                  <p>Next service due in 20 days</p>
-                </div>
-              </div>
+              {% empty %}
+              <p style="padding: 15px; color: #666; font-size: 0.9rem;">No upcoming reminders. Add them in My Account.</p>
+              {% endfor %}
+            </div>
+            <div style="padding: 10px 20px;">
+                <a href="{% url 'my_account' %}" style="font-size: 0.85rem; color: #1a73e8; text-decoration: none;">+ Manage Reminders</a>
             </div>
           </div>
 

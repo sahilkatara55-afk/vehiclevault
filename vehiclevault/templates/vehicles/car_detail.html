@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ car.make }} {{ car.model }} | VehicleVault{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}?v=9" />
+  <link rel="stylesheet" href="{% static 'css/cars.css' %}?v=2" />
+{% endblock %}
+
+{% block content %}
+
+  <div class="car-detail-page">
+    
+    <!-- Back Navigation -->
+    <div class="cd-back-nav">
+      <a href="javascript:history.back()" class="btn-cd-back">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        Back
+      </a>
+    </div>
+
+    <!-- Header Section -->
+    <div class="car-detail-header">
+      <div class="car-detail-img-col">
+        {% if car.image %}
+          <img src="{{ car.image.url }}" alt="{{ car.make }} {{ car.model }}">
+        {% else %}
+          <div class="car-detail-img-placeholder">🚗</div>
+        {% endif %}
+      </div>
+      
+      <div class="car-detail-info-col">
+        <div class="cd-brand">{{ car.make }}</div>
+        <h1 class="cd-title">{{ car.model }}</h1>
+        <div class="cd-year">{{ car.year }} • {{ car.get_body_type_display|default:"Vehicle" }}</div>
+        
+        <div class="cd-price">
+          ₹{{ car.min_price|floatformat:0 }} - ₹{{ car.max_price|floatformat:0 }} <span>Lakh</span>
+        </div>
+
+        <div class="cd-actions">
+          {% if user.is_authenticated %}
+            <a href="{% url 'toggle_favorite' car.id %}?next={{ request.path }}" class="btn-cd-fav {% if is_favorite %}active{% endif %}">
+              {% if is_favorite %}
+                ❤️ Saved to Favorites
+              {% else %}
+                🤍 Add to Favorites
+              {% endif %}
+            </a>
+          {% endif %}
+          <a href="{% url 'compare_cars' %}?car1={{ car.id }}" class="btn-cd-compare">
+            ⚖️ Compare this Car
+          </a>
+        </div>
+
+        {% if car.description %}
+          <div class="cd-desc">
+            {{ car.description }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Specifications Section -->
+    <h2 class="cd-section-title">⚙️ Technical Specifications</h2>
+    <div class="cd-specs-grid" style="margin-bottom: 50px;">
+      
+      <div class="cd-spec-card">
+        <div class="cd-spec-icon">⛽</div>
+        <div class="cd-spec-data">
+          <span class="cd-spec-label">Fuel Type</span>
+          <span class="cd-spec-val">{{ car.get_engine_display }}</span>
+        </div>
+      </div>
+
+      <div class="cd-spec-card">
+        <div class="cd-spec-icon">🔧</div>
+        <div class="cd-spec-data">
+          <span class="cd-spec-label">Transmission</span>
+          <span class="cd-spec-val">{{ car.get_transmission_display }}</span>
+        </div>
+      </div>
+
+      <div class="cd-spec-card">
+        <div class="cd-spec-icon">📏</div>
+        <div class="cd-spec-data">
+          <span class="cd-spec-label">Mileage</span>
+          <span class="cd-spec-val">{{ car.mileage|default:"—" }}</span>
+        </div>
+      </div>
+
+      <div class="cd-spec-card">
+        <div class="cd-spec-icon">⚙️</div>
+        <div class="cd-spec-data">
+          <span class="cd-spec-label">Displacement</span>
+          <span class="cd-spec-val">{{ car.engine_displacement|default:"—" }} cc</span>
+        </div>
+      </div>
+
+      <div class="cd-spec-card">
+        <div class="cd-spec-icon">⚡</div>
+        <div class="cd-spec-data">
+          <span class="cd-spec-label">Max Power</span>
+          <span class="cd-spec-val">{{ car.max_power|default:"—" }}</span>
+        </div>
+      </div>
+
+      <div class="cd-spec-card">
+        <div class="cd-spec-icon">🔄</div>
+        <div class="cd-spec-data">
+          <span class="cd-spec-label">Max Torque</span>
+          <span class="cd-spec-val">{{ car.max_torque|default:"—" }}</span>
+        </div>
+      </div>
+
+      <div class="cd-spec-card">
+        <div class="cd-spec-icon">💺</div>
+        <div class="cd-spec-data">
+          <span class="cd-spec-label">Seating</span>
+          <span class="cd-spec-val">{{ car.seating_capacity|default:"—" }} Adults</span>
+        </div>
+      </div>
+
+      <div class="cd-spec-card">
+        <div class="cd-spec-icon">🧳</div>
+        <div class="cd-spec-data">
+          <span class="cd-spec-label">Boot Space</span>
+          <span class="cd-spec-val">{{ car.boot_space|default:"—" }} L</span>
+        </div>
+      </div>
+
+      <div class="cd-spec-card">
+        <div class="cd-spec-icon">💧</div>
+        <div class="cd-spec-data">
+          <span class="cd-spec-label">Fuel Tank</span>
+          <span class="cd-spec-val">{{ car.fuel_tank_capacity|default:"—" }} L</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Safety & Features Section -->
+    <h2 class="cd-section-title">🛡️ Safety & Features</h2>
+    <div class="cd-specs-grid">
+      
+      <div class="cd-spec-card">
+        <div class="cd-spec-icon">⭐</div>
+        <div class="cd-spec-data">
+          <span class="cd-spec-label">Safety Rating</span>
+          <span class="cd-spec-val">{{ car.safety_rating }} / 5 Stars</span>
+        </div>
+      </div>
+
+      <div class="cd-spec-card">
+        <div class="cd-spec-icon">🎈</div>
+        <div class="cd-spec-data">
+          <span class="cd-spec-label">Airbags</span>
+          <span class="cd-spec-val">
+            {% if car.has_airbags %}<span class="spec-status-yes">✅ Equipped</span>{% else %}<span class="spec-status-no">❌ Not Equipped</span>{% endif %}
+          </span>
+        </div>
+      </div>
+
+      <div class="cd-spec-card">
+        <div class="cd-spec-icon">🛑</div>
+        <div class="cd-spec-data">
+          <span class="cd-spec-label">ABS System</span>
+          <span class="cd-spec-val">
+            {% if car.has_abs %}<span class="spec-status-yes">✅ Equipped</span>{% else %}<span class="spec-status-no">❌ Not Equipped</span>{% endif %}
+          </span>
+        </div>
+      </div>
+
+      <div class="cd-spec-card">
+        <div class="cd-spec-icon">☀️</div>
+        <div class="cd-spec-data">
+          <span class="cd-spec-label">Sunroof</span>
+          <span class="cd-spec-val">
+            {% if car.has_sunroof %}<span class="spec-status-yes">✅ Equipped</span>{% else %}<span class="spec-status-no">❌ Not Equipped</span>{% endif %}
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+{% endblock %}

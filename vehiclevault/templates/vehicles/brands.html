@@ -40,7 +40,11 @@
       <div class="brands-grid">
         {% for brand in brands_data %}
         <a href="{% url 'brand_cars' brand.make %}" class="brand-card">
-          <div class="brand-emoji">🚗</div>
+          {% if brand.logo %}
+            <img src="{{ brand.logo.url }}" alt="{{ brand.make }}" style="width:60px;height:60px;object-fit:contain;">
+          {% else %}
+            <div class="brand-emoji">🚗</div>
+          {% endif %}
           <div class="brand-name">{{ brand.make }}</div>
           <div class="brand-count">{{ brand.car_count }} car{{ brand.car_count|pluralize }}</div>
         </a>

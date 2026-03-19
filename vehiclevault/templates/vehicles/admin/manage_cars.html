@@ -16,6 +16,7 @@
     <a href="{% url 'manage_cars' %}" class="uv-nav-link active"><span>🚗</span> Manage Cars</a>
     <a href="{% url 'manage_users' %}" class="uv-nav-link"><span>👥</span> Manage Users</a>
     <a href="{% url 'manage_accessories' %}" class="uv-nav-link"><span>🔧</span> Accessories</a>
+    <a href="{% url 'manage_brands' %}" class="uv-nav-link"><span>🏷️</span> Manage Brands</a>
     <a href="{% url 'admin_notifications' %}" class="uv-nav-link"><span>🔔</span> Notifications</a>
     <a href="{% url 'admin_reports' %}" class="uv-nav-link"><span>📊</span> Reports</a>
     <a href="{% url 'admin_settings' %}" class="uv-nav-link"><span>⚙️</span> Settings</a>
@@ -35,7 +36,7 @@
           <p class="mc-subtitle">Add, edit and delete vehicle listings</p>
         </div>
       </div>
-      <button class="mc-btn mc-btn-primary" onclick="openAddModal()">+ Add New Car</button>
+      <a href="{% url 'car_add' %}" class="mc-btn mc-btn-primary" style="text-decoration:none;">+ Add New Car</a>
     </div>
 
     <!-- Flash Messages -->
@@ -61,7 +62,7 @@
               <th>Image</th>
               <th>Make / Model</th>
               <th>Year</th>
-              <th>Price (₹)</th>
+              <th>Price Range (₹)</th>
               <th>Mileage</th>
               <th>Engine</th>
               <th>Safety</th>
@@ -83,7 +84,7 @@
                 <div class="mc-car-name">{{ car.make }} {{ car.model }}</div>
               </td>
               <td>{{ car.year }}</td>
-              <td class="mc-price">₹{{ car.price|floatformat:0 }}</td>
+              <td class="mc-price">₹{{ car.min_price|floatformat:0 }} - ₹{{ car.max_price|floatformat:0 }}</td>
               <td>{{ car.mileage|default:"—" }}</td>
               <td>
                 <span class="mc-engine-badge mc-engine-{{ car.engine }}">{{ car.get_engine_display }}</span>
@@ -98,7 +99,28 @@
               <td>
                 <div class="mc-actions">
                   <button class="mc-btn mc-btn-edit"
-                    onclick="openEditModal({{ car.pk }}, '{{ car.make }}', '{{ car.model }}', {{ car.year }}, '{{ car.price }}', '{{ car.mileage }}', '{{ car.engine }}', '{{ car.safety_rating }}', '{{ car.transmission }}', `{{ car.description|default:'' }}`)">
+                    onclick="openEditModal({{ car.pk }}, {
+                      make: '{{ car.make|escapejs }}',
+                      model: '{{ car.model|escapejs }}',
+                      year: {{ car.year }},
+                      min_price: '{{ car.min_price }}',
+                      max_price: '{{ car.max_price }}',
+                      mileage: '{{ car.mileage|escapejs }}',
+                      engine: '{{ car.engine }}',
+                      safety: '{{ car.safety_rating }}',
+                      transmission: '{{ car.transmission }}',
+                      description: `{{ car.description|default:''|escapejs }}`,
+                      body_type: '{{ car.body_type|default:'' }}',
+                      engine_displacement: '{{ car.engine_displacement|default:'' }}',
+                      max_power: '{{ car.max_power|default:''|escapejs }}',
+                      max_torque: '{{ car.max_torque|default:''|escapejs }}',
+                      fuel_tank_capacity: '{{ car.fuel_tank_capacity|default:'' }}',
+                      seating_capacity: '{{ car.seating_capacity|default:'' }}',
+                      boot_space: '{{ car.boot_space|default:'' }}',
+                      has_sunroof: '{{ car.has_sunroof }}',
+                      has_airbags: '{{ car.has_airbags }}',
+                      has_abs: '{{ car.has_abs }}'
+                    })">
                     ✏️ Edit
                   </button>
                   <form method="post" action="{% url 'car_delete' car.pk %}" style="display:inline;" onsubmit="return confirm('Delete {{ car.make }} {{ car.model }}?')">
@@ -123,100 +145,18 @@
   </div>
 </div>
 
-<!-- ====== ADD MODAL ====== -->
-<div class="mc-modal-overlay" id="addModal">
-  <div class="mc-modal">
-    <div class="mc-modal-header">
-      <h3>Add New Car</h3>
-      <button class="mc-modal-close" onclick="closeModal('addModal')">✕</button>
-    </div>
-    <form method="post" action="{% url 'car_add' %}" enctype="multipart/form-data">
-      {% csrf_token %}
-      <div class="mc-modal-body">
-        <div class="mc-form-row">
-          <div class="mc-form-group">
-            <label>Make (Brand)</label>
-            <input type="text" name="make" placeholder="e.g. Hyundai" required>
-          </div>
-          <div class="mc-form-group">
-            <label>Model</label>
-            <input type="text" name="model" placeholder="e.g. Creta" required>
-          </div>
-        </div>
-        <div class="mc-form-row">
-          <div class="mc-form-group">
-            <label>Year</label>
-            <input type="number" name="year" value="2024" min="1990" max="2030" required>
-          </div>
-          <div class="mc-form-group">
-            <label>Price (₹)</label>
-            <input type="number" name="price" placeholder="e.g. 1500000" step="1000" required>
-          </div>
-        </div>
-        <div class="mc-form-row">
-          <div class="mc-form-group">
-            <label>Mileage</label>
-            <input type="text" name="mileage" placeholder="e.g. 17 kmpl">
-          </div>
-          <div class="mc-form-group">
-            <label>Engine Type</label>
-            <select name="engine" required>
-              <option value="petrol">Petrol</option>
-              <option value="diesel">Diesel</option>
-              <option value="electric">Electric</option>
-              <option value="hybrid">Hybrid</option>
-              <option value="cng">CNG</option>
-            </select>
-          </div>
-        </div>
-        <div class="mc-form-row">
-          <div class="mc-form-group">
-            <label>Transmission</label>
-            <select name="transmission" required>
-              <option value="manual">Manual</option>
-              <option value="automatic">Automatic</option>
-            </select>
-          </div>
-          <div class="mc-form-group">
-            <label>Safety Rating</label>
-            <select name="safety_rating" required>
-              <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
-              <option value="4" selected>⭐⭐⭐⭐ 4 Stars</option>
-              <option value="3">⭐⭐⭐ 3 Stars</option>
-              <option value="2">⭐⭐ 2 Stars</option>
-              <option value="1">⭐ 1 Star</option>
-            </select>
-          </div>
-        </div>
-        <div class="mc-form-row">
-          <div class="mc-form-group" style="flex:1;">
-            <label>Description (optional)</label>
-            <textarea name="description" rows="2" style="width:100%;padding:8px;border:1.5px solid #E2E8F0;border-radius:8px;font-family:inherit;font-size:0.9rem;resize:vertical;" placeholder="Short description of the car..."></textarea>
-          </div>
-          <div class="mc-form-group">
-            <label>Car Image</label>
-            <input type="file" name="image" accept="image/*">
-          </div>
-        </div>
-      </div>
-      <div class="mc-modal-footer">
-        <button type="button" class="mc-btn mc-btn-gray" onclick="closeModal('addModal')">Cancel</button>
-        <button type="submit" class="mc-btn mc-btn-primary">Save Car</button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <!-- ====== EDIT MODAL ====== -->
 <div class="mc-modal-overlay" id="editModal">
-  <div class="mc-modal">
+  <div class="mc-modal" style="max-width: 800px;">
     <div class="mc-modal-header">
       <h3>Edit Car</h3>
       <button class="mc-modal-close" onclick="closeModal('editModal')">✕</button>
     </div>
     <form method="post" id="editForm" enctype="multipart/form-data">
       {% csrf_token %}
-      <div class="mc-modal-body">
+      <div class="mc-modal-body" style="max-height: 70vh; overflow-y: auto;">
+        
+        <h4 style="margin: 0 0 15px; padding-bottom: 5px; border-bottom: 1px solid #eee; color: #3b82f6;">General Information</h4>
         <div class="mc-form-row">
           <div class="mc-form-group">
             <label>Make (Brand)</label>
@@ -226,6 +166,21 @@
             <label>Model</label>
             <input type="text" name="model" id="edit_model" required>
           </div>
+          <div class="mc-form-group">
+            <label>Body Type</label>
+            <select name="body_type" id="edit_body_type">
+              <option value="">Select Body Type</option>
+              <option value="suv">SUV</option>
+              <option value="sedan">Sedan</option>
+              <option value="hatchback">Hatchback</option>
+              <option value="muv">MUV</option>
+              <option value="coupe">Coupe</option>
+              <option value="convertible">Convertible</option>
+              <option value="wagon">Wagon</option>
+              <option value="van">Van</option>
+              <option value="jeep">Jeep</option>
+            </select>
+          </div>
         </div>
         <div class="mc-form-row">
           <div class="mc-form-group">
@@ -233,15 +188,21 @@
             <input type="number" name="year" id="edit_year" min="1990" max="2030" required>
           </div>
           <div class="mc-form-group">
-            <label>Price (₹)</label>
-            <input type="number" name="price" id="edit_price" step="1000" required>
+            <label>Min Price (₹)</label>
+            <input type="number" name="min_price" id="edit_min_price" step="1000" required>
           </div>
-        </div>
-        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Max Price (₹)</label>
+            <input type="number" name="max_price" id="edit_max_price" step="1000" required>
+          </div>
           <div class="mc-form-group">
             <label>Mileage</label>
             <input type="text" name="mileage" id="edit_mileage">
           </div>
+        </div>
+
+        <h4 style="margin: 25px 0 15px; padding-bottom: 5px; border-bottom: 1px solid #eee; color: #3b82f6;">Engine & Performance</h4>
+        <div class="mc-form-row">
           <div class="mc-form-group">
             <label>Engine Type</label>
             <select name="engine" id="edit_engine" required>
@@ -252,8 +213,6 @@
               <option value="cng">CNG</option>
             </select>
           </div>
-        </div>
-        <div class="mc-form-row">
           <div class="mc-form-group">
             <label>Transmission</label>
             <select name="transmission" id="edit_transmission" required>
@@ -261,6 +220,40 @@
               <option value="automatic">Automatic</option>
             </select>
           </div>
+          <div class="mc-form-group">
+            <label>Engine Displ. (cc)</label>
+            <input type="number" name="engine_displacement" id="edit_engine_displacement">
+          </div>
+        </div>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Max Power</label>
+            <input type="text" name="max_power" id="edit_max_power" placeholder="e.g. 113.18 bhp @ 4000 rpm">
+          </div>
+          <div class="mc-form-group">
+            <label>Max Torque</label>
+            <input type="text" name="max_torque" id="edit_max_torque" placeholder="e.g. 250 Nm @ 2750 rpm">
+          </div>
+        </div>
+
+        <h4 style="margin: 25px 0 15px; padding-bottom: 5px; border-bottom: 1px solid #eee; color: #3b82f6;">Dimensions & Capacity</h4>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Fuel Tank (L)</label>
+            <input type="number" name="fuel_tank_capacity" id="edit_fuel_tank_capacity">
+          </div>
+          <div class="mc-form-group">
+            <label>Seating Capacity</label>
+            <input type="number" name="seating_capacity" id="edit_seating_capacity">
+          </div>
+          <div class="mc-form-group">
+            <label>Boot Space (L)</label>
+            <input type="number" name="boot_space" id="edit_boot_space">
+          </div>
+        </div>
+
+        <h4 style="margin: 25px 0 15px; padding-bottom: 5px; border-bottom: 1px solid #eee; color: #3b82f6;">Features & Safety</h4>
+        <div class="mc-form-row">
           <div class="mc-form-group">
             <label>Safety Rating</label>
             <select name="safety_rating" id="edit_safety" required>
@@ -271,7 +264,20 @@
               <option value="1">⭐ 1 Star</option>
             </select>
           </div>
+          <div class="mc-form-group" style="display: flex; gap: 15px; align-items: flex-end; padding-bottom: 10px;">
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: 500;">
+              <input type="checkbox" name="has_sunroof" id="edit_has_sunroof"> Sunroof
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: 500;">
+              <input type="checkbox" name="has_airbags" id="edit_has_airbags"> Airbags
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: 500;">
+              <input type="checkbox" name="has_abs" id="edit_has_abs"> ABS
+            </label>
+          </div>
         </div>
+
+        <h4 style="margin: 25px 0 15px; padding-bottom: 5px; border-bottom: 1px solid #eee; color: #3b82f6;">Media & Details</h4>
         <div class="mc-form-row">
           <div class="mc-form-group" style="flex:1;">
             <label>Description (optional)</label>
@@ -292,21 +298,34 @@
 </div>
 
 <script>
-  function openAddModal() {
-    document.getElementById('addModal').classList.add('active');
-  }
-  function openEditModal(pk, make, model, year, price, mileage, engine, safety, transmission, description) {
+  function openEditModal(pk, obj) {
     const base = "{% url 'car_edit' 0 %}".replace('/0/', '/' + pk + '/');
     document.getElementById('editForm').action = base;
-    document.getElementById('edit_make').value         = make;
-    document.getElementById('edit_model').value        = model;
-    document.getElementById('edit_year').value         = year;
-    document.getElementById('edit_price').value        = price;
-    document.getElementById('edit_mileage').value      = mileage;
-    document.getElementById('edit_engine').value       = engine;
-    document.getElementById('edit_safety').value       = safety;
-    document.getElementById('edit_transmission').value = transmission || 'manual';
-    document.getElementById('edit_description').value  = description || '';
+    document.getElementById('edit_make').value         = obj.make;
+    document.getElementById('edit_model').value        = obj.model;
+    document.getElementById('edit_year').value         = obj.year;
+    document.getElementById('edit_min_price').value    = obj.min_price;
+    document.getElementById('edit_max_price').value    = obj.max_price;
+    document.getElementById('edit_mileage').value      = obj.mileage;
+    document.getElementById('edit_engine').value       = obj.engine;
+    document.getElementById('edit_safety').value       = obj.safety;
+    document.getElementById('edit_transmission').value = obj.transmission || 'manual';
+    document.getElementById('edit_description').value  = obj.description || '';
+    
+    // Technical fields
+    if (document.getElementById('edit_body_type')) document.getElementById('edit_body_type').value = obj.body_type || '';
+    if (document.getElementById('edit_engine_displacement')) document.getElementById('edit_engine_displacement').value = obj.engine_displacement || '';
+    if (document.getElementById('edit_max_power')) document.getElementById('edit_max_power').value = obj.max_power || '';
+    if (document.getElementById('edit_max_torque')) document.getElementById('edit_max_torque').value = obj.max_torque || '';
+    if (document.getElementById('edit_fuel_tank_capacity')) document.getElementById('edit_fuel_tank_capacity').value = obj.fuel_tank_capacity || '';
+    if (document.getElementById('edit_seating_capacity')) document.getElementById('edit_seating_capacity').value = obj.seating_capacity || '';
+    if (document.getElementById('edit_boot_space')) document.getElementById('edit_boot_space').value = obj.boot_space || '';
+    
+    // Checkboxes
+    if (document.getElementById('edit_has_sunroof')) document.getElementById('edit_has_sunroof').checked = obj.has_sunroof === 'True';
+    if (document.getElementById('edit_has_airbags')) document.getElementById('edit_has_airbags').checked = obj.has_airbags === 'True';
+    if (document.getElementById('edit_has_abs')) document.getElementById('edit_has_abs').checked = obj.has_abs === 'True';
+
     document.getElementById('editModal').classList.add('active');
   }
   function closeModal(id) {

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import UsersignupForm, UserProfileUpdateForm, OTPVerifyForm
 from .models import User, AdminSignupRequest
-from vehicles.models import Car, FavoriteVehicle, CompareHistory, RecentlyViewed, UserDocument, Reminder, Accessory, AdminNotification
+from vehicles.models import Car, FavoriteVehicle, CompareHistory, RecentlyViewed, UserDocument, Reminder, Accessory, AdminNotification, Brand
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
@@ -319,7 +319,43 @@ def reject_admin_request(request, pk):
 # Home
 # ──────────────────────────────────────────────
 def home(request):
-    return render(request, 'home.html')
+    latest_cars = Car.objects.all().order_by('-created_at')
+    
+    # Calculate statistics for the home page
+    cars_available = Car.objects.count()
+    top_brands_count = Car.objects.values('make').distinct().count()
+    comparisons_done = CompareHistory.objects.count()
+
+    # Get Brands data exactly like brands_view
+    from django.db.models import Count
+    raw_brands_data = Car.objects.values('make').annotate(car_count=Count('id'))
+    brands_dict = {}
+    for item in raw_brands_data:
+        clean_make = item['make'].strip().title()
+        if clean_make.lower() == 'mg':
+            clean_make = 'MG'
+        elif clean_make.lower() == 'bmw':
+            clean_make = 'BMW'
+        brands_dict[clean_make] = brands_dict.get(clean_make, 0) + item['car_count']
+        
+    brands_data = [
+        {'make': make, 'car_count': count} 
+        for make, count in sorted(brands_dict.items())
+    ]
+    
+    brand_logos = {b.name.lower(): b.logo for b in Brand.objects.all() if b.logo}
+    for brand in brands_data:
+        brand['logo'] = brand_logos.get(brand['make'].lower())
+
+    context = {
+        'latest_cars': latest_cars,
+        'cars_available': cars_available,
+        'top_brands_count': top_brands_count,
+        'comparisons_done': comparisons_done,
+        'brands_data': brands_data,
+    }
+    
+    return render(request, 'home.html', context)
 
 
 # ──────────────────────────────────────────────
@@ -352,7 +388,42 @@ def userloginform(request):
 # ──────────────────────────────────────────────
 @login_required
 def user_dashboard(request):
-    return render(request, 'vehicles/user/user_dashboard.html')
+    user = request.user
+    
+    # Counts for Top Stat Cards
+    comparisons_count = CompareHistory.objects.filter(user=user).count()
+    saved_cars_count = FavoriteVehicle.objects.filter(user=user).count()
+    documents_count = UserDocument.objects.filter(user=user).count()
+    reminders_count = Reminder.objects.filter(user=user).count()
+
+    # Recent Data
+    recent_comparisons = CompareHistory.objects.filter(user=user).prefetch_related('cars')[:2]
+    saved_cars = FavoriteVehicle.objects.filter(user=user).select_related('car')[:2]
+    recent_documents = UserDocument.objects.filter(user=user)[:2]
+    upcoming_reminders = Reminder.objects.filter(user=user).order_by('due_date')[:2]
+
+    # Accessories (Suggest based on saved cars, or just random latest if none saved)
+    suggested_accessories = Accessory.objects.all().order_by('-created_at')[:2]
+    if saved_cars.exists():
+        saved_makes = [fav.car.make for fav in saved_cars]
+        suggested = Accessory.objects.filter(compatible_car__in=saved_makes)[:2]
+        if suggested.exists():
+            suggested_accessories = suggested
+
+    context = {
+        'comparisons_count': comparisons_count,
+        'saved_cars_count': saved_cars_count,
+        'documents_count': documents_count,
+        'reminders_count': reminders_count,
+        
+        'recent_comparisons': recent_comparisons,
+        'saved_cars': saved_cars,
+        'recent_documents': recent_documents,
+        'upcoming_reminders': upcoming_reminders,
+        'suggested_accessories': suggested_accessories,
+    }
+
+    return render(request, 'vehicles/user/user_dashboard.html', context)
 
 
 # ──────────────────────────────────────────────
@@ -415,23 +486,42 @@ def manage_cars(request):
 def car_add(request):
     if not (request.user.is_staff or request.user.is_superuser):
         return redirect('user_dashboard')
+        
     if request.method == 'POST':
         car = Car(
             make=request.POST['make'],
             model=request.POST['model'],
             year=request.POST['year'],
-            price=request.POST['price'],
+            min_price=request.POST['min_price'],
+            max_price=request.POST['max_price'],
             mileage=request.POST.get('mileage', ''),
             engine=request.POST['engine'],
             transmission=request.POST.get('transmission', 'manual'),
             description=request.POST.get('description', ''),
             safety_rating=request.POST['safety_rating'],
+            
+            # Technical Specifications
+            engine_displacement=request.POST.get('engine_displacement') or None,
+            max_power=request.POST.get('max_power', ''),
+            max_torque=request.POST.get('max_torque', ''),
+            fuel_tank_capacity=request.POST.get('fuel_tank_capacity') or None,
+            seating_capacity=request.POST.get('seating_capacity') or None,
+            boot_space=request.POST.get('boot_space') or None,
+            body_type=request.POST.get('body_type') or None,
+            
+            # Features
+            has_sunroof=request.POST.get('has_sunroof') == 'on',
+            has_airbags=request.POST.get('has_airbags') == 'on',
+            has_abs=request.POST.get('has_abs') == 'on',
         )
         if 'image' in request.FILES:
             car.image = request.FILES['image']
         car.save()
         messages.success(request, f'{car} added successfully.')
-    return redirect('manage_cars')
+        return redirect('manage_cars')
+        
+    # Render the new full-page create form
+    return render(request, 'vehicles/admin/add_car.html')
 
 
 @login_required
@@ -443,12 +533,28 @@ def car_edit(request, pk):
         car.make         = request.POST['make']
         car.model        = request.POST['model']
         car.year         = request.POST['year']
-        car.price        = request.POST['price']
+        car.min_price    = request.POST['min_price']
+        car.max_price    = request.POST['max_price']
         car.mileage      = request.POST.get('mileage', '')
         car.engine       = request.POST['engine']
         car.transmission = request.POST.get('transmission', 'manual')
         car.description  = request.POST.get('description', '')
         car.safety_rating = request.POST['safety_rating']
+        
+        # Technical Specifications
+        car.engine_displacement = request.POST.get('engine_displacement') or None
+        car.max_power           = request.POST.get('max_power', '')
+        car.max_torque          = request.POST.get('max_torque', '')
+        car.fuel_tank_capacity  = request.POST.get('fuel_tank_capacity') or None
+        car.seating_capacity    = request.POST.get('seating_capacity') or None
+        car.boot_space          = request.POST.get('boot_space') or None
+        car.body_type           = request.POST.get('body_type') or None
+        
+        # Features
+        car.has_sunroof         = request.POST.get('has_sunroof') == 'on'
+        car.has_airbags         = request.POST.get('has_airbags') == 'on'
+        car.has_abs             = request.POST.get('has_abs') == 'on'
+        
         if 'image' in request.FILES:
             car.image = request.FILES['image']
         car.save()
@@ -644,6 +750,75 @@ def admin_settings(request):
 
 
 # ──────────────────────────────────────────────
+# Admin: Brand Management
+# ──────────────────────────────────────────────
+@login_required
+def manage_brands(request):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('user_dashboard')
+    from django.db.models import Count
+    brands = Brand.objects.annotate(car_count=Count('name')).order_by('name')
+    # Attach car count by matching brand name (case-insensitive) to Car.make
+    from vehicles.models import Car as CarModel
+    brand_car_counts = {
+        item['make'].strip().lower(): item['cnt']
+        for item in CarModel.objects.values('make').annotate(cnt=Count('id'))
+    }
+    for brand in brands:
+        brand.total_cars = brand_car_counts.get(brand.name.lower(), 0)
+    return render(request, 'vehicles/admin/manage_brands.html', {'brands': brands})
+
+
+@login_required
+def brand_add(request):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('user_dashboard')
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        if name:
+            brand, created = Brand.objects.get_or_create(name=name)
+            if 'logo' in request.FILES:
+                brand.logo = request.FILES['logo']
+                brand.save()
+            if created:
+                messages.success(request, f'Brand "{name}" added successfully.')
+            else:
+                messages.info(request, f'Brand "{name}" already exists. Logo updated if provided.')
+        else:
+            messages.error(request, 'Brand name is required.')
+    return redirect('manage_brands')
+
+
+@login_required
+def brand_edit(request, pk):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('user_dashboard')
+    brand = get_object_or_404(Brand, pk=pk)
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        if name:
+            brand.name = name
+        if 'logo' in request.FILES:
+            brand.logo = request.FILES['logo']
+        brand.save()
+        messages.success(request, f'Brand "{brand.name}" updated.')
+    return redirect('manage_brands')
+
+
+@login_required
+def brand_delete(request, pk):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('user_dashboard')
+    brand = get_object_or_404(Brand, pk=pk)
+    name = brand.name
+    if brand.logo:
+        brand.logo.delete(save=False)
+    brand.delete()
+    messages.success(request, f'Brand "{name}" deleted.')
+    return redirect('manage_brands')
+
+
+# ──────────────────────────────────────────────
 # Logout View
 # ──────────────────────────────────────────────
 def logout_user(request):
@@ -665,6 +840,20 @@ def search_cars(request):
     price_min   = request.GET.get('price_min', '').strip()
     price_max   = request.GET.get('price_max', '').strip()
     query       = request.GET.get('q', '').strip()
+    
+    # Handle home page budget dropdown
+    budget = request.GET.get('budget', '').strip()
+    if budget:
+        if budget == 'under5':
+            price_max = '500000'
+        elif budget == '5-10':
+            price_min = '500000'
+            price_max = '1000000'
+        elif budget == '10-20':
+            price_min = '1000000'
+            price_max = '2000000'
+        elif budget == 'above20':
+            price_min = '2000000'
 
     if query:
         cars = cars.filter(
@@ -678,12 +867,12 @@ def search_cars(request):
         cars = cars.filter(transmission=transmission)
     if price_min:
         try:
-            cars = cars.filter(price__gte=float(price_min))
+            cars = cars.filter(min_price__gte=float(price_min))
         except ValueError:
             pass
     if price_max:
         try:
-            cars = cars.filter(price__lte=float(price_max))
+            cars = cars.filter(max_price__lte=float(price_max))
         except ValueError:
             pass
 
@@ -706,15 +895,67 @@ def search_cars(request):
 
 
 # ──────────────────────────────────────────────
+# Car Detail
+# ──────────────────────────────────────────────
+def car_detail(request, pk):
+    car = get_object_or_404(Car, pk=pk)
+    
+    is_favorite = False
+    if request.user.is_authenticated:
+        # Track that the user viewed this car
+        RecentlyViewed.objects.update_or_create(
+            user=request.user,
+            car=car,
+            defaults={'viewed_at': timezone.now()}
+        )
+        is_favorite = FavoriteVehicle.objects.filter(user=request.user, car=car).exists()
+
+    return render(request, 'vehicles/car_detail.html', {
+        'car': car,
+        'is_favorite': is_favorite
+    })
+
+
+# ──────────────────────────────────────────────
 # Brands
 # ──────────────────────────────────────────────
 def brands_view(request):
     from django.db.models import Count
-    brands_data = (
+    # Get raw counts grouped by exact make strings
+    raw_brands_data = (
         Car.objects.values('make')
         .annotate(car_count=Count('id'))
-        .order_by('make')
     )
+    
+    # Process in Python to handle case insensitivity and trailing spaces
+    brands_dict = {}
+    for item in raw_brands_data:
+        # Standardize the brand name: strip whitespace and convert to Title Case
+        clean_make = item['make'].strip().title()
+        
+        # Override specific brands to maintain full caps
+        if clean_make.lower() == 'mg':
+            clean_make = 'MG'
+        elif clean_make.lower() == 'bmw':
+            clean_make = 'BMW'
+            
+        if clean_make in brands_dict:
+            brands_dict[clean_make] += item['car_count']
+        else:
+            brands_dict[clean_make] = item['car_count']
+            
+    # Convert back to the expected list of dictionaries format and sort alphabetically
+    brands_data = [
+        {'make': make, 'car_count': count} 
+        for make, count in sorted(brands_dict.items())
+    ]
+    
+    # Attach logo from Brand model if exists
+    brand_logos = {b.name.lower(): b.logo for b in Brand.objects.all() if b.logo}
+    for brand in brands_data:
+        logo = brand_logos.get(brand['make'].lower())
+        brand['logo'] = logo
+    
     return render(request, 'vehicles/brands.html', {'brands_data': brands_data})
 
 
@@ -738,6 +979,21 @@ def compare_cars(request):
     compare_list = []
     if selected_ids:
         compare_list = list(Car.objects.filter(id__in=selected_ids))
+        
+        # Save compare history if user is authenticated and at least 2 cars are selected
+        if request.user.is_authenticated and len(compare_list) > 1:
+            last_history = CompareHistory.objects.filter(user=request.user).order_by('-compared_at').first()
+            create_new = True
+            
+            if last_history:
+                last_caps = set(last_history.cars.values_list('id', flat=True))
+                if set([car.id for car in compare_list]) == last_caps:
+                    create_new = False
+                    
+            if create_new:
+                from django.utils import timezone
+                history = CompareHistory.objects.create(user=request.user, compared_at=timezone.now())
+                history.cars.set(compare_list)
 
     return render(request, 'vehicles/compare_cars.html', {
         'all_cars': all_cars,

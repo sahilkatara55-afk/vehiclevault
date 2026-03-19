@@ -15,9 +15,14 @@
   <!-- Center/Right: Main Menu -->
   <div class="topbar-menu">
     <a href="{% url 'home' %}">Home</a>
+    {% if user.is_authenticated and user.is_superuser %}
+    <a href="{% url 'manage_brands' %}">Brands</a>
+    <a href="/admin/" target="_blank">Admin Panel</a>
+    {% else %}
     <a href="{% url 'search_cars' %}">Search Cars</a>
     <a href="{% url 'compare_cars' %}">Compare Cars</a>
     <a href="{% url 'brands' %}">Brands</a>
+    {% endif %}
     <a href="{% if user.is_authenticated %}{% if user.is_superuser %}{% url 'admin_dashboard' %}{% else %}{% url 'user_dashboard' %}{% endif %}{% else %}{% url 'login' %}{% endif %}">Dashboard</a>
   </div>
 
@@ -56,14 +61,12 @@
     <script>
       function toggleSidebar(event) {
         if (event) event.stopPropagation();
-        const sidebar = document.querySelector(".admin-sidebar") || document.querySelector(".uv-sidebar") || document.querySelector(".user-sidebar") || document.querySelector(".sidebar");
-        const overlay = document.querySelector(".sidebar-overlay");
-        if (sidebar) {
-            sidebar.classList.toggle("active");
-        }
-        if (overlay) {
-            overlay.classList.toggle("active");
-        }
+        
+        const sidebars = document.querySelectorAll(".admin-sidebar, .uv-sidebar, .user-sidebar, .sidebar");
+        const overlays = document.querySelectorAll(".sidebar-overlay");
+        
+        sidebars.forEach(sidebar => sidebar.classList.toggle("active"));
+        overlays.forEach(overlay => overlay.classList.toggle("active"));
       }
 
       function toggleProfileDropdown(event) {

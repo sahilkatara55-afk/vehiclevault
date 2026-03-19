@@ -24,6 +24,7 @@
     <a href="{% url 'manage_cars' %}" class="uv-nav-link"><span>🚗</span> Manage Cars</a>
     <a href="{% url 'manage_users' %}" class="uv-nav-link"><span>👥</span> Manage Users</a>
     <a href="{% url 'manage_accessories' %}" class="uv-nav-link"><span>🔧</span> Accessories</a>
+    <a href="{% url 'manage_brands' %}" class="uv-nav-link"><span>🏷️</span> Manage Brands</a>
     <a href="{% url 'admin_notifications' %}" class="uv-nav-link"><span>🔔</span> Notifications</a>
     <a href="{% url 'admin_reports' %}" class="uv-nav-link active"><span>📊</span> Reports</a>
     <a href="{% url 'admin_settings' %}" class="uv-nav-link"><span>⚙️</span> Settings</a>
@@ -95,7 +96,7 @@
               <td><div class="mc-car-name">{{ car.make }} {{ car.model }}</div></td>
               <td>{{ car.year }}</td>
               <td><span class="mc-engine-badge mc-engine-{{ car.engine }}">{{ car.get_engine_display }}</span></td>
-              <td class="mc-price">₹{{ car.price|floatformat:0 }}</td>
+              <td class="mc-price">₹{{ car.min_price|floatformat:0 }} - ₹{{ car.max_price|floatformat:0 }}</td>
               <td><strong style="color:#3B82F6;">{{ car.cmp_count }}</strong></td>
               <td>
                 {% if max_cmp > 0 %}

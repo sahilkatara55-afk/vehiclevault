@@ -38,6 +38,12 @@ urlpatterns = [
     path('admin-reports/', views.admin_reports, name='admin_reports'),
     path('admin-settings/', views.admin_settings, name='admin_settings'),
 
+    # Brand Management
+    path('manage-brands/', views.manage_brands, name='manage_brands'),
+    path('manage-brands/add/', views.brand_add, name='brand_add'),
+    path('manage-brands/edit/<int:pk>/', views.brand_edit, name='brand_edit'),
+    path('manage-brands/delete/<int:pk>/', views.brand_delete, name='brand_delete'),
+
     # Admin Signup Request Management
     path('admin-requests/', views.admin_requests_list, name='admin_requests_list'),
     path('admin-requests/<int:pk>/approve/', views.approve_admin_request, name='approve_admin_request'),
@@ -45,11 +51,12 @@ urlpatterns = [
 
     path('logout/', views.logout_user, name='logout'),
 
-    # Public Pages — Search, Brands, Compare
+    # Public Pages — Search, Brands, Compare, Details
     path('search/', views.search_cars, name='search_cars'),
     path('brands/', views.brands_view, name='brands'),
     path('brands/<str:make>/', views.brand_cars, name='brand_cars'),
     path('compare/', views.compare_cars, name='compare_cars'),
+    path('car/<int:pk>/', views.car_detail, name='car_detail'),
 
     # My Account Sub-Pages
     path('compare-history/', views.compare_history, name='compare_history'),

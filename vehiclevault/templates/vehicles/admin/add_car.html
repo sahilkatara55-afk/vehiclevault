@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Add New Car | VehicleVault Admin{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}?v=9" />
+  <link rel="stylesheet" href="{% static 'css/manage_cars.css' %}?v=1" />
+  <link rel="stylesheet" href="{% static 'css/add_car.css' %}?v=1" />
+{% endblock %}
+
+{% block content %}
+<div class="sidebar-overlay" onclick="toggleSidebar(event)"></div>
+
+<!-- Admin Sidebar -->
+<aside class="uv-sidebar">
+  <div class="uv-sidebar-menu">
+    <a href="{% url 'admin_dashboard' %}" class="uv-nav-link"><span>🏠</span> Dashboard</a>
+    <a href="{% url 'manage_cars' %}" class="uv-nav-link active"><span>🚗</span> Manage Cars</a>
+    <a href="{% url 'manage_users' %}" class="uv-nav-link"><span>👥</span> Manage Users</a>
+    <a href="{% url 'manage_accessories' %}" class="uv-nav-link"><span>🔧</span> Accessories</a>
+    <a href="{% url 'manage_brands' %}" class="uv-nav-link"><span>🏷️</span> Manage Brands</a>
+    <a href="{% url 'admin_notifications' %}" class="uv-nav-link"><span>🔔</span> Notifications</a>
+    <a href="{% url 'admin_reports' %}" class="uv-nav-link"><span>📊</span> Reports</a>
+    <a href="{% url 'admin_settings' %}" class="uv-nav-link"><span>⚙️</span> Settings</a>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<div class="admin-main">
+  <div class="mc-page">
+
+    <!-- Page Header -->
+    <div class="mc-header">
+      <div class="mc-header-left">
+        <div class="mc-header-icon">➕</div>
+        <div>
+          <h1 class="mc-title">Add New Car</h1>
+          <p class="mc-subtitle">Enter vehicle details and technical specifications</p>
+        </div>
+      </div>
+      <a href="{% url 'manage_cars' %}" class="mc-btn mc-btn-gray">← Back to List</a>
+    </div>
+
+    <!-- Form Container -->
+    <div class="add-car-container">
+      <form method="post" action="{% url 'car_add' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <h3 class="section-heading">General Information</h3>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Make (Brand)</label>
+            <input type="text" name="make" placeholder="e.g. Hyundai" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Model</label>
+            <input type="text" name="model" placeholder="e.g. Creta" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Body Type</label>
+            <select name="body_type">
+              <option value="">Select Body Type...</option>
+              <option value="suv">SUV</option>
+              <option value="sedan">Sedan</option>
+              <option value="hatchback">Hatchback</option>
+              <option value="muv">MUV</option>
+              <option value="coupe">Coupe</option>
+              <option value="convertible">Convertible</option>
+              <option value="wagon">Wagon</option>
+              <option value="van">Van</option>
+              <option value="jeep">Jeep</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Year</label>
+            <input type="number" name="year" value="2024" min="1990" max="2030" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Min Price (₹)</label>
+            <input type="number" name="min_price" placeholder="e.g. 500000" step="1000" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Max Price (₹)</label>
+            <input type="number" name="max_price" placeholder="e.g. 1500000" step="1000" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Mileage</label>
+            <input type="text" name="mileage" placeholder="e.g. 17 kmpl">
+          </div>
+        </div>
+
+        <h3 class="section-heading">Engine & Performance</h3>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Engine Type</label>
+            <select name="engine" required>
+              <option value="petrol">Petrol</option>
+              <option value="diesel">Diesel</option>
+              <option value="electric">Electric</option>
+              <option value="hybrid">Hybrid</option>
+              <option value="cng">CNG</option>
+            </select>
+          </div>
+          <div class="mc-form-group">
+            <label>Transmission</label>
+            <select name="transmission" required>
+              <option value="manual">Manual</option>
+              <option value="automatic">Automatic</option>
+            </select>
+          </div>
+          <div class="mc-form-group">
+            <label>Engine Displ. (cc)</label>
+            <input type="number" name="engine_displacement" placeholder="e.g. 1497">
+          </div>
+        </div>
+        
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Max Power</label>
+            <input type="text" name="max_power" placeholder="e.g. 113.18 bhp @ 4000 rpm">
+          </div>
+          <div class="mc-form-group">
+            <label>Max Torque</label>
+            <input type="text" name="max_torque" placeholder="e.g. 250 Nm @ 2750 rpm">
+          </div>
+        </div>
+
+        <h3 class="section-heading">Dimensions & Capacity</h3>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Fuel Tank Capacity (Liters)</label>
+            <input type="number" name="fuel_tank_capacity" placeholder="e.g. 50">
+          </div>
+          <div class="mc-form-group">
+            <label>Seating Capacity</label>
+            <input type="number" name="seating_capacity" placeholder="e.g. 5">
+          </div>
+          <div class="mc-form-group">
+            <label>Boot Space (Liters)</label>
+            <input type="number" name="boot_space" placeholder="e.g. 433">
+          </div>
+        </div>
+
+        <h3 class="section-heading">Features & Safety</h3>
+        <div class="mc-form-row mc-form-row-center">
+          <div class="mc-form-group mc-form-group-flex1">
+            <label>Global NCAP Safety Rating</label>
+            <select name="safety_rating" required>
+              <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+              <option value="4" selected>⭐⭐⭐⭐ 4 Stars</option>
+              <option value="3">⭐⭐⭐ 3 Stars</option>
+              <option value="2">⭐⭐ 2 Stars</option>
+              <option value="1">⭐ 1 Star</option>
+            </select>
+          </div>
+          <div class="mc-form-group mc-form-group-flex2 safety-features-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="has_sunroof" class="large-checkbox"> Sunroof
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="has_airbags" checked class="large-checkbox"> Airbags
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="has_abs" checked class="large-checkbox"> ABS
+            </label>
+          </div>
+        </div>
+
+        <h3 class="section-heading">Media & Details</h3>
+        <div class="mc-form-row">
+          <div class="mc-form-group mc-form-group-flex2">
+            <label>Vehicle Description (optional)</label>
+            <textarea name="description" rows="4" class="desc-textarea" placeholder="Write a short description or highlights about the car..."></textarea>
+          </div>
+          <div class="mc-form-group mc-form-group-flex1">
+            <label>Primary Car Image</label>
+            <input type="file" name="image" accept="image/*" class="image-upload-input">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <a href="{% url 'manage_cars' %}" class="mc-btn mc-btn-gray mc-btn-large">Cancel</a>
+          <button type="submit" class="mc-btn mc-btn-primary mc-btn-large">Save Vehicle</button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
