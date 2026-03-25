@@ -1,96 +1,311 @@
-<!-- TOP NAVBAR -->
-<div class="topbar">
-  <!-- Left Side: Logo -->
-  <div class="topbar-left">
-    {% if user.is_authenticated %}
-    <button class="hamburger-menu-btn" onclick="toggleSidebar(event)" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; margin-right: 15px; padding: 5px;">
-      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-    </button>
-    {% endif %}
-    <a href="{% url 'home' %}" class="topbar-logo">VehicleVault</a>
-  </div>
+{% load static %}
+<header class="vv-main-header sticky-top">
+  <!-- UPPER TIER -->
+  <div class="vv-header-upper">
+    
+    <!-- Left: Logo & Hamburger -->
+    <div class="vv-header-left">
 
-  <!-- Center/Right: Main Menu -->
-  <div class="topbar-menu">
-    <a href="{% url 'home' %}">Home</a>
-    {% if user.is_authenticated and user.is_superuser %}
-    <a href="{% url 'manage_brands' %}">Brands</a>
-    <a href="/admin/" target="_blank">Admin Panel</a>
-    {% else %}
-    <a href="{% url 'search_cars' %}">Search Cars</a>
-    <a href="{% url 'compare_cars' %}">Compare Cars</a>
-    <a href="{% url 'brands' %}">Brands</a>
-    {% endif %}
-    <a href="{% if user.is_authenticated %}{% if user.is_superuser %}{% url 'admin_dashboard' %}{% else %}{% url 'user_dashboard' %}{% endif %}{% else %}{% url 'login' %}{% endif %}">Dashboard</a>
-  </div>
+      <a href="{% url 'home' %}" class="vv-logo">
+        <span class="vv-logo-icon"></span> VehicleVault
+      </a>
+    </div>
 
-  <!-- Right Side: User Actions -->
-  <div class="topbar-right">
-    {% if user.is_authenticated %}
-    <div class="profile-dropdown-container">
-      <button class="profile-icon-btn" onclick="toggleProfileDropdown(event)">
-        {% if user.profile_picture %}
-        <div
-          class="profile-avatar"
-          style="background-image: url('{{ user.profile_picture.url }}'); background-size: cover; background-position: center; border-radius: 50%; border: 2px solid white;"
-        ></div>
-        {% else %}
-        <div class="profile-avatar">
-          {{ user.email|make_list|first|upper }}
+    <!-- Center: Search Bar -->
+    <div class="vv-header-center">
+      <form action="{% url 'search_cars' %}" method="GET" class="vv-search-form">
+        <input type="text" name="query" class="vv-search-input" placeholder="Search Cars or Ask a Question">
+        <button type="submit" class="vv-search-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+      </form>
+    </div>
+
+    <!-- Right: Actions -->
+    <div class="vv-header-right">
+      
+      <!-- Language Dropdown -->
+      <div class="vv-lang-dropdown-wrapper">
+        <div class="vv-action-item vv-lang-select">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <span id="currentLang">English</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="margin-left: 4px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
         </div>
-        {% endif %}
+        <div class="vv-lang-dropdown-menu">
+          <div class="vv-lang-item" onclick="setLanguage('English')">English</div>
+          <div class="vv-lang-item" onclick="setLanguage('हिन्दी')">हिन्दी</div>
+          <div class="vv-lang-item" onclick="setLanguage('ગુજરાતી')">ગુજરાતી</div>
+          <div class="vv-lang-item" onclick="setLanguage('मराठी')">मराठी</div>
+          <div class="vv-lang-item" onclick="setLanguage('தமிழ்')">தமிழ்</div>
+          <div class="vv-lang-item" onclick="setLanguage('తెలుగు')">తెలుగు</div>
+        </div>
+      </div>
+
+      <!-- Dark Mode Toggle -->
+      <button class="vv-action-item vv-dark-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode" id="darkModeBtn">
+        🌙
       </button>
 
-      <!-- Dropdown Content -->
-      <div class="profile-dropdown-menu" id="profileDropdown">
-        <div class="dropdown-links">
-          <a href="{% url 'my_account' %}">
-            <span class="dropdown-icon">⚙️</span> Profile
-            <span class="dropdown-chevron">&rsaquo;</span>
-          </a>
+      <!-- Saved Cars (Favorites) -->
+      <a href="{% url 'favorites' %}" class="vv-action-item vv-favorites" title="Saved Cars">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+      </a>
+
+      <!-- Auth -->
+      {% if user.is_authenticated %}
+      <div class="profile-dropdown-container">
+        <button class="vv-profile-btn" onclick="toggleProfileDropdown(event)">
+          {% if user.profile_picture %}
+          <div class="vv-avatar" style="background-image: url('{{ user.profile_picture.url }}');"></div>
+          {% else %}
+          <div class="vv-avatar-text">{{ user.email|make_list|first|upper }}</div>
+          {% endif %}
+          <span class="vv-profile-name">Profile</span>
+        </button>
+        <!-- Dropdown -->
+        <div class="profile-dropdown-menu" id="profileDropdown">
+          <div class="dropdown-links">
+            <a href="{% url 'my_account' %}"><span class="dropdown-icon">👤</span> Profile</a>
+            <a href="{% if user.is_superuser %}{% url 'admin_dashboard' %}{% else %}{% url 'user_dashboard' %}{% endif %}"><span class="dropdown-icon">📊</span> Dashboard</a>
+          </div>
+          <div class="dropdown-footer">
+            <a href="{% url 'logout' %}" class="dropdown-logout-btn">Logout</a>
+          </div>
         </div>
-        <div class="dropdown-footer">
-          <a href="{% url 'logout' %}" class="dropdown-logout-btn">Logout</a>
+      </div>
+      {% else %}
+      <div class="vv-auth-links">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="margin-right: 2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+        <a href="{% url 'login' %}">Login</a> <span style="margin: 0 4px; color: #cbd5e1;">/</span> <a href="{% url 'signup' %}">Register</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- LOWER TIER -->
+  <div class="vv-header-lower">
+    <nav class="vv-lower-nav">
+      
+      <!-- NEW CARS Dropdown -->
+      <div class="vv-nav-dropdown">
+        <a href="{% url 'search_cars' %}" class="vv-nav-link">NEW CARS <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></a>
+        <div class="vv-nav-dropdown-menu">
+          <a href="{% url 'search_cars' %}" class="vv-nav-dropdown-item">Explore New Cars</a>
+          <div class="vv-nav-submenu-container">
+            <a href="#" class="vv-nav-dropdown-item">Electric Cars <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></a>
+            <div class="vv-nav-submenu">
+              <a href="#" class="vv-nav-dropdown-item">Maruti Suzuki e Vitara</a>
+              <a href="#" class="vv-nav-dropdown-item">Mahindra BE 6</a>
+              <a href="#" class="vv-nav-dropdown-item">Tata Punch EV</a>
+              <a href="#" class="vv-nav-dropdown-item">Mahindra XEV 9e</a>
+              <a href="#" class="vv-nav-dropdown-item">MG Windsor EV</a>
+              <a href="#" class="vv-nav-dropdown-item">MG Comet EV</a>
+              <a href="#" class="vv-nav-dropdown-item">All Electric Cars</a>
+            </div>
+          </div>
+          <div class="vv-nav-submenu-container">
+            <a href="#" class="vv-nav-dropdown-item">Popular Cars <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></a>
+            <div class="vv-nav-submenu">
+              <a href="#" class="vv-nav-dropdown-item">Check Popular Cars</a>
+            </div>
+          </div>
+          <a href="#" class="vv-nav-dropdown-item">Upcoming Cars</a>
+          <a href="#" class="vv-nav-dropdown-item">New Launches</a>
+          <div class="vv-nav-submenu-container">
+            <a href="{% url 'brands' %}" class="vv-nav-dropdown-item">Popular Brands <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></a>
+            <div class="vv-nav-submenu">
+              <a href="{% url 'brands' %}" class="vv-nav-dropdown-item">All Brands</a>
+            </div>
+          </div>
+          <a href="{% url 'compare_cars' %}" class="vv-nav-dropdown-item">Compare Cars</a>
+          <a href="#" class="vv-nav-dropdown-item">New Car Offers & Discounts</a>
+          <a href="#" class="vv-nav-dropdown-item">Find Car Dealers</a>
+          <a href="#" class="vv-nav-dropdown-item">Find EV Charging Stations</a>
+          <a href="#" class="vv-nav-dropdown-item">Find Fuel Stations</a>
+          <a href="#" class="vv-nav-dropdown-item">Check Fuel Prices</a>
+        </div>
+      </div>
+
+      <!-- NEWS & REVIEWS Dropdown -->
+      <div class="vv-nav-dropdown">
+        <a href="#" class="vv-nav-link">NEWS & REVIEWS <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></a>
+        <div class="vv-nav-dropdown-menu">
+          <a href="#" class="vv-nav-dropdown-item">News & Top stories</a>
+          <a href="#" class="vv-nav-dropdown-item">Car Expert Reviews</a>
+          <a href="#" class="vv-nav-dropdown-item">User Reviews</a>
+          <a href="#" class="vv-nav-dropdown-item">Car Collection</a>
+          <a href="#" class="vv-nav-dropdown-item">Tips & Advice</a>
+        </div>
+      </div>
+
+      <!-- VIDEOS Dropdown -->
+      <div class="vv-nav-dropdown">
+        <a href="#" class="vv-nav-link">VIDEOS <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></a>
+        <div class="vv-nav-dropdown-menu">
+          <a href="#" class="vv-nav-dropdown-item">Video Reviews</a>
+          <a href="#" class="vv-nav-dropdown-item">Visual Stories</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="vv-lower-right">
+      <!-- Searchable City Selection -->
+      <div class="vv-city-select-container" id="cityDropdownContainer">
+        <!-- Display Button -->
+        <div id="cityDisplayBtn" onclick="toggleCityDropdown(event)" class="vv-city-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          <span id="selectedCityText" style="margin-left: 4px;">Select City</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.6; margin-left:4px;"><path d="M19 9l-7 7-7-7"/></svg>
+        </div>
+        
+        <!-- Dropdown Menu -->
+        <div id="cityDropdownList" class="vv-city-dropdown">
+          <div class="vv-city-search-box">
+            <input type="text" id="citySearchInput" onkeyup="filterCities()" onclick="event.stopPropagation()" placeholder="Search your city..." autocomplete="off">
+          </div>
+          <div id="cityOptionsContainer" class="vv-city-options"></div>
         </div>
       </div>
     </div>
-
-    <!-- Script to handle clicking outside dropdown -->
-    <script>
-      function toggleSidebar(event) {
-        if (event) event.stopPropagation();
-        
-        const sidebars = document.querySelectorAll(".admin-sidebar, .uv-sidebar, .user-sidebar, .sidebar");
-        const overlays = document.querySelectorAll(".sidebar-overlay");
-        
-        sidebars.forEach(sidebar => sidebar.classList.toggle("active"));
-        overlays.forEach(overlay => overlay.classList.toggle("active"));
-      }
-
-      function toggleProfileDropdown(event) {
-        event.stopPropagation();
-        const dropdown = document.getElementById("profileDropdown");
-        dropdown.classList.toggle("show");
-      }
-
-      window.addEventListener("click", function (e) {
-        const profileDropdown = document.getElementById("profileDropdown");
-        const profileBtn = document.querySelector(".profile-icon-btn");
-        if (profileDropdown && profileDropdown.classList.contains("show")) {
-          if (!profileDropdown.contains(e.target) && (!profileBtn || !profileBtn.contains(e.target))) {
-            profileDropdown.classList.remove("show");
-          }
-        }
-        
-        // Code to click outside sidebar to close it on mobile could go here if needed
-      });
-    </script>
-
-    {% else %}
-    <a href="{% url 'login' %}" class="topbar-link">Login</a>
-    <a href="{% url 'signup' %}" class="btn-topbar btn-signup">Signup</a>
-    {% endif %}
   </div>
-</div>
+</header>
+
+<!-- Scripts for Navbar -->
+<script>
+  // City Dropdown Logic
+  const indianCities = [
+    "Delhi","New Delhi","Mumbai","Pune","Nagpur","Nashik","Aurangabad","Solapur","Kolhapur","Amravati","Nanded","Jalgaon","Akola","Latur","Ahmednagar","Chandrapur","Parbhani","Satara","Sangli","Thane","Kalyan","Vasai","Bhiwandi",
+    "Ahmedabad","Surat","Vadodara","Rajkot","Bhavnagar","Jamnagar","Junagadh","Gandhinagar","Anand","Nadiad","Mehsana","Palanpur","Bharuch","Ankleshwar","Vapi","Navsari","Valsad","Godhra","Dahod","Morbi","Surendranagar","Botad","Amreli","Porbandar","Dwarka","Veraval","Jetpur","Kalol","Halol","Himmatnagar","Bhuj","Gandhidham","Mundra",
+    "Jaipur","Jodhpur","Udaipur","Kota","Ajmer","Bikaner","Alwar","Bharatpur","Sikar","Pali","Tonk","Barmer","Chittorgarh","Sri Ganganagar","Hanumangarh",
+    "Lucknow","Kanpur","Varanasi","Prayagraj","Agra","Meerut","Ghaziabad","Noida","Aligarh","Bareilly","Moradabad","Gorakhpur","Jhansi","Mathura","Ayodhya","Saharanpur","Firozabad",
+    "Indore","Bhopal","Gwalior","Jabalpur","Ujjain","Sagar","Satna","Rewa","Ratlam","Dewas","Khandwa","Chhindwara",
+    "Bangalore","Mysore","Hubli","Belgaum","Mangalore","Gulbarga","Davangere","Shimoga","Tumkur","Udupi","Bijapur",
+    "Chennai","Coimbatore","Madurai","Salem","Tiruchirappalli","Tirunelveli","Erode","Vellore","Thoothukudi","Dindigul","Karur","Hosur",
+    "Kochi","Thiruvananthapuram","Kozhikode","Thrissur","Kollam","Kannur","Alappuzha","Palakkad","Kottayam",
+    "Hyderabad","Warangal","Karimnagar","Nizamabad","Khammam","Vijayawada","Visakhapatnam","Guntur","Nellore","Kurnool","Rajahmundry","Tirupati","Kakinada",
+    "Amritsar","Ludhiana","Jalandhar","Patiala","Bathinda","Chandigarh","Mohali","Panchkula","Gurgaon","Faridabad","Hisar","Rohtak","Panipat","Karnal","Ambala",
+    "Kolkata","Asansol","Durgapur","Siliguri","Howrah","Kharagpur","Haldia",
+    "Patna","Gaya","Muzaffarpur","Bhagalpur","Ranchi","Jamshedpur","Dhanbad","Bokaro",
+    "Bhubaneswar","Cuttack","Rourkela","Sambalpur","Berhampur",
+    "Guwahati","Shillong","Imphal","Aizawl","Agartala","Dimapur","Itanagar",
+    "Dehradun","Haridwar","Roorkee","Srinagar","Jammu","Raipur","Bilaspur","Korba","Durg","Jorhat","Silchar"
+  ];
+
+  function populateCities() {
+    const container = document.getElementById("cityOptionsContainer");
+    if (!container) return;
+    container.innerHTML = "";
+    let savedCity = localStorage.getItem("vehiclevault_city");
+    if (savedCity) {
+      const btnText = document.getElementById("selectedCityText");
+      if (btnText) btnText.textContent = savedCity;
+    }
+    indianCities.forEach(city => {
+      const div = document.createElement("div");
+      div.className = "city-option-item";
+      div.textContent = city;
+      div.onclick = function(e) {
+        e.stopPropagation();
+        document.getElementById("selectedCityText").textContent = city;
+        localStorage.setItem("vehiclevault_city", city);
+        document.getElementById("cityDropdownList").style.display = "none";
+      };
+      container.appendChild(div);
+    });
+  }
+
+  function toggleCityDropdown(event) {
+    if (event) event.stopPropagation();
+    const dropdown = document.getElementById("cityDropdownList");
+    if (dropdown.style.display === "none" || dropdown.style.display === "") {
+      dropdown.style.display = "flex";
+      document.getElementById("citySearchInput").value = "";
+      filterCities();
+      setTimeout(() => document.getElementById("citySearchInput").focus(), 50);
+    } else {
+      dropdown.style.display = "none";
+    }
+  }
+
+  function filterCities() {
+    const input = document.getElementById("citySearchInput").value.toUpperCase();
+    const items = document.querySelectorAll(".city-option-item");
+    items.forEach(item => {
+      item.style.display = item.textContent.toUpperCase().indexOf(input) > -1 ? "" : "none";
+    });
+  }
+
+  // Dark Mode Logic
+  function toggleDarkMode() {
+    const body = document.body;
+    body.classList.toggle("dark-mode");
+    const isDark = body.classList.contains("dark-mode");
+    localStorage.setItem("vehiclevault_dark_mode", isDark ? "dark" : "light");
+    document.getElementById("darkModeBtn").textContent = isDark ? "☀️" : "🌙";
+  }
+
+  // Language Logic
+  function setLanguage(lang) {
+    document.getElementById("currentLang").textContent = lang;
+    localStorage.setItem("vehiclevault_language", lang);
+    // Hide dropdown briefly to signify selection (CSS hover fallback handles display)
+    document.querySelector('.vv-lang-dropdown-menu').style.display = 'none';
+    setTimeout(() => { document.querySelector('.vv-lang-dropdown-menu').style.display = ''; }, 100);
+  }
+
+  function applyLanguagePreference() {
+    const savedLang = localStorage.getItem("vehiclevault_language");
+    if (savedLang) {
+      const langEl = document.getElementById("currentLang");
+      if (langEl) langEl.textContent = savedLang;
+    }
+  }
+
+  function applyDarkModePreference() {
+    const isDark = localStorage.getItem("vehiclevault_dark_mode") === "dark";
+    if (isDark) {
+      document.body.classList.add("dark-mode");
+      document.getElementById("darkModeBtn").textContent = "☀️";
+    } else {
+      document.body.classList.remove("dark-mode");
+      document.getElementById("darkModeBtn").textContent = "🌙";
+    }
+  }
+
+  // Profile Dropdown functionality
+  function toggleProfileDropdown(event) {
+    event.stopPropagation();
+    const dropdown = document.getElementById("profileDropdown");
+    if(dropdown) dropdown.classList.toggle("show");
+  }
+
+
+
+  // Window Event Listeners
+  document.addEventListener("DOMContentLoaded", () => {
+    populateCities();
+    applyDarkModePreference();
+    applyLanguagePreference();
+  });
+
+  window.addEventListener("click", function(e) {
+    // Close city dropdown
+    const cityDropdown = document.getElementById("cityDropdownList");
+    const cityBtn = document.getElementById("cityDisplayBtn");
+    if (cityDropdown && cityDropdown.style.display === "flex") {
+      if (!cityDropdown.contains(e.target) && (!cityBtn || !cityBtn.contains(e.target))) {
+        cityDropdown.style.display = "none";
+      }
+    }
+    // Close profile dropdown
+    const profileDropdown = document.getElementById("profileDropdown");
+    const profileBtn = document.querySelector(".vv-profile-btn");
+    if (profileDropdown && profileDropdown.classList.contains("show")) {
+      if (!profileDropdown.contains(e.target) && (!profileBtn || !profileBtn.contains(e.target))) {
+        profileDropdown.classList.remove("show");
+      }
+    }
+  });
+</script>

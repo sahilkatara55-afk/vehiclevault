@@ -57,6 +57,10 @@ urlpatterns = [
     path('brands/<str:make>/', views.brand_cars, name='brand_cars'),
     path('compare/', views.compare_cars, name='compare_cars'),
     path('car/<int:pk>/', views.car_detail, name='car_detail'),
+    path('car/<int:car_id>/review/', views.submit_review, name='submit_review'),
+    path('review/<int:pk>/edit/', views.edit_review, name='edit_review'),
+    path('admin-reviews/', views.admin_reviews, name='admin_reviews'),
+    path('admin-reviews/delete/<int:pk>/', views.delete_review, name='delete_review'),
 
     # My Account Sub-Pages
     path('compare-history/', views.compare_history, name='compare_history'),
