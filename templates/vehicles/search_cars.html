@@ -3,29 +3,12 @@
 {% block title %}Search Cars | VehicleVault{% endblock %}
 {% block css %}
   <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}?v=9" />
-  <link rel="stylesheet" href="{% static 'css/cars.css' %}?v=1" />
+  <link rel="stylesheet" href="{% static 'css/cars.css' %}?v=3" />
 {% endblock %}
 
 {% block content %}
 
-  <!-- Sidebar Overlay -->
-  <div class="sidebar-overlay" onclick="toggleSidebar(event)"></div>
-  <aside class="uv-sidebar">
-    <div class="uv-sidebar-menu">
-      {% if user.is_authenticated %}
-        <a href="{% url 'user_dashboard' %}" class="uv-nav-link"><span>🏠</span> Dashboard</a>
-        <a href="{% url 'search_cars' %}" class="uv-nav-link active"><span>🔍</span> Search Cars</a>
-        <a href="{% url 'brands' %}" class="uv-nav-link"><span>🏷️</span> Brands</a>
-        <a href="{% url 'compare_cars' %}" class="uv-nav-link"><span>⚖️</span> Compare</a>
-        <a href="{% url 'my_account' %}" class="uv-nav-link"><span>⚙️</span> My Account</a>
-      {% else %}
-        <a href="{% url 'search_cars' %}" class="uv-nav-link active"><span>🔍</span> Search Cars</a>
-        <a href="{% url 'brands' %}" class="uv-nav-link"><span>🏷️</span> Brands</a>
-        <a href="{% url 'compare_cars' %}" class="uv-nav-link"><span>⚖️</span> Compare</a>
-        <a href="{% url 'login' %}" class="uv-nav-link"><span>🔑</span> Login</a>
-      {% endif %}
-    </div>
-  </aside>
+
 
   <div class="cars-page">
     <div class="cars-inner">
@@ -38,67 +21,65 @@
 
       <div class="search-layout">
 
-        <!-- Filter Panel -->
-        <form method="GET" action="{% url 'search_cars' %}">
-          <aside class="filter-panel">
-            <div class="filter-title">🎛️ Filters</div>
-
-            <!-- Search -->
-            <div class="filter-group">
-              <label class="filter-label">Keyword</label>
-              <input type="text" name="q" class="filter-input" placeholder="e.g. Creta, Swift…" value="{{ query }}">
-            </div>
-
-            <!-- Brand -->
-            <div class="filter-group">
-              <label class="filter-label">Brand</label>
-              <select name="brand" class="filter-select">
-                <option value="">All Brands</option>
-                {% for b in brands %}
-                  <option value="{{ b }}" {% if b == selected_brand %}selected{% endif %}>{{ b }}</option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <!-- Fuel Type -->
-            <div class="filter-group">
-              <label class="filter-label">Fuel Type</label>
-              <select name="fuel" class="filter-select">
-                <option value="">All Fuels</option>
-                <option value="petrol" {% if selected_fuel == 'petrol' %}selected{% endif %}>Petrol</option>
-                <option value="diesel" {% if selected_fuel == 'diesel' %}selected{% endif %}>Diesel</option>
-                <option value="electric" {% if selected_fuel == 'electric' %}selected{% endif %}>Electric</option>
-                <option value="hybrid" {% if selected_fuel == 'hybrid' %}selected{% endif %}>Hybrid</option>
-                <option value="cng" {% if selected_fuel == 'cng' %}selected{% endif %}>CNG</option>
-              </select>
-            </div>
-
-            <!-- Transmission -->
-            <div class="filter-group">
-              <label class="filter-label">Transmission</label>
-              <select name="transmission" class="filter-select">
-                <option value="">All</option>
-                <option value="manual" {% if selected_transmission == 'manual' %}selected{% endif %}>Manual</option>
-                <option value="automatic" {% if selected_transmission == 'automatic' %}selected{% endif %}>Automatic</option>
-              </select>
-            </div>
-
-            <!-- Price Range -->
-            <div class="filter-group">
-              <label class="filter-label">Price Range (₹)</label>
-              <div class="price-range-row">
-                <input type="number" name="price_min" class="filter-input" placeholder="Min" value="{{ price_min }}">
-                <input type="number" name="price_max" class="filter-input" placeholder="Max" value="{{ price_max }}">
+        <!-- Horizontal Filter Panel -->
+        <form method="GET" action="{% url 'search_cars' %}" class="filter-form">
+          <div class="filter-panel">
+            <div class="horizontal-filters-wrap">
+              
+              <!-- Search -->
+              <div class="filter-group">
+                <input type="text" name="q" class="filter-input" placeholder="Keyword (e.g. Creta)" value="{{ query }}">
               </div>
-            </div>
 
-            <button type="submit" class="filter-btn">Apply Filters</button>
-            <a href="{% url 'search_cars' %}" class="filter-reset">✕ Clear Filters</a>
-          </aside>
+              <!-- Brand -->
+              <div class="filter-group">
+                <select name="brand" class="filter-select">
+                  <option value="">All Brands</option>
+                  {% for b in brands %}
+                    <option value="{{ b }}" {% if b == selected_brand %}selected{% endif %}>{{ b }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Fuel Type -->
+              <div class="filter-group">
+                <select name="fuel" class="filter-select">
+                  <option value="">All Fuels</option>
+                  <option value="petrol" {% if selected_fuel == 'petrol' %}selected{% endif %}>Petrol</option>
+                  <option value="diesel" {% if selected_fuel == 'diesel' %}selected{% endif %}>Diesel</option>
+                  <option value="electric" {% if selected_fuel == 'electric' %}selected{% endif %}>Electric</option>
+                  <option value="hybrid" {% if selected_fuel == 'hybrid' %}selected{% endif %}>Hybrid</option>
+                  <option value="cng" {% if selected_fuel == 'cng' %}selected{% endif %}>CNG</option>
+                </select>
+              </div>
+
+              <!-- Transmission -->
+              <div class="filter-group">
+                <select name="transmission" class="filter-select">
+                  <option value="">Transmission</option>
+                  <option value="manual" {% if selected_transmission == 'manual' %}selected{% endif %}>Manual</option>
+                  <option value="automatic" {% if selected_transmission == 'automatic' %}selected{% endif %}>Automatic</option>
+                </select>
+              </div>
+
+              <!-- Price Range -->
+              <div class="filter-group price-range-group">
+                <input type="number" name="price_min" class="filter-input" placeholder="Min ₹" value="{{ price_min }}">
+                <span class="price-sep">-</span>
+                <input type="number" name="price_max" class="filter-input" placeholder="Max ₹" value="{{ price_max }}">
+              </div>
+
+              <div class="filter-actions">
+                <button type="submit" class="filter-btn">Search</button>
+                <a href="{% url 'search_cars' %}" class="filter-reset">Clear</a>
+              </div>
+
+            </div>
+          </div>
         </form>
 
         <!-- Results -->
-        <div>
+        <div class="search-results-area">
           <p class="results-count">Showing <strong>{{ total }}</strong> car{{ total|pluralize }}</p>
 
           <div class="cars-grid">
@@ -119,7 +100,7 @@
                   <span class="spec-badge">⭐ {{ car.safety_rating }} Star</span>
                 </div>
                 <div class="car-card-price">
-                  ₹{{ car.min_price|floatformat:0 }} - ₹{{ car.max_price|floatformat:0 }} <span>lakh</span>
+                  {{ car.formatted_price_range }}
                 </div>
                 <div class="car-card-footer">
                   <a href="{% url 'car_detail' car.id %}" class="btn-view-details">View Details</a>

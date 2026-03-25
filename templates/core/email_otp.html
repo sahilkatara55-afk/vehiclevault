@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VehicleVault — OTP Verification</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f0f4f8; font-family:'Segoe UI', Roboto, Arial, sans-serif;">
+
+  <!-- Outer wrapper -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f0f4f8; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+
+        <!-- Card -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px; background:#ffffff; border-radius:20px; box-shadow:0 8px 40px rgba(0,0,0,0.10); overflow:hidden;">
+
+          <!-- Header gradient -->
+          <tr>
+            <td align="center" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 36px 40px 32px;">
+              <p style="margin:0; font-size:28px; font-weight:800; color:#ffffff; letter-spacing:-0.5px;">🚗 VehicleVault</p>
+              <p style="margin:8px 0 0; font-size:14px; color:#bfdbfe; letter-spacing:0.5px; text-transform:uppercase;">OTP Verification</p>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding: 40px 44px 30px;">
+
+              <!-- Greeting -->
+              <p style="margin:0 0 8px; font-size:22px; font-weight:700; color:#0f172a;">Hello, {{UserName}}! 👋</p>
+              <p style="margin:0 0 28px; font-size:15px; color:#475569; line-height:1.7;">
+                We received a request to verify your identity on <strong style="color:#1e40af;">VehicleVault</strong>. Use the one-time password below to complete your verification.
+              </p>
+
+              <!-- OTP Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="padding:0 0 28px;">
+                    <div style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 2px solid #93c5fd; border-radius:16px; padding: 24px 32px; display:inline-block;">
+                      <p style="margin:0 0 6px; font-size:12px; font-weight:600; color:#3b82f6; text-transform:uppercase; letter-spacing:1.5px;">Your OTP Code</p>
+                      <p style="margin:0; font-size:48px; font-weight:900; color:#1e40af; letter-spacing:14px; font-variant-numeric:tabular-nums;">{{OTP_CODE}}</p>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Expiry & Warning -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+                <tr>
+                  <td style="background:#f0fdf4; border-left:4px solid #22c55e; border-radius:0 8px 8px 0; padding:12px 16px; margin-bottom:10px;">
+                    <p style="margin:0; font-size:14px; color:#15803d; font-weight:600;">⏱ This OTP is valid for <strong>10 minutes</strong> only.</p>
+                  </td>
+                </tr>
+                <tr><td style="height:10px;"></td></tr>
+                <tr>
+                  <td style="background:#fff7ed; border-left:4px solid #f97316; border-radius:0 8px 8px 0; padding:12px 16px;">
+                    <p style="margin:0; font-size:14px; color:#c2410c; font-weight:600;">🔒 Do <u>not</u> share this code with anyone, including VehicleVault staff.</p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- CTA Button -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+                <tr>
+                  <td align="center">
+                    <a href="http://127.0.0.1:8000/verify-otp/"
+                       style="display:inline-block; background: linear-gradient(135deg, #1e40af, #3b82f6); color:#ffffff; text-decoration:none; font-size:16px; font-weight:700; padding:14px 40px; border-radius:12px; letter-spacing:0.3px; box-shadow: 0 4px 15px rgba(59,130,246,0.4);">
+                      ✅ Verify Now
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Note -->
+              <p style="margin:0; font-size:13px; color:#94a3b8; line-height:1.6; text-align:center;">
+                If you didn't request this code, you can safely ignore this email. Your account remains secure.
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="padding:0 44px;"><hr style="border:none; border-top:1px solid #e2e8f0; margin:0;"></td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding: 24px 44px 32px;">
+              <p style="margin:0 0 4px; font-size:13px; font-weight:700; color:#1e293b;">The VehicleVault Team</p>
+              <a href="http://127.0.0.1:8000/" style="font-size:13px; color:#3b82f6; text-decoration:none;">www.vehiclevault.com</a>
+              <p style="margin:14px 0 0; font-size:11px; color:#cbd5e1;">© 2025 VehicleVault. All rights reserved.</p>
+            </td>
+          </tr>
+
+        </table>
+        <!-- /Card -->
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

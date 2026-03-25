@@ -207,7 +207,7 @@
             <span class="spec-badge home-spec-badge">🔧 {{ car.get_transmission_display }}</span>
           </div>
           <div class="car-card-price home-car-card-price">
-            ₹{{ car.min_price|floatformat:0 }} - ₹{{ car.max_price|floatformat:0 }} <span class="home-car-card-lakh">lakh</span>
+            {{ car.formatted_price_range }}
           </div>
           <div class="car-card-footer home-car-card-footer">
             <a href="{% url 'car_detail' car.id %}" class="btn-view-details home-btn-view-details">View Details</a>

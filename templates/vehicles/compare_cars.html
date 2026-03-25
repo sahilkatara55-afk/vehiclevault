@@ -115,7 +115,7 @@
             <tr>
               <td>💰 Price</td>
               {% for car in compare_list %}
-              <td><strong>₹{{ car.min_price|floatformat:0 }} - ₹{{ car.max_price|floatformat:0 }}</strong> lakh</td>
+              <td><strong>{{ car.formatted_price_range }}</strong></td>
               {% endfor %}
             </tr>
             <tr>
@@ -239,7 +239,7 @@
               <span class="spec-badge">🔧 {{ car.get_transmission_display }}</span>
               {% if car.mileage %}<span class="spec-badge">📏 {{ car.mileage }}</span>{% endif %}
             </div>
-            <div class="car-card-price">₹{{ car.min_price|floatformat:0 }} - ₹{{ car.max_price|floatformat:0 }} <span>lakh</span></div>
+            <div class="car-card-price">{{ car.formatted_price_range }}</div>
             <div class="car-card-footer" style="padding-top:15px;">
               <a href="{% url 'car_detail' car.id %}" class="btn-view-details" style="width:100%;">View Full Details</a>
             </div>

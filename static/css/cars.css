@@ -33,45 +33,49 @@
   margin: 0 auto;
 }
 
-/* ── Search Layout ── */
+/* ── Search Layout (Horizontal) ── */
 .search-layout {
-  display: grid;
-  grid-template-columns: 280px 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 24px;
-  align-items: start;
 }
 
-/* ── Filter Panel ── */
+/* ── Filter Panel (Horizontal) ── */
 .filter-panel {
   background: #fff;
-  border-radius: 14px;
-  padding: 24px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  border-radius: 12px;
+  padding: 16px 24px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  margin-bottom: 10px;
   position: sticky;
-  top: 80px;
+  top: 72px; /* Below navbar */
+  z-index: 90;
+  border: 1px solid #e2e8f0;
 }
 
-.filter-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #0F172A;
-  margin: 0 0 20px;
-  border-bottom: 2px solid #EFF6FF;
-  padding-bottom: 12px;
+.horizontal-filters-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 15px;
 }
 
 .filter-group {
-  margin-bottom: 20px;
+  margin: 0;
+  flex: 1;
+  min-width: 140px;
 }
 
-.filter-label {
-  display: block;
-  font-size: 0.82rem;
-  font-weight: 600;
+.price-range-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.price-sep {
   color: #64748B;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 8px;
+  font-weight: 500;
 }
 
 .filter-select,
@@ -84,8 +88,9 @@
   font-size: 0.95rem;
   color: #1E293B;
   background: #F8FAFC;
-  transition: border 0.2s;
+  transition: border 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
+  height: 44px;
 }
 
 .filter-select:focus,
@@ -93,40 +98,37 @@
   outline: none;
   border-color: #3B82F6;
   background: #fff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.price-range-row {
+.filter-actions {
   display: flex;
-  gap: 8px;
-}
-
-.price-range-row .filter-input {
-  flex: 1;
+  align-items: center;
+  gap: 15px;
+  margin-left: auto;
 }
 
 .filter-btn {
-  width: 100%;
-  padding: 12px;
+  padding: 0 24px;
+  height: 44px;
   background: #3B82F6;
   color: #fff;
   border: none;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
   transition: background 0.2s;
-  margin-top: 4px;
 }
 
 .filter-btn:hover { background: #2563EB; }
 
 .filter-reset {
-  display: block;
-  text-align: center;
-  margin-top: 10px;
-  font-size: 0.88rem;
+  font-size: 0.95rem;
   color: #64748B;
   text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
 }
 
 .filter-reset:hover { color: #EF4444; }
@@ -527,13 +529,10 @@
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
-  .search-layout {
-    grid-template-columns: 1fr;
-  }
-
   .filter-panel {
     position: static;
   }
+
 
   .compare-dropdowns {
     grid-template-columns: 1fr 1fr;

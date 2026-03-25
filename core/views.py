@@ -49,20 +49,28 @@ def Usersignupview(request):
                 'otp_created': timezone.now().isoformat(),
             }
 
-            # Send OTP email
-            send_mail(
-                subject='VehicleVault — Your OTP Code',
-                message=(
-                    f'Hi {first_name},\n\n'
-                    f'Your OTP for VehicleVault signup is:\n\n'
-                    f'   {otp}\n\n'
-                    f'This OTP is valid for 10 minutes. Do not share it with anyone.\n\n'
-                    f'— VehicleVault Team'
-                ),
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[email],
-                fail_silently=False,
+            # Send OTP email (HTML version)
+            from django.core.mail import EmailMultiAlternatives
+            from django.template.loader import render_to_string
+            html_body = render_to_string('core/email_otp.html', {
+                'UserName': first_name,
+                'OTP_CODE': otp,
+            })
+            plain_body = (
+                f'Hi {first_name},\n\n'
+                f'Your OTP for VehicleVault signup is:\n\n'
+                f'   {otp}\n\n'
+                f'This OTP is valid for 10 minutes. Do not share it with anyone.\n\n'
+                f'— VehicleVault Team'
             )
+            msg = EmailMultiAlternatives(
+                subject='VehicleVault — Your OTP Code',
+                body=plain_body,
+                from_email=settings.EMAIL_HOST_USER,
+                to=[email],
+            )
+            msg.attach_alternative(html_body, "text/html")
+            msg.send(fail_silently=False)
 
             return redirect('verify_otp')
 
@@ -903,6 +911,7 @@ def car_detail(request, pk):
     is_favorite = False
     if request.user.is_authenticated:
         # Track that the user viewed this car
+        from vehicles.models import RecentlyViewed
         RecentlyViewed.objects.update_or_create(
             user=request.user,
             car=car,
@@ -910,10 +919,79 @@ def car_detail(request, pk):
         )
         is_favorite = FavoriteVehicle.objects.filter(user=request.user, car=car).exists()
 
+    from vehicles.models import CarReview
+    reviews = car.reviews.all().select_related('user')
+
     return render(request, 'vehicles/car_detail.html', {
         'car': car,
-        'is_favorite': is_favorite
+        'is_favorite': is_favorite,
+        'reviews': reviews,
     })
+
+@login_required
+def submit_review(request, car_id):
+    if request.method == 'POST':
+        car = get_object_or_404(Car, id=car_id)
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment', '').strip()
+        
+        if not rating or not rating.isdigit() or not (1 <= int(rating) <= 5):
+            messages.error(request, 'Invalid rating provided.')
+            return redirect('car_detail', pk=car_id)
+            
+        from vehicles.models import CarReview
+        CarReview.objects.create(
+            user=request.user,
+            car=car,
+            rating=int(rating),
+            comment=comment
+        )
+        messages.success(request, 'Your review has been submitted!')
+            
+    return redirect('car_detail', pk=car_id)
+
+
+@login_required
+def edit_review(request, pk):
+    from vehicles.models import CarReview
+    review = get_object_or_404(CarReview, pk=pk, user=request.user)
+    
+    if request.method == 'POST':
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment', '').strip()
+        
+        if not rating or not rating.isdigit() or not (1 <= int(rating) <= 5):
+            messages.error(request, 'Invalid rating.')
+            return redirect('car_detail', pk=review.car.id)
+        
+        review.rating = int(rating)
+        review.comment = comment
+        review.save()
+        messages.success(request, 'Your review has been updated!')
+    
+    return redirect('car_detail', pk=review.car.id)
+
+
+@login_required
+def admin_reviews(request):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('user_dashboard')
+    
+    from vehicles.models import CarReview
+    reviews = CarReview.objects.all().select_related('user', 'car')
+    return render(request, 'vehicles/admin/admin_reviews.html', {'reviews': reviews})
+
+
+@login_required
+def delete_review(request, pk):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('user_dashboard')
+    
+    from vehicles.models import CarReview
+    review = get_object_or_404(CarReview, pk=pk)
+    review.delete()
+    messages.success(request, 'Review deleted successfully.')
+    return redirect('admin_reviews')
 
 
 # ──────────────────────────────────────────────

@@ -66,6 +66,39 @@ class Car(models.Model):
     created_at   = models.DateTimeField(auto_now_add=True)
     updated_at   = models.DateTimeField(auto_now=True)
 
+    @property
+    def formatted_min_price(self):
+        val = float(self.min_price)
+        if val >= 10000000:
+            cr = val / 10000000
+            return f"{cr:.2f} Crore".replace(".00", "")
+        elif val >= 100000:
+            lakh = val / 100000
+            return f"{lakh:.2f} Lakh".replace(".00", "")
+        return f"{val:,.0f}"
+
+    @property
+    def formatted_max_price(self):
+        val = float(self.max_price)
+        if val >= 10000000:
+            cr = val / 10000000
+            return f"{cr:.2f} Crore".replace(".00", "")
+        elif val >= 100000:
+            lakh = val / 100000
+            return f"{lakh:.2f} Lakh".replace(".00", "")
+        return f"{val:,.0f}"
+
+    @property
+    def formatted_price_range(self):
+        min_p = self.formatted_min_price
+        max_p = self.formatted_max_price
+        if self.min_price == self.max_price or not self.max_price:
+            return f"₹{min_p}"
+        
+        # Avoid redundancy like ₹11.55 Lakh - ₹15 Lakh -> ₹11.55 - 15 Lakh
+        # For simplicity, returning both full strings is safest
+        return f"₹{min_p} - ₹{max_p}"
+
     def __str__(self):
         return f"{self.make} {self.model} ({self.year})"
 
@@ -196,3 +229,17 @@ class Brand(models.Model):
 
     def __str__(self):
         return self.name
+
+# ── Car Review ─────────────────────────────────────────────────
+class CarReview(models.Model):
+    car        = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='reviews')
+    user       = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews_left')
+    rating     = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 6)])
+    comment    = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.email} - {self.car.make} {self.car.model} ({self.rating}/5)"
