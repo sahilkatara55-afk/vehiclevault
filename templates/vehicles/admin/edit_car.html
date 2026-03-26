@@ -1,0 +1,422 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Edit Car | VehicleVault Admin{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/user_dashboard.css' %}?v=9" />
+  <link rel="stylesheet" href="{% static 'css/manage_cars.css' %}?v=1" />
+  <link rel="stylesheet" href="{% static 'css/add_car.css' %}?v=1" />
+{% endblock %}
+
+{% block content %}
+<div class="sidebar-overlay" onclick="toggleSidebar(event)"></div>
+
+<!-- Admin Sidebar -->
+<aside class="uv-sidebar">
+  <div class="uv-sidebar-menu">
+    <a href="{% url 'admin_dashboard' %}" class="uv-nav-link"><span>🏠</span> Dashboard</a>
+    <a href="{% url 'manage_cars' %}" class="uv-nav-link active"><span>🚗</span> Manage Cars</a>
+    <a href="{% url 'manage_users' %}" class="uv-nav-link"><span>👥</span> Manage Users</a>
+    <a href="{% url 'manage_accessories' %}" class="uv-nav-link"><span>🔧</span> Accessories</a>
+    <a href="{% url 'manage_brands' %}" class="uv-nav-link"><span>🏷️</span> Manage Brands</a>
+    <a href="{% url 'admin_notifications' %}" class="uv-nav-link"><span>🔔</span> Notifications</a>
+    <a href="{% url 'admin_reports' %}" class="uv-nav-link"><span>📊</span> Reports</a>
+    <a href="{% url 'admin_settings' %}" class="uv-nav-link"><span>⚙️</span> Settings</a>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<div class="admin-main">
+  <div class="mc-page">
+
+    <!-- Page Header -->
+    <div class="mc-header">
+      <div class="mc-header-left">
+        <div class="mc-header-icon">➕</div>
+        <div>
+          <h1 class="mc-title">Edit Car</h1>
+          <p class="mc-subtitle">Update vehicle details and technical specifications</p>
+        </div>
+      </div>
+      <a href="{% url 'manage_cars' %}" class="mc-btn mc-btn-gray">← Back to List</a>
+    </div>
+
+    <!-- Form Container -->
+    <div class="add-car-container">
+      <form method="post" action="{% url 'car_edit' car.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <h3 class="section-heading">General Information</h3>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Make (Brand)</label>
+            <input type="text" name="make" value="{{ car.make |default:'' }}" placeholder="e.g. Hyundai" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Model</label>
+            <input type="text" name="model" value="{{ car.model |default:'' }}" placeholder="e.g. Creta" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Body Type</label>
+            <select name="body_type">
+              <option value="">Select Body Type...</option>
+              <option value="suv">SUV</option>
+              <option value="sedan">Sedan</option>
+              <option value="hatchback">Hatchback</option>
+              <option value="muv">MUV</option>
+              <option value="coupe">Coupe</option>
+              <option value="convertible">Convertible</option>
+              <option value="wagon">Wagon</option>
+              <option value="van">Van</option>
+              <option value="jeep">Jeep</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Year</label>
+            <input type="number" name="year" value="{{ car.year |default:'' }}" value="2024" min="1990" max="2030" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Min Price (₹)</label>
+            <input type="number" name="min_price" value="{{ car.min_price |default:'' }}" placeholder="e.g. 500000" step="1000" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Max Price (₹)</label>
+            <input type="number" name="max_price" value="{{ car.max_price |default:'' }}" placeholder="e.g. 1500000" step="1000" required>
+          </div>
+          <div class="mc-form-group">
+            <label>Mileage</label>
+            <input type="text" name="mileage" value="{{ car.mileage |default:'' }}" placeholder="e.g. 17 kmpl">
+          </div>
+        </div>
+
+        <h3 class="section-heading">Engine & Performance</h3>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Engine Type</label>
+            <select name="engine" required>
+              <option value="petrol">Petrol</option>
+              <option value="diesel">Diesel</option>
+              <option value="electric">Electric</option>
+              <option value="hybrid">Hybrid</option>
+              <option value="cng">CNG</option>
+            </select>
+          </div>
+          <div class="mc-form-group">
+            <label>Transmission</label>
+            <select name="transmission" required>
+              <option value="manual">Manual</option>
+              <option value="automatic">Automatic</option>
+            </select>
+          </div>
+          <div class="mc-form-group">
+            <label>Engine Displ. (cc)</label>
+            <input type="number" name="engine_displacement" value="{{ car.engine_displacement |default:'' }}" placeholder="e.g. 1497">
+          </div>
+        </div>
+        
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Max Power</label>
+            <input type="text" name="max_power" value="{{ car.max_power |default:'' }}" placeholder="e.g. 113.18 bhp @ 4000 rpm">
+          </div>
+          <div class="mc-form-group">
+            <label>Max Torque</label>
+            <input type="text" name="max_torque" value="{{ car.max_torque |default:'' }}" placeholder="e.g. 250 Nm @ 2750 rpm">
+          </div>
+        </div>
+
+        <h3 class="section-heading">Dimensions & Capacity</h3>
+        <div class="mc-form-row">
+          <div class="mc-form-group">
+            <label>Fuel Tank Capacity (Liters)</label>
+            <input type="number" name="fuel_tank_capacity" value="{{ car.fuel_tank_capacity |default:'' }}" placeholder="e.g. 50">
+          </div>
+          <div class="mc-form-group">
+            <label>Seating Capacity</label>
+            <input type="number" name="seating_capacity" value="{{ car.seating_capacity |default:'' }}" placeholder="e.g. 5">
+          </div>
+          <div class="mc-form-group">
+            <label>Boot Space (Liters)</label>
+            <input type="number" name="boot_space" value="{{ car.boot_space |default:'' }}" placeholder="e.g. 433">
+          </div>
+        </div>
+
+        <h3 class="section-heading">Features & Safety</h3>
+        <div class="mc-form-row mc-form-row-center">
+          <div class="mc-form-group mc-form-group-flex1">
+            <label>Global NCAP Safety Rating</label>
+            <select name="safety_rating" required>
+              <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+              <option value="4" selected>⭐⭐⭐⭐ 4 Stars</option>
+              <option value="3">⭐⭐⭐ 3 Stars</option>
+              <option value="2">⭐⭐ 2 Stars</option>
+              <option value="1">⭐ 1 Star</option>
+            </select>
+          </div>
+          <div class="mc-form-group mc-form-group-flex2 safety-features-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="has_sunroof" class="large-checkbox"> Sunroof
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="has_airbags" checked class="large-checkbox"> Airbags
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="has_abs" checked class="large-checkbox"> ABS
+            </label>
+          </div>
+        </div>
+
+        <h3 class="section-heading">Media & Details</h3>
+        <div class="mc-form-row">
+          <div class="mc-form-group mc-form-group-flex2">
+            <label>Vehicle Description (optional)</label>
+            <textarea name="description" rows="4" class="desc-textarea" placeholder="Write a short description or highlights about the car...">{{ car.description|default:"" }}</textarea>
+          </div>
+          <div class="mc-form-group mc-form-group-flex1">
+            <label>Primary Car Image</label>
+            <input type="file" name="image" accept="image/*" class="image-upload-input">
+          </div>
+        </div>
+        <div class="mc-form-row">
+          <div class="mc-form-group" style="width: 100%;">
+            <label style="font-size:16px; font-weight:600; color:#1e293b; margin-bottom:12px; display:block;">Advanced Image Gallery Upload</label>
+            <div class="gallery-upload-container" id="galleryUploadContainer" style="background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:20px;">
+              
+              <!-- Category Selector -->
+              <div class="gallery-category-selector" style="margin-bottom: 15px; display: flex; gap: 12px; align-items: center; background:#f8fafc; padding:12px 15px; border-radius:8px;">
+                <label style="margin-bottom: 0; font-weight:500; font-size:14px; color:#475569;">Assign Category for next upload:</label>
+                <select id="galleryCategorySelect" class="mc-select" style="width: 200px; padding:8px 12px; border:1px solid #cbd5e1; border-radius:6px; outline:none; font-weight:500; color:#0f172a;">
+                  <option value="exterior">🚙 Exterior</option>
+                  <option value="interior">💺 Interior</option>
+                  <option value="colors">🎨 Colors</option>
+                  <option value="360_view">🔄 360° View</option>
+                </select>
+              </div>
+
+              
+              {% if car.gallery_images.exists %}
+              <div style="margin-top: 15px; margin-bottom: 25px;">
+                <label style="font-size:14px; font-weight:600; color:#475569;">Existing Gallery Images:</label>
+                <div style="display:flex; flex-wrap:wrap; gap:15px; margin-top:10px;">
+                  {% for img in car.gallery_images.all %}
+                  <div class="gallery-preview-card" style="box-shadow: none; border: 1px solid #e2e8f0; position:relative;">
+                    <img src="{{ img.image.url }}" alt="Gallery Image" style="width:100%; height:100%; object-fit:cover;">
+                    <span class="preview-tag">{{ img.get_category_display }}</span>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+              <hr style="border:none; border-top:1px dashed #cbd5e1; margin-bottom:20px;">
+              {% endif %}
+
+              <!-- Dropzone -->
+              <div class="gallery-dropzone" id="galleryDropzone" style="border: 2px dashed #94a3b8; border-radius: 10px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.2s; background:#f1f5f9;">
+                <div class="dropzone-content" style="pointer-events:none;">
+                  <span class="dropzone-icon" style="font-size:40px; display:block; margin-bottom:10px;">📸</span>
+                  <p style="margin:0 0 10px 0; color:#475569; font-size:15px;">Drag & drop multiple images here or <strong>Click to browse</strong></p>
+                  <p style="margin:0; color:#94a3b8; font-size:12px;">Images will be tagged as the category selected above</p>
+                </div>
+                <input type="file" id="galleryFileInput" multiple accept="image/*" style="display:none;">
+              </div>
+              
+              <!-- Preview Grid -->
+              <div class="gallery-preview-grid" id="galleryPreviewGrid" style="display:flex; flex-wrap:wrap; gap:15px; margin-top:20px;">
+                <!-- JS injected previews -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 30px;">
+          <a href="{% url 'manage_cars' %}" class="mc-btn mc-btn-gray mc-btn-large">Cancel</a>
+          <button type="submit" class="mc-btn mc-btn-primary mc-btn-large">Update Vehicle & Upload Options</button>
+        </div>
+      
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector('form');
+  if (form) {
+    if ('{{ car.body_type }}') form.querySelector('select[name="body_type"]').value = '{{ car.body_type }}';
+    if ('{{ car.engine }}') form.querySelector('select[name="engine"]').value = '{{ car.engine }}';
+    if ('{{ car.transmission }}') form.querySelector('select[name="transmission"]').value = '{{ car.transmission }}';
+    if ('{{ car.safety_rating }}') form.querySelector('select[name="safety_rating"]').value = '{{ car.safety_rating }}';
+    
+    if ('{{ car.has_sunroof }}' === 'True') form.querySelector('input[name="has_sunroof"]').checked = true;
+    else form.querySelector('input[name="has_sunroof"]').checked = false;
+    if ('{{ car.has_airbags }}' === 'True') form.querySelector('input[name="has_airbags"]').checked = true;
+    else form.querySelector('input[name="has_airbags"]').checked = false;
+    if ('{{ car.has_abs }}' === 'True') form.querySelector('input[name="has_abs"]').checked = true;
+    else form.querySelector('input[name="has_abs"]').checked = false;
+  }
+});
+</script>
+</form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .gallery-dropzone.dragover {
+    background: #e0f2fe !important;
+    border-color: #3b82f6 !important;
+  }
+  .gallery-preview-card {
+    position: relative;
+    width: 120px;
+    height: 100px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  }
+  .gallery-preview-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .preview-tag {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(15, 23, 42, 0.8);
+    color: white;
+    font-size: 11px;
+    text-align: center;
+    padding: 3px 0;
+    font-weight: 500;
+  }
+  .preview-remove {
+    position: absolute;
+    top: 4px; right: 4px;
+    background: #ef4444; color: white;
+    border: none; border-radius: 50%;
+    width: 20px; height: 20px;
+    line-height: normal;
+    text-align: center; cursor: pointer;
+    font-size: 14px; display:flex; align-items:center; justify-content:center;
+  }
+  .preview-remove:hover { background: #dc2626; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  let selectedGalleryImages = [];
+
+  const dropzone = document.getElementById('galleryDropzone');
+  const fileInput = document.getElementById('galleryFileInput');
+  const categorySelect = document.getElementById('galleryCategorySelect');
+  const previewGrid = document.getElementById('galleryPreviewGrid');
+  const carForm = document.querySelector('form');
+
+  // Prevent default drag behaviors
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropzone.addEventListener(eventName, preventDefaults, false);
+  });
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  // Hover effects
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false);
+  });
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false);
+  });
+
+  // Handle drops and clicks
+  dropzone.addEventListener('drop', (e) => {
+    handleFiles(e.dataTransfer.files);
+  });
+  dropzone.addEventListener('click', () => {
+    fileInput.click();
+  });
+  fileInput.addEventListener('change', function() {
+    handleFiles(this.files);
+    this.value = ''; // reset so same files can be picked again
+  });
+
+  function handleFiles(files) {
+    let category = categorySelect.value;
+    let categoryName = categorySelect.options[categorySelect.selectedIndex].text.replace(/[^a-zA-Z0-9 °]/g, '').trim();
+    
+    [...files].forEach(file => {
+      if(!file.type.startsWith('image/')) return;
+      
+      // Add to array
+      selectedGalleryImages.push({
+        file: file,
+        category: category,
+        categoryName: categoryName
+      });
+      
+      // Update UI
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = function(e) {
+        let previewCard = document.createElement('div');
+        previewCard.className = 'gallery-preview-card';
+        previewCard.innerHTML = `
+          <img src="${e.target.result}" alt="Preview">
+          <span class="preview-tag">${categoryName}</span>
+          <button type="button" class="preview-remove">×</button>
+        `;
+        
+        previewCard.querySelector('.preview-remove').addEventListener('click', function() {
+          let currentCard = this.closest('.gallery-preview-card');
+          let index = Array.from(previewGrid.children).indexOf(currentCard);
+          selectedGalleryImages.splice(index, 1);
+          currentCard.remove();
+        });
+        
+        previewGrid.appendChild(previewCard);
+      }
+    });
+  }
+
+  // Override form submission with AJAX FormData
+  if(carForm) {
+    carForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = this.querySelector('button[type="submit"]');
+      submitBtn.innerText = 'Saving... Please wait';
+      submitBtn.style.opacity = '0.7';
+      submitBtn.disabled = true;
+
+      const formData = new FormData(this);
+      
+      // Append gallery files and categories
+      selectedGalleryImages.forEach(imgObj => {
+        formData.append('gallery_images', imgObj.file);
+        formData.append('image_categories', imgObj.category);
+      });
+      
+      fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(response => {
+        if(response.redirected) {
+            window.location.href = response.url;
+        } else {
+            window.location.href = "{% url 'manage_cars' %}";
+        }
+      })
+      .catch(error => {
+        console.error('Error submitting form:', error);
+        alert('Failed to save vehicle');
+        submitBtn.innerText = 'Update Vehicle & Upload Options';
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+      });
+    });
+  }
+});
+</script>
+
+  </div>
+</div>
+{% endblock %}

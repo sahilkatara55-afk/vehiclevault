@@ -21,10 +21,52 @@
     <!-- Header Section -->
     <div class="car-detail-header">
       <div class="car-detail-img-col">
-        {% if car.image %}
-          <img src="{{ car.image.url }}" alt="{{ car.make }} {{ car.model }}">
-        {% else %}
-          <div class="car-detail-img-placeholder">🚗</div>
+        <div class="main-image-container" style="position:relative;">
+          {% if car.image %}
+            <img src="{{ car.image.url }}" alt="{{ car.make }} {{ car.model }}" id="mainCarImage" style="width:100%; border-radius:20px; display:block; object-fit:cover; max-height:450px; box-shadow:0 15px 35px rgba(0,0,0,0.1); transition:transform 0.3s ease;">
+          {% else %}
+            <div class="car-detail-img-placeholder" id="mainCarImagePlaceholder" style="width:100%; height:350px; background:linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:6rem; color:#94A3B8; box-shadow:inset 0 4px 6px rgba(0,0,0,0.05);">🚗</div>
+          {% endif %}
+        </div>
+        
+        {% if car.gallery_images.exists %}
+        <div class="car-gallery-thumbs" style="display:flex; gap:12px; margin-top:20px; overflow-x:auto; padding-bottom:8px;">
+          {% if car.image %}
+          <img src="{{ car.image.url }}" class="gallery-thumb active" onclick="swapMainImage(this, '{{ car.image.url }}')" style="width:85px; height:60px; object-fit:cover; border-radius:10px; cursor:pointer; border:2.5px solid var(--cv-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.08); transition:all 0.2s; flex-shrink:0;">
+          {% endif %}
+          
+          {% for gallery_img in car.gallery_images.all %}
+          <img src="{{ gallery_img.image.url }}" class="gallery-thumb" onclick="swapMainImage(this, '{{ gallery_img.image.url }}')" style="width:85px; height:60px; object-fit:cover; border-radius:10px; cursor:pointer; border:2.5px solid transparent; box-shadow: 0 4px 10px rgba(0,0,0,0.08); transition:all 0.2s; flex-shrink:0;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          {% endfor %}
+        </div>
+        
+        <script>
+        function swapMainImage(element, newSrc) {
+          const mainImg = document.getElementById('mainCarImage');
+          if (mainImg) {
+            mainImg.src = newSrc;
+          } else {
+            const placeholder = document.getElementById('mainCarImagePlaceholder');
+            if (placeholder) {
+              const newImg = document.createElement('img');
+              newImg.src = newSrc;
+              newImg.id = 'mainCarImage';
+              newImg.alt = 'Car Image';
+              newImg.style.cssText = "width:100%; border-radius:20px; display:block; object-fit:cover; max-height:450px; box-shadow:0 15px 35px rgba(0,0,0,0.1); transition:transform 0.3s ease;";
+              placeholder.parentNode.replaceChild(newImg, placeholder);
+            }
+          }
+          
+          document.querySelectorAll('.gallery-thumb').forEach(thumb => {
+            thumb.style.borderColor = 'transparent';
+            thumb.classList.remove('active');
+            thumb.style.transform = 'scale(1)';
+          });
+          element.style.borderColor = 'var(--cv-blue)';
+          element.classList.add('active');
+          element.style.transform = 'scale(1.05)';
+        }
+        </script>
         {% endif %}
       </div>
       
@@ -276,6 +318,163 @@ function toggleEditForm(reviewId) {
 }
 </script>
 
+<!-- ── Fullscreen Lightbox Gallery ── -->
+<div id="vvLightbox" class="vv-lightbox">
+  <div class="lb-header">
+    <div class="lb-back" onclick="closeLightbox()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </div>
+    <div class="lb-title">{{ car.make }} {{ car.model }}</div>
+    <div class="lb-tabs" id="lbTabs">
+      <button class="lb-tab active" data-cat="all" onclick="filterGallery('all')">All Images</button>
+      <button class="lb-tab" data-cat="exterior" onclick="filterGallery('exterior')">Exterior</button>
+      <button class="lb-tab" data-cat="interior" onclick="filterGallery('interior')">Interior</button>
+      <button class="lb-tab" data-cat="colors" onclick="filterGallery('colors')">Colors</button>
+      <button class="lb-tab" data-cat="360_view" onclick="filterGallery('360_view')">360° View</button>
+    </div>
+    <div style="width:40px;"></div>
+  </div>
+  
+  <div class="lb-main">
+    <button class="lb-nav-btn lb-prev" onclick="navImg(-1)" id="lbPrevBtn">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1e293b" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    
+    <div class="lb-image-container">
+      <img id="lbMainImage" src="" alt="Fullscreen View">
+    </div>
+    
+    <button class="lb-nav-btn lb-next" onclick="navImg(1)" id="lbNextBtn">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1e293b" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+  
+  <div class="lb-thumbnails-wrapper">
+    <div class="lb-thumbnails" id="lbThumbnails"></div>
+  </div>
+</div>
+
+<style>
+.vv-lightbox {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: #0f172aa8; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  z-index: 99999; display: flex; flex-direction: column; opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.vv-lightbox.active { opacity: 1; pointer-events:all; }
+.lb-header { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(15, 23, 42, 0.4); }
+.lb-back { color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; transition: background 0.2s; }
+.lb-back:hover { background: rgba(255,255,255,0.1); }
+.lb-title { color: white; font-weight: 600; font-size: 18px; margin-right: auto; padding-left: 15px;}
+.lb-tabs { display: flex; gap: 20px; }
+.lb-tab { background: transparent; border: none; color: #94a3b8; font-size: 14px; font-weight: 500; padding: 24px 0; cursor: pointer; position: relative; transition: color 0.2s; }
+.lb-tab:hover { color: white; }
+.lb-tab.active { color: #f8fafc; font-weight: 600; }
+.lb-tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 3px; background: #ef4444; border-radius: 3px 3px 0 0; }
+.lb-main { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 20px; }
+.lb-image-container { width: 100%; max-width: 1100px; height: 100%; display: flex; align-items: center; justify-content: center; }
+#lbMainImage { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+.lb-nav-btn { width: 50px; height: 50px; border-radius: 50%; background: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); transition: all 0.2s; }
+.lb-nav-btn:hover { background: #f8fafc; transform: translateY(-50%) scale(1.1); }
+.lb-prev { left: 40px; }
+.lb-next { right: 40px; }
+.lb-nav-btn:disabled { opacity: 0; pointer-events: none; }
+.lb-thumbnails-wrapper { height: 120px; background: rgba(15, 23, 42, 0.6); border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; padding: 0 20px; }
+.lb-thumbnails { display: flex; gap: 12px; overflow-x: auto; max-width: 100%; padding-bottom: 5px; scrollbar-width: thin; }
+.lb-thumb { width: 120px; height: 80px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; opacity: 0.6; transition: all 0.2s; flex-shrink: 0; object-fit: cover; }
+.lb-thumb:hover { opacity: 0.8; transform: translateY(-2px); }
+.lb-thumb.active { border-color: #3b82f6; opacity: 1; }
+body.dark-mode .lb-nav-btn { background: #334155; }
+body.dark-mode .lb-nav-btn svg { stroke: white; }
+</style>
+
+<script>
+let galleryData = [];
+{% if car.image %}
+galleryData.push({ url: "{{ car.image.url }}", category: "exterior" });
+{% endif %}
+{% for img in car.gallery_images.all %}
+galleryData.push({ url: "{{ img.image.url }}", category: "{{ img.category }}" });
+{% endfor %}
+
+let currentCat = 'all';
+let currentImages = [];
+let currentIndex = 0;
+
+function openLightbox() {
+  document.getElementById('vvLightbox').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  filterGallery('all'); 
+}
+
+function closeLightbox() {
+  document.getElementById('vvLightbox').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function filterGallery(cat) {
+  currentCat = cat;
+  document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
+  let activeTab = document.querySelector(`.lb-tab[data-cat="${cat}"]`);
+  if(activeTab) activeTab.classList.add('active');
+  
+  if(cat === 'all') currentImages = galleryData;
+  else currentImages = galleryData.filter(img => img.category === cat);
+  
+  if(currentImages.length > 0) {
+    currentIndex = 0;
+    renderThumbnails();
+    showImage(0);
+  } else {
+    document.getElementById('lbMainImage').src = '';
+    document.getElementById('lbThumbnails').innerHTML = '<div style="color:#94a3b8; padding:30px;">No images in this category.</div>';
+    updateNavButtons();
+  }
+}
+
+function renderThumbnails() {
+  const container = document.getElementById('lbThumbnails');
+  container.innerHTML = '';
+  currentImages.forEach((img, idx) => {
+    let el = document.createElement('img');
+    el.src = img.url;
+    el.className = 'lb-thumb';
+    el.onclick = () => showImage(idx);
+    container.appendChild(el);
+  });
+}
+
+function showImage(idx) {
+  if (idx < 0 || idx >= currentImages.length) return;
+  currentIndex = idx;
+  const mainImg = document.getElementById('lbMainImage');
+  mainImg.style.animation = 'none';
+  mainImg.offsetHeight; 
+  mainImg.style.animation = null; 
+  mainImg.src = currentImages[idx].url;
+  
+  let thumbs = document.getElementById('lbThumbnails').children;
+  for(let i=0; i<thumbs.length; i++) thumbs[i].classList.remove('active');
+  if(thumbs[idx]) thumbs[idx].classList.add('active');
+  if(thumbs[idx]) thumbs[idx].scrollIntoView({behavior: "smooth", block: "nearest", inline: "center"});
+  
+  updateNavButtons();
+}
+
+function navImg(dir) { showImage(currentIndex + dir); }
+
+function updateNavButtons() {
+  document.getElementById('lbPrevBtn').disabled = (currentIndex === 0);
+  document.getElementById('lbNextBtn').disabled = (currentIndex === currentImages.length - 1);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    let mainImg = document.getElementById("mainCarImage");
+    if(mainImg) {
+        mainImg.style.cursor = "pointer";
+        mainImg.addEventListener("click", openLightbox);
+    }
+});
+</script>
 {% endblock %}
-
-

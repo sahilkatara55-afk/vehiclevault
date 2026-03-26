@@ -179,13 +179,208 @@
             <input type="file" name="image" accept="image/*" class="image-upload-input">
           </div>
         </div>
+        <div class="mc-form-row">
+          <div class="mc-form-group" style="width: 100%;">
+            <label style="font-size:16px; font-weight:600; color:#1e293b; margin-bottom:12px; display:block;">Advanced Image Gallery Upload</label>
+            <div class="gallery-upload-container" id="galleryUploadContainer" style="background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:20px;">
+              
+              <!-- Category Selector -->
+              <div class="gallery-category-selector" style="margin-bottom: 15px; display: flex; gap: 12px; align-items: center; background:#f8fafc; padding:12px 15px; border-radius:8px;">
+                <label style="margin-bottom: 0; font-weight:500; font-size:14px; color:#475569;">Assign Category for next upload:</label>
+                <select id="galleryCategorySelect" class="mc-select" style="width: 200px; padding:8px 12px; border:1px solid #cbd5e1; border-radius:6px; outline:none; font-weight:500; color:#0f172a;">
+                  <option value="exterior">🚙 Exterior</option>
+                  <option value="interior">💺 Interior</option>
+                  <option value="colors">🎨 Colors</option>
+                  <option value="360_view">🔄 360° View</option>
+                </select>
+              </div>
 
-        <div class="form-actions">
+              <!-- Dropzone -->
+              <div class="gallery-dropzone" id="galleryDropzone" style="border: 2px dashed #94a3b8; border-radius: 10px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.2s; background:#f1f5f9;">
+                <div class="dropzone-content" style="pointer-events:none;">
+                  <span class="dropzone-icon" style="font-size:40px; display:block; margin-bottom:10px;">📸</span>
+                  <p style="margin:0 0 10px 0; color:#475569; font-size:15px;">Drag & drop multiple images here or <strong>Click to browse</strong></p>
+                  <p style="margin:0; color:#94a3b8; font-size:12px;">Images will be tagged as the category selected above</p>
+                </div>
+                <input type="file" id="galleryFileInput" multiple accept="image/*" style="display:none;">
+              </div>
+              
+              <!-- Preview Grid -->
+              <div class="gallery-preview-grid" id="galleryPreviewGrid" style="display:flex; flex-wrap:wrap; gap:15px; margin-top:20px;">
+                <!-- JS injected previews -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 30px;">
           <a href="{% url 'manage_cars' %}" class="mc-btn mc-btn-gray mc-btn-large">Cancel</a>
-          <button type="submit" class="mc-btn mc-btn-primary mc-btn-large">Save Vehicle</button>
+          <button type="submit" class="mc-btn mc-btn-primary mc-btn-large">Save Vehicle & Upload Options</button>
         </div>
       </form>
     </div>
+  </div>
+</div>
+
+<style>
+  .gallery-dropzone.dragover {
+    background: #e0f2fe !important;
+    border-color: #3b82f6 !important;
+  }
+  .gallery-preview-card {
+    position: relative;
+    width: 120px;
+    height: 100px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  }
+  .gallery-preview-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .preview-tag {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(15, 23, 42, 0.8);
+    color: white;
+    font-size: 11px;
+    text-align: center;
+    padding: 3px 0;
+    font-weight: 500;
+  }
+  .preview-remove {
+    position: absolute;
+    top: 4px; right: 4px;
+    background: #ef4444; color: white;
+    border: none; border-radius: 50%;
+    width: 20px; height: 20px;
+    line-height: normal;
+    text-align: center; cursor: pointer;
+    font-size: 14px; display:flex; align-items:center; justify-content:center;
+  }
+  .preview-remove:hover { background: #dc2626; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  let selectedGalleryImages = [];
+
+  const dropzone = document.getElementById('galleryDropzone');
+  const fileInput = document.getElementById('galleryFileInput');
+  const categorySelect = document.getElementById('galleryCategorySelect');
+  const previewGrid = document.getElementById('galleryPreviewGrid');
+  const carForm = document.getElementById('carAddForm');
+
+  // Prevent default drag behaviors
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropzone.addEventListener(eventName, preventDefaults, false);
+  });
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  // Hover effects
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false);
+  });
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false);
+  });
+
+  // Handle drops and clicks
+  dropzone.addEventListener('drop', (e) => {
+    handleFiles(e.dataTransfer.files);
+  });
+  dropzone.addEventListener('click', () => {
+    fileInput.click();
+  });
+  fileInput.addEventListener('change', function() {
+    handleFiles(this.files);
+    this.value = ''; // reset so same files can be picked again
+  });
+
+  function handleFiles(files) {
+    let category = categorySelect.value;
+    let categoryName = categorySelect.options[categorySelect.selectedIndex].text.replace(/[^a-zA-Z0-9 °]/g, '').trim();
+    
+    [...files].forEach(file => {
+      if(!file.type.startsWith('image/')) return;
+      
+      // Add to array
+      selectedGalleryImages.push({
+        file: file,
+        category: category,
+        categoryName: categoryName
+      });
+      
+      // Update UI
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = function(e) {
+        let previewCard = document.createElement('div');
+        previewCard.className = 'gallery-preview-card';
+        previewCard.innerHTML = `
+          <img src="${e.target.result}" alt="Preview">
+          <span class="preview-tag">${categoryName}</span>
+          <button type="button" class="preview-remove">×</button>
+        `;
+        
+        previewCard.querySelector('.preview-remove').addEventListener('click', function() {
+          let currentCard = this.closest('.gallery-preview-card');
+          let index = Array.from(previewGrid.children).indexOf(currentCard);
+          selectedGalleryImages.splice(index, 1);
+          currentCard.remove();
+        });
+        
+        previewGrid.appendChild(previewCard);
+      }
+    });
+  }
+
+  // Override form submission with AJAX FormData
+  if(carForm) {
+    carForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = this.querySelector('button[type="submit"]');
+      submitBtn.innerText = 'Saving... Please wait';
+      submitBtn.style.opacity = '0.7';
+      submitBtn.disabled = true;
+
+      const formData = new FormData(this);
+      
+      // Append gallery files and categories
+      selectedGalleryImages.forEach(imgObj => {
+        formData.append('gallery_images', imgObj.file);
+        formData.append('image_categories', imgObj.category);
+      });
+      
+      fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(response => {
+        if(response.redirected) {
+            window.location.href = response.url;
+        } else {
+            window.location.href = "{% url 'manage_cars' %}";
+        }
+      })
+      .catch(error => {
+        console.error('Error submitting form:', error);
+        alert('Failed to save vehicle');
+        submitBtn.innerText = 'Save Vehicle & Upload Options';
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+      });
+    });
+  }
+});
+</script>
 
   </div>
 </div>
