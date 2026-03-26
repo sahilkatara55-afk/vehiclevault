@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import UsersignupForm, UserProfileUpdateForm, OTPVerifyForm
 from .models import User, AdminSignupRequest
-from vehicles.models import Car, FavoriteVehicle, CompareHistory, RecentlyViewed, UserDocument, Reminder, Accessory, AdminNotification, Brand
+from vehicles.models import Car, CarImage, FavoriteVehicle, CompareHistory, RecentlyViewed, UserDocument, Reminder, Accessory, AdminNotification, Brand
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
@@ -525,6 +525,20 @@ def car_add(request):
         if 'image' in request.FILES:
             car.image = request.FILES['image']
         car.save()
+        
+        # Handle Image Gallery uploads via AJAX FormData
+        gallery_images = request.FILES.getlist('gallery_images')
+        image_categories = request.POST.getlist('image_categories')
+        
+        for i, gallery_image in enumerate(gallery_images):
+            # Fallback to exterior if categories array is somehow mismatched
+            category = image_categories[i] if i < len(image_categories) else 'exterior'
+            CarImage.objects.create(
+                car=car,
+                image=gallery_image,
+                category=category
+            )
+            
         messages.success(request, f'{car} added successfully.')
         return redirect('manage_cars')
         
@@ -566,8 +580,24 @@ def car_edit(request, pk):
         if 'image' in request.FILES:
             car.image = request.FILES['image']
         car.save()
+        
+        # Handle new gallery images correctly
+        gallery_images = request.FILES.getlist('gallery_images')
+        image_categories = request.POST.getlist('image_categories')
+        
+        for i, gallery_image in enumerate(gallery_images):
+            category = image_categories[i] if i < len(image_categories) else 'exterior'
+            CarImage.objects.create(
+                car=car,
+                image=gallery_image,
+                category=category
+            )
+            
         messages.success(request, f'{car} updated successfully.')
-    return redirect('manage_cars')
+        return redirect('manage_cars')
+
+    # Render full page edit form
+    return render(request, 'vehicles/admin/edit_car.html', {'car': car})
 
 
 @login_required

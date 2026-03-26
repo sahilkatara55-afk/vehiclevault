@@ -243,3 +243,24 @@ class CarReview(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.car.make} {self.car.model} ({self.rating}/5)"
+
+# ── Car Image Gallery ──────────────────────────────────────────
+class CarImage(models.Model):
+    CATEGORY_CHOICES = [
+        ('exterior', 'Exterior'),
+        ('interior', 'Interior'),
+        ('colors', 'Colors'),
+        ('360_view', '360° View')
+    ]
+    
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='gallery_images')
+    image = models.ImageField(upload_to='cars/gallery/')
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='exterior')
+    is_primary = models.BooleanField(default=False, help_text="Set to True to feature this image.")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-is_primary', 'uploaded_at']
+
+    def __str__(self):
+        return f"Image for {self.car.make} {self.car.model}"
