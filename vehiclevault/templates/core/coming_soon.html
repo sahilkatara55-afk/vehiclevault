@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ feature|default:"Feature" }} - Coming Soon | VehicleVault{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/coming_soon.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="coming-soon-container">
+    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="none" viewBox="0 0 24 24" stroke="#3B82F6" stroke-width="1.5" class="coming-soon-icon">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <h1 class="coming-soon-title">{{ feature|default:"This Feature" }}</h1>
+    <h2 class="coming-soon-subtitle">Coming Soon!</h2>
+    <p class="coming-soon-text">
+        We're working hard to bring you this feature. Stay tuned for exciting updates to your VehicleVault experience!
+    </p>
+    <a href="{% url 'home' %}" class="vv-btn coming-soon-btn">Return to Home</a>
+</div>
+{% endblock %}

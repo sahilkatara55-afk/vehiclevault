@@ -42,10 +42,10 @@ class ReminderForm(forms.ModelForm):
 class AccessoryForm(forms.ModelForm):
     class Meta:
         model = Accessory
-        fields = ['name', 'compatible_car', 'price', 'image', 'description']
+        fields = ['name', 'category', 'price', 'image', 'description']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Accessory Name'}),
-            'compatible_car': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Compatible Cars (e.g., Universal, Honda City)'}),
+            'category': forms.Select(attrs={'class': 'form-select'}),
             'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Price'}),
             'image': forms.FileInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Accessory description...'}),

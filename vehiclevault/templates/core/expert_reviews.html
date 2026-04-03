@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Expert Reviews | VehicleVault{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 1200px; margin: 40px auto; padding: 20px;">
+  <h1 style="font-weight: 800; margin-bottom: 30px; color: var(--vv-text);">Car Expert Reviews</h1>
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+    <!-- Dummy Review 1 -->
+    <div style="background: var(--vv-surface); padding: 20px; border-radius: var(--vv-radius); box-shadow: var(--vv-card-shadow); border: 1px solid var(--vv-border);">
+      <h3 style="margin-top: 0; color: var(--vv-text);">2026 Mahindra XEV 9e - First Drive</h3>
+      <p style="color: var(--vv-text-muted); font-size: 0.9rem;">By AutoExpert India | March 28, 2026</p>
+      <p style="color: var(--vv-text);">The Mahindra XEV 9e brings a revolution in the electric segment. With its futuristic design and robust performance, it offers unparalleled ride quality.</p>
+      <p style="font-weight: bold; color: #f59e0b;">Rating: 4.5/5</p>
+    </div>
+    <!-- Dummy Review 2 -->
+    <div style="background: var(--vv-surface); padding: 20px; border-radius: var(--vv-radius); box-shadow: var(--vv-card-shadow); border: 1px solid var(--vv-border);">
+      <h3 style="margin-top: 0; color: var(--vv-text);">Tata Punch EV - Urban Warrior</h3>
+      <p style="color: var(--vv-text-muted); font-size: 0.9rem;">By CityDrive Reviews | April 01, 2026</p>
+      <p style="color: var(--vv-text);">Perfect for city commutes, the Punch EV packs a surprising amount of features in a compact body, though highway range could be improved.</p>
+      <p style="font-weight: bold; color: #f59e0b;">Rating: 4.0/5</p>
+    </div>
+    <!-- Dummy Review 3 -->
+    <div style="background: var(--vv-surface); padding: 20px; border-radius: var(--vv-radius); box-shadow: var(--vv-card-shadow); border: 1px solid var(--vv-border);">
+      <h3 style="margin-top: 0; color: var(--vv-text);">Maruti Suzuki e Vitara</h3>
+      <p style="color: var(--vv-text-muted); font-size: 0.9rem;">By GearHead | April 02, 2026</p>
+      <p style="color: var(--vv-text);">Maruti steps into the EV space strongly. Impressive range, sensible pricing, and the trusted service network make it a compelling choice.</p>
+      <p style="font-weight: bold; color: #f59e0b;">Rating: 4.2/5</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

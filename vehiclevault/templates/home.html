@@ -24,11 +24,7 @@
 
     <div class="hero-content">
 
-      {% comment %} <!-- Badge -->
-      <div class="hero-badge animate-fade-up">
-        <span class="hero-badge-dot"></span>
-        India's #1 Car Comparison Platform
-      </div> {% endcomment %}
+
 
       <!-- Heading -->
       <h1 class="hero-title animate-fade-up anim-delay-1">
@@ -42,27 +38,7 @@
         Make smarter buying decisions with side-by-side comparisons.
       </p>
 
-      <!-- Quick Filter Chips -->
-      <div class="quick-filters animate-fade-up anim-delay-3">
-        <a href="{% url 'search_cars' %}?query=city" class="quick-chip" data-query="city use" id="qc-city">
-          <span class="quick-chip-icon">🏙️</span> City Use
-        </a>
-        <a href="{% url 'search_cars' %}?query=family" class="quick-chip" data-query="family car" id="qc-family">
-          <span class="quick-chip-icon">👨‍👩‍👧</span> Family Car
-        </a>
-        <a href="{% url 'search_cars' %}?query=highway" class="quick-chip" data-query="long drive" id="qc-highway">
-          <span class="quick-chip-icon">🛣️</span> Long Drive
-        </a>
-        <a href="{% url 'search_cars' %}?query=mileage" class="quick-chip" data-query="best mileage" id="qc-mileage">
-          <span class="quick-chip-icon">⛽</span> Best Mileage
-        </a>
-        <a href="{% url 'search_cars' %}?fuel=electric" class="quick-chip" id="qc-ev">
-          <span class="quick-chip-icon">⚡</span> Electric
-        </a>
-        <a href="{% url 'search_cars' %}?query=suv" class="quick-chip" id="qc-suv">
-          <span class="quick-chip-icon">🚙</span> SUV
-        </a>
-      </div>
+      
 
       <!-- Glassmorphism Search Bar -->
       <div class="pill-search-container animate-fade-up anim-delay-4">
@@ -141,25 +117,7 @@
     </div><!-- /hero-content -->
   </section>
 
-  <!-- ════════════════════════════════════════
-       2. AI SUGGESTION BANNER
-  ════════════════════════════════════════ -->
-  <div class="ai-section">
-    <div class="ai-card">
-      <div class="ai-icon-wrap">🤖</div>
-      <div class="ai-text">
-        <h3>Not sure what to choose?</h3>
-        <p>Let our smart filters help you discover the best car for your lifestyle and budget.</p>
-      </div>
-      <div class="ai-chips">
-        <a href="{% url 'search_cars' %}?query=city" class="ai-chip ai-chip-outline">🏙️ City Commuter</a>
-        <a href="{% url 'search_cars' %}?query=family" class="ai-chip ai-chip-outline">👨‍👩‍👧 Family Car</a>
-        <a href="{% url 'search_cars' %}?fuel=electric" class="ai-chip ai-chip-outline">⚡ Go Electric</a>
-        <a href="{% url 'search_cars' %}?query=mileage" class="ai-chip ai-chip-outline">💨 Best Mileage</a>
-        <a href="{% url 'search_cars' %}" class="ai-chip ai-chip-filled">Explore All Cars →</a>
-      </div>
-    </div>
-  </div>
+
 
   <!-- ════════════════════════════════════════
        3. STATS

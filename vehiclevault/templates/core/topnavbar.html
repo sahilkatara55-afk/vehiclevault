@@ -1,4 +1,62 @@
 {% load static %}
+<style>
+  /* Dropdown Visibility */
+  .profile-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 240px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    z-index: 2000;
+  }
+  .profile-dropdown-menu.show {
+    display: block !important;
+  }
+  
+  .notif-dropdown-menu.show {
+    display: block !important;
+  }
+
+  /* Dropdown Icons & Links */
+  .dropdown-links a {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    color: #1e293b;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.2s;
+  }
+  .dropdown-links a:hover { background: #f8fafc; }
+  .dropdown-icon { margin-right: 10px; font-size: 1.1rem; }
+  .dropdown-footer { border-top: 1px solid #f1f5f9; padding: 10px; }
+  .dropdown-logout-btn {
+    display: block; text-align: center; padding: 8px; background: #fee2e2;
+    color: #ef4444; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 0.85rem;
+  }
+  .dropdown-logout-btn:hover { background: #fecaca; }
+
+  /* Notification Scrollbar */
+  #notif-list::-webkit-scrollbar { width: 6px; }
+  #notif-list::-webkit-scrollbar-track { background: #f1f5f9; }
+  #notif-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+  /* Dark Mode Adjustments */
+  body.dark-mode .profile-dropdown-menu,
+  body.dark-mode .notif-dropdown-menu {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f8fafc;
+  }
+  body.dark-mode .dropdown-links a { color: #f8fafc; }
+  body.dark-mode .dropdown-links a:hover { background: #334155; }
+  body.dark-mode .dropdown-footer { border-top-color: #334155; }
+</style>
 <header class="vv-main-header sticky-top">
   <!-- UPPER TIER -->
   <div class="vv-header-upper">
@@ -53,6 +111,23 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
       </a>
 
+      <!-- Notifications -->
+      {% if user.is_authenticated %}
+      <div class="vv-action-item vv-notifications" id="notificationDropdownBtn" style="position: relative; cursor: pointer;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+        <span id="notif-badge" style="display:none; position:absolute; top:-5px; right:-8px; background:#ef4444; color:white; font-size:10px; font-weight:bold; border-radius:50%; padding:2px 5px; box-shadow:0 2px 4px rgba(0,0,0,0.2);">0</span>
+        
+        <div class="notif-dropdown-menu" id="notifDropdown" style="display:none; position:absolute; top:45px; right:0; width:340px; background:var(--vv-card-bg, #fff); border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.15); z-index:100; max-height:400px; overflow-y:auto; border:1px solid var(--vv-border, #e2e8f0); color:var(--vv-text, #333);">
+          <div style="padding:15px; border-bottom:1px solid var(--vv-border, #e2e8f0); font-weight:700; display:flex; justify-content:space-between; align-items:center;">
+            <span>Notifications</span>
+          </div>
+          <div id="notif-list" style="padding:0;">
+            <div style="padding:20px; text-align:center; color:#888;">Loading...</div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
       <!-- Auth -->
       {% if user.is_authenticated %}
       <div class="profile-dropdown-container">
@@ -66,6 +141,20 @@
         </button>
         <!-- Dropdown -->
         <div class="profile-dropdown-menu" id="profileDropdown">
+          <!-- Last Login Info -->
+          <div style="padding:12px 16px; border-bottom:1px solid #F1F5F9; background:#F8FAFC; border-top-left-radius:12px; border-top-right-radius:12px;">
+            <div style="font-size:0.7rem; color:#64748B; text-transform:uppercase; font-weight:800; letter-spacing:0.04em; margin-bottom:4px;">Last Login Device</div>
+            {% with last_d=user.devices.first %}
+              {% if last_d %}
+                <div style="font-size:0.8rem; color:#0F172A; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{ last_d.device_name }}">
+                  {{ last_d.device_name|truncatechars:28 }}
+                </div>
+                <div style="font-size:0.72rem; color:#64748B; margin-top:2px;">IP: {{ last_d.ip_address }}</div>
+              {% else %}
+                <div style="font-size:0.8rem; color:#94A3B8;">First session</div>
+              {% endif %}
+            {% endwith %}
+          </div>
           <div class="dropdown-links">
             <a href="{% url 'my_account' %}"><span class="dropdown-icon">👤</span> Profile</a>
             <a href="{% if user.is_superuser %}{% url 'admin_dashboard' %}{% else %}{% url 'user_dashboard' %}{% endif %}"><span class="dropdown-icon">📊</span> Dashboard</a>
@@ -94,25 +183,24 @@
         <div class="vv-nav-dropdown-menu">
           <a href="{% url 'search_cars' %}" class="vv-nav-dropdown-item">Explore New Cars</a>
           <div class="vv-nav-submenu-container">
-            <a href="#" class="vv-nav-dropdown-item">Electric Cars <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></a>
+            <a href="{% url 'search_cars' %}?q=Electric" class="vv-nav-dropdown-item">Electric Cars <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></a>
             <div class="vv-nav-submenu">
-              <a href="#" class="vv-nav-dropdown-item">Maruti Suzuki e Vitara</a>
-              <a href="#" class="vv-nav-dropdown-item">Mahindra BE 6</a>
-              <a href="#" class="vv-nav-dropdown-item">Tata Punch EV</a>
-              <a href="#" class="vv-nav-dropdown-item">Mahindra XEV 9e</a>
-              <a href="#" class="vv-nav-dropdown-item">MG Windsor EV</a>
-              <a href="#" class="vv-nav-dropdown-item">MG Comet EV</a>
-              <a href="#" class="vv-nav-dropdown-item">All Electric Cars</a>
+              <a href="{% url 'search_cars' %}?q=Vitara" class="vv-nav-dropdown-item">Maruti Suzuki e Vitara</a>
+              <a href="{% url 'search_cars' %}?q=BE+6" class="vv-nav-dropdown-item">Mahindra BE 6</a>
+              <a href="{% url 'search_cars' %}?q=Punch" class="vv-nav-dropdown-item">Tata Punch EV</a>
+              <a href="{% url 'search_cars' %}?q=XEV+9e" class="vv-nav-dropdown-item">Mahindra XEV 9e</a>
+              <a href="{% url 'search_cars' %}?q=Windsor" class="vv-nav-dropdown-item">MG Windsor EV</a>
+              <a href="{% url 'search_cars' %}?q=Comet" class="vv-nav-dropdown-item">MG Comet EV</a>
+              <a href="{% url 'search_cars' %}?q=Electric" class="vv-nav-dropdown-item">All Electric Cars</a>
             </div>
           </div>
           <div class="vv-nav-submenu-container">
-            <a href="#" class="vv-nav-dropdown-item">Popular Cars <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></a>
+            <a href="{% url 'search_cars' %}" class="vv-nav-dropdown-item">Popular Cars <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></a>
             <div class="vv-nav-submenu">
-              <a href="#" class="vv-nav-dropdown-item">Check Popular Cars</a>
+              <a href="{% url 'search_cars' %}" class="vv-nav-dropdown-item">Check Popular Cars</a>
             </div>
           </div>
-          <a href="#" class="vv-nav-dropdown-item">Upcoming Cars</a>
-          <a href="#" class="vv-nav-dropdown-item">New Launches</a>
+
           <div class="vv-nav-submenu-container">
             <a href="{% url 'brands' %}" class="vv-nav-dropdown-item">Popular Brands <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></a>
             <div class="vv-nav-submenu">
@@ -120,34 +208,22 @@
             </div>
           </div>
           <a href="{% url 'compare_cars' %}" class="vv-nav-dropdown-item">Compare Cars</a>
-          <a href="#" class="vv-nav-dropdown-item">New Car Offers & Discounts</a>
-          <a href="#" class="vv-nav-dropdown-item">Find Car Dealers</a>
-          <a href="#" class="vv-nav-dropdown-item">Find EV Charging Stations</a>
-          <a href="#" class="vv-nav-dropdown-item">Find Fuel Stations</a>
-          <a href="#" class="vv-nav-dropdown-item">Check Fuel Prices</a>
+
         </div>
       </div>
 
       <!-- NEWS & REVIEWS Dropdown -->
       <div class="vv-nav-dropdown">
-        <a href="#" class="vv-nav-link">NEWS & REVIEWS <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></a>
+        <a href="{% url 'coming_soon' %}?feature=News+and+Reviews" class="vv-nav-link">NEWS & REVIEWS <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></a>
         <div class="vv-nav-dropdown-menu">
-          <a href="#" class="vv-nav-dropdown-item">News & Top stories</a>
-          <a href="#" class="vv-nav-dropdown-item">Car Expert Reviews</a>
-          <a href="#" class="vv-nav-dropdown-item">User Reviews</a>
-          <a href="#" class="vv-nav-dropdown-item">Car Collection</a>
-          <a href="#" class="vv-nav-dropdown-item">Tips & Advice</a>
+
+          <a href="{% url 'expert_reviews' %}" class="vv-nav-dropdown-item">Car Expert Reviews</a>
+          <a href="{% url 'user_reviews_page' %}" class="vv-nav-dropdown-item">User Reviews</a>
+
         </div>
       </div>
 
-      <!-- VIDEOS Dropdown -->
-      <div class="vv-nav-dropdown">
-        <a href="#" class="vv-nav-link">VIDEOS <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></a>
-        <div class="vv-nav-dropdown-menu">
-          <a href="#" class="vv-nav-dropdown-item">Video Reviews</a>
-          <a href="#" class="vv-nav-dropdown-item">Visual Stories</a>
-        </div>
-      </div>
+
     </nav>
 
     <div class="vv-lower-right">
@@ -308,4 +384,92 @@
       }
     }
   });
+
+  // Notifications Polling
+  {% if user.is_authenticated %}
+  function fetchNotifications() {
+      fetch("{% url 'user_notifications_api' %}")
+      .then(res => res.json())
+      .then(data => {
+          const badge = document.getElementById('notif-badge');
+          if (data.unread_count > 0) {
+              badge.textContent = data.unread_count > 99 ? '99+' : data.unread_count;
+              badge.style.display = 'block';
+          } else {
+              badge.style.display = 'none';
+          }
+          
+          let html = '';
+          if (data.notifications.length === 0) {
+              html = '<div style="padding:20px; text-align:center; color:#888; font-size:0.9rem;">No new notifications</div>';
+          } else {
+              data.notifications.forEach(n => {
+                  html += `<div style="padding:15px; border-bottom:1px solid var(--vv-border, #e2e8f0); transition:background 0.2s; ${n.is_read ? 'opacity:0.8;' : 'background:rgba(59, 130, 246, 0.05); border-left:3px solid #3b82f6;'}">
+                              <div style="font-size:0.95rem; font-weight:600; margin-bottom:4px;">${n.title}</div>
+                              <div style="font-size:0.85rem; color:var(--vv-text-muted, #64748b); line-height:1.4;">${n.message}</div>
+                              <div style="font-size:0.75rem; color:#94a3b8; margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
+                                <span>${n.created_at}</span>
+                                <div>
+                                    ${!n.is_read ? `<span style="cursor:pointer; color:#3b82f6; margin-right:10px; font-weight:500;" onclick="markRead(${n.id}, event)">Mark Read</span>` : ''}
+                                    <span style="cursor:pointer; color:#ef4444; font-weight:500;" onclick="deleteNotif(${n.id}, event)">Delete</span>
+                                </div>
+                              </div>
+                           </div>`;
+              });
+          }
+          const notifList = document.getElementById('notif-list');
+          if (notifList) notifList.innerHTML = html;
+      })
+      .catch(console.error);
+  }
+
+  function markRead(id, e) {
+      e.stopPropagation();
+      fetch(`/api/notifications/read/${id}/`, {
+          method: 'POST',
+          headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+          }
+      }).then(() => fetchNotifications());
+  }
+
+  function deleteNotif(id, e) {
+      e.stopPropagation();
+      fetch(`/api/notifications/delete/${id}/`, {
+          method: 'POST',
+          headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+          }
+      }).then(() => fetchNotifications());
+  }
+
+  const notifBtn = document.getElementById('notificationDropdownBtn');
+  if (notifBtn) {
+      notifBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const drop = document.getElementById('notifDropdown');
+          if(drop) drop.classList.toggle("show");
+      });
+  }
+
+  document.addEventListener('click', function(e) {
+      const drop = document.getElementById('notifDropdown');
+      const btn = document.getElementById('notificationDropdownBtn');
+      if (drop && drop.classList.contains("show")) {
+          if (!drop.contains(e.target) && (!btn || !btn.contains(e.target))) {
+              drop.classList.remove("show");
+          }
+      }
+  });
+
+  const notifDropdown = document.getElementById('notifDropdown');
+  if (notifDropdown) {
+      notifDropdown.addEventListener('click', function(e) {
+          e.stopPropagation();
+      });
+  }
+
+  setInterval(fetchNotifications, 5000);
+  fetchNotifications();
+  {% endif %}
 </script>

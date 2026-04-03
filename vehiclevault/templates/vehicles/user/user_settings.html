@@ -121,6 +121,65 @@
         </div>
       </div>
 
+      <!-- ── Notification Settings ── -->
+      <div class="settings-card">
+        <div class="settings-card-title">🔔 Notification Settings</div>
+        <form method="POST" action="{% url 'user_settings' %}" class="settings-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="notifications">
+
+          <div>
+            <label class="settings-label">Preferred Language</label>
+            <select name="language" class="settings-input">
+              <option value="en" {% if prefs.language == 'en' %}selected{% endif %}>English</option>
+              <option value="gu" {% if prefs.language == 'gu' %}selected{% endif %}>Gujarati (ગુજરાતી)</option>
+            </select>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top:5px;">
+            <label style="display:flex; align-items:center; cursor:pointer;">
+              <input type="checkbox" name="in_app" {% if prefs.in_app_notifications %}checked{% endif %} style="margin-right:10px; width:18px; height:18px;">
+              <span style="font-size:0.95rem; color:#1E293B;">In-app Notifications (Bell Icon)</span>
+            </label>
+            <label style="display:flex; align-items:center; cursor:pointer;">
+              <input type="checkbox" name="email" {% if prefs.email_notifications %}checked{% endif %} style="margin-right:10px; width:18px; height:18px;">
+              <span style="font-size:0.95rem; color:#1E293B;">Email Alerts (for major actions)</span>
+            </label>
+          </div>
+
+          <button type="submit" class="settings-btn" style="margin-top:10px;">💾 Save Preferences</button>
+        </form>
+      </div>
+
+      <!-- ── Login History (Devices) ── -->
+      <div class="settings-card" style="grid-column: 1 / -1;">
+        <div class="settings-card-title">📱 Login History & Devices</div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+            <thead>
+              <tr style="text-align:left; border-bottom:2px solid #F1F5F9;">
+                <th style="padding:12px; color:#64748B;">Device / Browser</th>
+                <th style="padding:12px; color:#64748B;">IP Address</th>
+                <th style="padding:12px; color:#64748B;">Last Login</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for d in devices %}
+              <tr style="border-bottom:1px solid #F1F5F9;">
+                <td style="padding:12px; max-width:400px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{{ d.device_name }}">
+                  {{ d.device_name }}
+                </td>
+                <td style="padding:12px;">{{ d.ip_address }}</td>
+                <td style="padding:12px; color:#64748B;">{{ d.last_login|date:"M d, Y, H:i" }}</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="3" style="padding:20px; text-align:center; color:#94A3B8;">No device history found.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div><!-- end grid -->
   </div>
 </div>

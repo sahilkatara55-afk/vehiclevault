@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import UsersignupForm, UserProfileUpdateForm, OTPVerifyForm
 from .models import User, AdminSignupRequest
-from vehicles.models import Car, CarImage, FavoriteVehicle, CompareHistory, RecentlyViewed, UserDocument, Reminder, Accessory, AdminNotification, Brand
+from vehicles.models import Car, CarImage, FavoriteVehicle, CompareHistory, RecentlyViewed, UserDocument, Reminder, Accessory, AdminNotification, Brand, FavoriteAccessory, Comparison
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
@@ -9,11 +9,18 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 from django.contrib import messages
-from django.http import JsonResponse
-from django.db.models import Q
+from django.http import JsonResponse, HttpResponse
+from django.db.models import Q, Count
+from django.db.models.functions import TruncDay, TruncWeek, TruncMonth, TruncYear
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
+from .models import Notification, UserDevice, NotificationPreference
+from .utils import send_action_notification, get_client_ip
 import random
-
-
+import csv
 # Helper: generate 6-digit OTP
 def _generate_otp():
     return str(random.randint(100000, 999999))
@@ -149,6 +156,11 @@ def verify_otp(request):
                     recipient_list=[email],
                     fail_silently=True,
                 )
+                # Notify Admins
+                admins = User.objects.filter(is_superuser=True)
+                for admin in admins:
+                    send_action_notification(admin, 'New Admin Request', f'{first_name} {last_name} ({email}) has requested admin access.')
+                
                 messages.success(
                     request,
                     'Email verified! Your admin access request is pending approval.'
@@ -173,6 +185,14 @@ def verify_otp(request):
                     recipient_list=[email],
                     fail_silently=True,
                 )
+                
+                send_action_notification(user, 'Account created successfully', 'Welcome to VehicleVault! Your account is ready.')
+                
+                # Notify Admins
+                admins = User.objects.filter(is_superuser=True)
+                for admin in admins:
+                    send_action_notification(admin, 'New User Registered', f'A new user has joined: {first_name} {last_name} ({email}).')
+                
                 messages.success(request, 'Account created successfully! Please login.')
                 return redirect('login')
 
@@ -324,6 +344,20 @@ def reject_admin_request(request, pk):
 
 
 # ──────────────────────────────────────────────
+# Coming Soon (Placeholder View)
+# ──────────────────────────────────────────────
+def coming_soon(request):
+    feature = request.GET.get('feature', 'Feature')
+    return render(request, 'core/coming_soon.html', {'feature': feature})
+
+def expert_reviews(request):
+    return render(request, 'core/expert_reviews.html')
+
+def user_reviews_page(request):
+    return render(request, 'core/user_reviews.html')
+
+
+# ──────────────────────────────────────────────
 # Home
 # ──────────────────────────────────────────────
 def home(request):
@@ -379,6 +413,30 @@ def userloginform(request):
 
         if user is not None:
             login(request, user)
+            
+            # ── Smart Login: Device Tracking ──────────────────
+            ip = get_client_ip(request)
+            user_agent = request.META.get('HTTP_USER_AGENT', 'Unknown Device')
+            
+            device, created = UserDevice.objects.get_or_create(
+                user=user,
+                device_name=user_agent,
+                ip_address=ip
+            )
+            
+            if created:
+                # NEW DEVICE/IP Detected
+                send_action_notification(
+                    user, 
+                    'New login detected', 
+                    f'A login was detected from a new device/IP ({ip}). If this was not you, please change your password immediately.',
+                    send_email=True
+                )
+            else:
+                # Known Device — just update last_login (handled by auto_now)
+                device.save()
+            # ──────────────────────────────────────────────────
+            
             if user.is_superuser or user.is_staff:
                 return redirect('admin_dashboard')
             else:
@@ -414,7 +472,7 @@ def user_dashboard(request):
     suggested_accessories = Accessory.objects.all().order_by('-created_at')[:2]
     if saved_cars.exists():
         saved_makes = [fav.car.make for fav in saved_cars]
-        suggested = Accessory.objects.filter(compatible_car__in=saved_makes)[:2]
+        suggested = Accessory.objects.filter(cars__make__in=saved_makes).distinct()[:2]
         if suggested.exists():
             suggested_accessories = suggested
 
@@ -460,12 +518,14 @@ def admin_dashboard(request):
     pending_count = AdminSignupRequest.objects.filter(status='pending').count()
     total_cars    = Car.objects.count()
     total_users   = User.objects.filter(is_superuser=False, is_deleted=False).count()
-    total_comparisons = CompareHistory.objects.count()
+    total_comparisons = Comparison.objects.count()
     total_accessories = Accessory.objects.count()
     top_compared = (
-        Car.objects.annotate(cmp_count=Count('compared_in'))
+        Car.objects.annotate(cmp_count=Count('comparison_events'))
         .order_by('-cmp_count')[:5]
     )
+    latest_comparisons_summary = Comparison.objects.all().prefetch_related('cars')[:5]
+    
     return render(request, 'vehicles/admin/admin_dashboard.html', {
         'pending_count':      pending_count,
         'total_cars':         total_cars,
@@ -473,6 +533,7 @@ def admin_dashboard(request):
         'total_comparisons':  total_comparisons,
         'total_accessories':  total_accessories,
         'top_compared':       top_compared,
+        'latest_comparisons_summary': latest_comparisons_summary,
     })
 
 
@@ -532,18 +593,23 @@ def car_add(request):
         
         for i, gallery_image in enumerate(gallery_images):
             # Fallback to exterior if categories array is somehow mismatched
-            category = image_categories[i] if i < len(image_categories) else 'exterior'
-            CarImage.objects.create(
-                car=car,
-                image=gallery_image,
-                category=category
-            )
+            if category:
+                CarImage.objects.create(
+                    car=car,
+                    image=gallery_image,
+                    category=category
+                )
+            
+        accessory_ids = request.POST.getlist('accessories')
+        if accessory_ids:
+            car.accessories.set(accessory_ids)
             
         messages.success(request, f'{car} added successfully.')
         return redirect('manage_cars')
         
     # Render the new full-page create form
-    return render(request, 'vehicles/admin/add_car.html')
+    accessories = Accessory.objects.all().order_by('category', 'name')
+    return render(request, 'vehicles/admin/add_car.html', {'accessories': accessories})
 
 
 @login_required
@@ -586,18 +652,22 @@ def car_edit(request, pk):
         image_categories = request.POST.getlist('image_categories')
         
         for i, gallery_image in enumerate(gallery_images):
-            category = image_categories[i] if i < len(image_categories) else 'exterior'
-            CarImage.objects.create(
-                car=car,
-                image=gallery_image,
-                category=category
-            )
+            if category:
+                CarImage.objects.create(
+                    car=car,
+                    image=gallery_image,
+                    category=category
+                )
+            
+        accessory_ids = request.POST.getlist('accessories')
+        car.accessories.set(accessory_ids)
             
         messages.success(request, f'{car} updated successfully.')
         return redirect('manage_cars')
 
     # Render full page edit form
-    return render(request, 'vehicles/admin/edit_car.html', {'car': car})
+    accessories = Accessory.objects.all().order_by('category', 'name')
+    return render(request, 'vehicles/admin/edit_car.html', {'car': car, 'accessories': accessories})
 
 
 @login_required
@@ -668,7 +738,7 @@ def accessory_add(request):
     if request.method == 'POST':
         acc = Accessory(
             name=request.POST['name'],
-            compatible_car=request.POST.get('compatible_car', ''),
+            category=request.POST.get('category', 'Interior'),
             price=request.POST['price'],
             description=request.POST.get('description', ''),
         )
@@ -686,7 +756,7 @@ def accessory_edit(request, pk):
     acc = get_object_or_404(Accessory, pk=pk)
     if request.method == 'POST':
         acc.name           = request.POST['name']
-        acc.compatible_car = request.POST.get('compatible_car', '')
+        acc.category       = request.POST.get('category', 'Interior')
         acc.price          = request.POST['price']
         acc.description    = request.POST.get('description', '')
         if 'image' in request.FILES:
@@ -720,15 +790,26 @@ def admin_notifications(request):
                 message=message_txt,
                 sent_to_all=send_to_all,
             )
-            if not send_to_all:
+            if send_to_all:
+                # Push Notification objects to all active, non-deleted non-admin users
+                target_users = User.objects.filter(is_active=True, is_deleted=False, is_superuser=False)
+            else:
                 selected_ids = request.POST.getlist('user_ids')
                 notif.recipients.set(User.objects.filter(pk__in=selected_ids))
-            messages.success(request, f'Notification "{title}" sent.')
+                target_users = User.objects.filter(pk__in=selected_ids)
+            
+            # Bulk create Notification rows
+            notifs_to_create = [
+                Notification(user=u, title=title, message=message_txt)
+                for u in target_users
+            ]
+            Notification.objects.bulk_create(notifs_to_create)
+            messages.success(request, f'Notification "{title}" sent to {len(notifs_to_create)} users.')
         else:
             messages.error(request, 'Title and message are required.')
         return redirect('admin_notifications')
     notifications = AdminNotification.objects.all()
-    all_users     = User.objects.filter(is_superuser=False, is_deleted=False)
+    all_users = User.objects.filter(is_superuser=False, is_deleted=False)
     return render(request, 'vehicles/admin/admin_notifications.html', {
         'notifications': notifications,
         'all_users':     all_users,
@@ -753,6 +834,115 @@ def admin_reports(request):
         'total_cars':        total_cars,
         'total_users':       total_users,
     })
+
+
+@login_required
+def admin_analytics(request):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('user_dashboard')
+        
+    total_comparisons = Comparison.objects.count()
+    total_cars        = Car.objects.count()
+    
+    # Simple growth calculation (This month vs Last month)
+    now = timezone.now()
+    this_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    last_month_end = this_month_start - timezone.timedelta(seconds=1)
+    last_month_start = last_month_end.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    
+    this_month_count = Comparison.objects.filter(created_at__gte=this_month_start).count()
+    last_month_count = Comparison.objects.filter(created_at__gte=last_month_start, created_at__lte=last_month_end).count()
+    
+    growth = 0
+    if last_month_count > 0:
+        growth = ((this_month_count - last_month_count) / last_month_count) * 100
+        
+    latest_comparisons = Comparison.objects.all().prefetch_related('cars')[:10]
+    
+    return render(request, 'vehicles/admin/admin_analytics.html', {
+        'total_comparisons': total_comparisons,
+        'total_cars':        total_cars,
+        'growth':            round(growth, 1),
+        'latest_comparisons': latest_comparisons,
+    })
+
+
+@login_required
+def analytics_data_api(request):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+        
+    # Filters
+    fuel_type_filter = request.GET.get('fuel_type')
+    date_range       = request.GET.get('date_range') # e.g. '7days', '30days', 'year'
+    
+    comparisons = Comparison.objects.all()
+    
+    if date_range == '7days':
+        comparisons = comparisons.filter(created_at__gte=timezone.now() - timezone.timedelta(days=7))
+    elif date_range == '30days':
+        comparisons = comparisons.filter(created_at__gte=timezone.now() - timezone.timedelta(days=30))
+    elif date_range == 'year':
+        comparisons = comparisons.filter(created_at__gte=timezone.now() - timezone.timedelta(days=365))
+
+    # 1. Fuel Type Comparison
+    # We count how many times cars of each fuel type were part of a comparison
+    fuel_data_raw = Comparison.objects.filter(id__in=comparisons).values('cars__engine').annotate(count=Count('id'))
+    fuel_labels = []
+    fuel_counts = []
+    for item in fuel_data_raw:
+        if item['cars__engine']:
+            fuel_labels.append(item['cars__engine'].capitalize())
+            fuel_counts.append(item['count'])
+            
+    # 2. Most Compared Cars (Top 5)
+    top_cars_raw = Car.objects.filter(comparison_events__in=comparisons).annotate(
+        comp_count=Count('comparison_events')
+    ).order_by('-comp_count')[:5]
+    
+    top_cars_labels = [f"{c.make} {c.model}" for c in top_cars_raw]
+    top_cars_counts = [c.comp_count for c in top_cars_raw]
+    
+    # 3. Activity Trend (Day-wise for now, can be dynamic)
+    activity_raw = comparisons.annotate(date=TruncDay('created_at')).values('date').annotate(count=Count('id')).order_by('date')
+    activity_labels = [item['date'].strftime('%d %b') for item in activity_raw]
+    activity_counts = [item['count'] for item in activity_raw]
+    
+    return JsonResponse({
+        'fuel_type': {
+            'labels': fuel_labels,
+            'counts': fuel_counts
+        },
+        'top_cars': {
+            'labels': top_cars_labels,
+            'counts': top_cars_counts
+        },
+        'activity': {
+            'labels': activity_labels,
+            'counts': activity_counts
+        }
+    })
+
+
+@login_required
+def export_analytics_csv(request):
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('user_dashboard')
+        
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="vehicle_vault_analytics.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['Comparison ID', 'Cars Compared', 'Date (Aggregated)'])
+    
+    comparisons = Comparison.objects.all().prefetch_related('cars')
+    for comp in comparisons:
+        cars_str = ", ".join([f"{c.make} {c.model}" for c in comp.cars.all()])
+        # Privacy: Only show Month/Year or Day/Month/Year without exact time if preferred
+        date_str = comp.created_at.strftime('%Y-%m-%d')
+        writer.writerow([comp.id, cars_str, date_str])
+        
+    return response
 
 
 @login_required
@@ -951,11 +1141,26 @@ def car_detail(request, pk):
 
     from vehicles.models import CarReview
     reviews = car.reviews.all().select_related('user')
+    
+    accessories = car.accessories.all()
+    categorized_accessories = {}
+    for choice in Accessory.CATEGORY_CHOICES:
+        categorized_accessories[choice[0]] = []
+    
+    for acc in accessories:
+        if acc.category in categorized_accessories:
+            categorized_accessories[acc.category].append(acc)
+            
+    favorite_accessory_ids = []
+    if request.user.is_authenticated:
+        favorite_accessory_ids = FavoriteAccessory.objects.filter(user=request.user).values_list('accessory_id', flat=True)
 
     return render(request, 'vehicles/car_detail.html', {
         'car': car,
         'is_favorite': is_favorite,
         'reviews': reviews,
+        'categorized_accessories': categorized_accessories,
+        'favorite_accessory_ids': favorite_accessory_ids,
     })
 
 @login_required
@@ -981,6 +1186,53 @@ def submit_review(request, car_id):
     return redirect('car_detail', pk=car_id)
 
 
+def submit_enquiry(request, car_id):
+    from vehicles.models import CarEnquiry
+    
+    if request.method == 'POST':
+        car = get_object_or_404(Car, id=car_id)
+        name = request.POST.get('name', '').strip()
+        email = request.POST.get('email', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        message = request.POST.get('message', '').strip()
+        
+        if name and email and phone:
+            user = request.user if request.user.is_authenticated else None
+            CarEnquiry.objects.create(
+                car=car,
+                user=user,
+                name=name,
+                email=email,
+                phone=phone,
+                message=message
+            )
+            
+            # Notify User
+            if user:
+                send_action_notification(
+                    user, 
+                    'Enquiry Submitted', 
+                    f'Your enquiry for {car.make} {car.model} has been received. Our team will contact you shortly.', 
+                    send_email=True
+                )
+            
+            # Notify Admins
+            admins = User.objects.filter(is_superuser=True)
+            for admin in admins:
+                send_action_notification(
+                    admin, 
+                    'New Car Enquiry', 
+                    f'A new enquiry was submitted by {name} for {car.make} {car.model}.', 
+                    send_email=False
+                )
+                
+            messages.success(request, 'Your enquiry has been submitted successfully!')
+        else:
+            messages.error(request, 'Please fill out all required fields.')
+            
+    return redirect('car_detail', pk=car_id)
+
+
 @login_required
 def edit_review(request, pk):
     from vehicles.models import CarReview
@@ -1000,6 +1252,17 @@ def edit_review(request, pk):
         messages.success(request, 'Your review has been updated!')
     
     return redirect('car_detail', pk=review.car.id)
+    
+@login_required
+def toggle_favorite_accessory(request, pk):
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        accessory = get_object_or_404(Accessory, pk=pk)
+        fav, created = FavoriteAccessory.objects.get_or_create(user=request.user, accessory=accessory)
+        if not created:
+            fav.delete()
+            return JsonResponse({'status': 'removed'})
+        return JsonResponse({'status': 'added'})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
 @login_required
@@ -1088,7 +1351,17 @@ def compare_cars(request):
     if selected_ids:
         compare_list = list(Car.objects.filter(id__in=selected_ids))
         
-        # Save compare history if user is authenticated and at least 2 cars are selected
+        # 1. Track advanced comparison analytics (Anonymous)
+        if len(compare_list) > 1:
+            # We track every unique comparison set to avoid spamming if user refreshes
+            # But the requirement implies tracking when cars ARE compared.
+            # I'll create a new Comparison record for every valid comparison action.
+            # To avoid duplicate tracking on refresh, I can check session or just log it.
+            # Usually, analytics tracks unique events. I'll log it every time a full comparison is rendered.
+            comp = Comparison.objects.create()
+            comp.cars.set(compare_list)
+
+        # 2. Save personal compare history if user is authenticated
         if request.user.is_authenticated and len(compare_list) > 1:
             last_history = CompareHistory.objects.filter(user=request.user).order_by('-compared_at').first()
             create_new = True
@@ -1256,4 +1529,117 @@ def user_settings(request):
                 messages.success(request, 'Password changed. Please log in again.')
                 logout(request)
                 return redirect('login')
-    return render(request, 'vehicles/user/user_settings.html')
+        elif action == 'notifications':
+            prefs, _ = NotificationPreference.objects.get_or_create(user=request.user)
+            prefs.email_notifications = 'email' in request.POST
+            prefs.in_app_notifications = 'in_app' in request.POST
+            prefs.language = request.POST.get('language', 'en')
+            prefs.save()
+            messages.success(request, 'Notification preferences updated.')
+
+    devices = UserDevice.objects.filter(user=request.user)
+    prefs, _ = NotificationPreference.objects.get_or_create(user=request.user)
+    return render(request, 'vehicles/user/user_settings.html', {
+        'devices': devices,
+        'prefs': prefs,
+    })
+
+
+# ──────────────────────────────────────────────
+# Forgot Password
+# ──────────────────────────────────────────────
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        user = User.objects.filter(email=email).first()
+        if user:
+            # Generate token and send email
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            reset_url = request.build_absolute_uri(f'/reset-password/{uid}/{token}/')
+            
+            subject = 'VehicleVault - Password Reset'
+            message = f'Hi {user.first_name},\n\nYou requested a password reset. Click the link below to reset your password:\n\n{reset_url}\n\nIf you did not request this, please ignore this email.\n\n- VehicleVault Team'
+            try:
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+            except:
+                pass
+            
+            send_action_notification(user, "Password reset request received", "We received a request to reset your password. If this was not you, please contact support.", send_email=False)
+            
+        # Alway show success to prevent email enumeration
+        messages.success(request, 'If an account with that email exists, a password reset link has been sent.')
+        return redirect('forgot_password')
+        
+    return render(request, 'core/forgot_password.html')
+
+
+# ──────────────────────────────────────────────
+# Reset Password
+# ──────────────────────────────────────────────
+def reset_password(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        if request.method == 'POST':
+            new_password = request.POST.get('new_password')
+            confirm_password = request.POST.get('confirm_password')
+            
+            if new_password and new_password == confirm_password:
+                user.set_password(new_password)
+                user.save()
+                send_action_notification(user, "Password updated successfully", "Your password has been reset successfully. You can now log in with your new password.", send_email=True)
+                messages.success(request, 'Your password has been reset successfully. Please log in.')
+                return redirect('login')
+            else:
+                messages.error(request, 'Passwords do not match.')
+        return render(request, 'core/reset_password.html', {'validlink': True})
+    else:
+        messages.error(request, 'The reset link is invalid or has expired.')
+        return render(request, 'core/reset_password.html', {'validlink': False})
+
+
+# ──────────────────────────────────────────────
+# Notification API (AJAX)
+# ──────────────────────────────────────────────
+@login_required
+def user_notifications_api(request):
+    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')[:10]
+    unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
+    
+    data = []
+    for notif in notifications:
+        data.append({
+            'id': notif.id,
+            'title': notif.title,
+            'message': notif.message,
+            'is_read': notif.is_read,
+            'created_at': notif.created_at.strftime("%b %d, %Y, %I:%M %p")
+        })
+        
+    return JsonResponse({
+        'notifications': data,
+        'unread_count': unread_count
+    })
+
+@login_required
+def mark_notification_read(request, pk):
+    if request.method == 'POST':
+        notif = get_object_or_404(Notification, pk=pk, user=request.user)
+        notif.is_read = True
+        notif.save()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=400)
+
+@login_required
+def delete_notification(request, pk):
+    if request.method == 'POST':
+        notif = get_object_or_404(Notification, pk=pk, user=request.user)
+        notif.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=400)
+

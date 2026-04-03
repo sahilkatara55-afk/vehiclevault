@@ -224,6 +224,99 @@
 
     </div>
 
+    <!-- Accessories Section -->
+    <h2 class="cd-section-title" style="margin-top: 50px;">🔧 Car Accessories</h2>
+    <div class="accessories-section" style="background:#fff; padding:30px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.05); border:1px solid #f1f5f9; margin-bottom:40px;">
+      
+      <!-- Category Tabs -->
+      <div class="acc-tabs" style="display:flex; gap:15px; margin-bottom:25px; overflow-x:auto; padding-bottom:5px;">
+        <button class="acc-tab-btn active" onclick="filterAccessories(event, 'all')">All</button>
+        {% for category, items in categorized_accessories.items %}
+          {% if items %}
+          <button class="acc-tab-btn" onclick="filterAccessories(event, '{{ category|slugify }}')">{{ category }}</button>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <!-- Accessory Grid -->
+      <div class="acc-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:20px;">
+        {% for category, items in categorized_accessories.items %}
+          {% for acc in items %}
+          <div class="acc-card acc-item-{{ category|slugify }} all-acc" style="border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; transition:transform 0.2s, box-shadow 0.2s; background:#fff; position:relative;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+            <div style="height:140px; background:#f1f5f9; position:relative;">
+              {% if acc.image %}
+              <img src="{{ acc.image.url }}" style="width:100%; height:100%; object-fit:cover;">
+              {% else %}
+              <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:3rem;">🔧</div>
+              {% endif %}
+              
+              {% if user.is_authenticated %}
+              <button class="wishlist-btn {% if acc.pk in favorite_accessory_ids %}active{% endif %}" onclick="toggleAccWishlist(this, {{ acc.pk }})" style="position:absolute; top:8px; right:8px; width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.9); border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; box-shadow:0 2px 5px rgba(0,0,0,0.1); transition:all 0.2s;">
+                <span class="heart-icon">{% if acc.pk in favorite_accessory_ids %}❤️{% else %}🤍{% endif %}</span>
+              </button>
+              {% endif %}
+            </div>
+            
+            <div style="padding:15px;">
+              <div style="font-size:0.75rem; color:#64748b; font-weight:600; text-transform:uppercase; margin-bottom:4px;">{{ acc.category }}</div>
+              <h4 style="margin:0 0 8px 0; font-size:1rem; color:#0f172a;">{{ acc.name }}</h4>
+              <div style="font-weight:700; color:#3b82f6; font-size:1.1rem;">₹{{ acc.price|floatformat:0 }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        {% endfor %}
+      </div>
+      
+      {% if not car.accessories.exists %}
+        <p style="color:#64748b;">No accessories linked to this vehicle yet.</p>
+      {% endif %}
+      
+    </div>
+
+    <style>
+      .acc-tab-btn { padding:8px 16px; border-radius:20px; border:1px solid #e2e8f0; background:#f8fafc; color:#475569; font-weight:600; font-size:0.9rem; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+      .acc-tab-btn:hover { background:#e2e8f0; }
+      .acc-tab-btn.active { background:#3b82f6; color:white; border-color:#3b82f6; }
+      .wishlist-btn.active .heart-icon { transform:scale(1.1); }
+      .wishlist-btn:hover { transform:scale(1.1); }
+      .wishlist-btn:active { transform:scale(0.9); }
+    </style>
+
+    <script>
+    function filterAccessories(event, catSlug) {
+      document.querySelectorAll('.acc-tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      document.querySelectorAll('.all-acc').forEach(card => card.style.display = 'none');
+      if (catSlug === 'all') {
+        document.querySelectorAll('.all-acc').forEach(card => card.style.display = 'block');
+      } else {
+        document.querySelectorAll('.acc-item-' + catSlug).forEach(card => card.style.display = 'block');
+      }
+    }
+    
+    function toggleAccWishlist(btn, accId) {
+      fetch(`/accessories/toggle/${accId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.status === 'added') {
+          btn.classList.add('active');
+          btn.querySelector('.heart-icon').innerHTML = '❤️';
+        } else if(data.status === 'removed') {
+          btn.classList.remove('active');
+          btn.querySelector('.heart-icon').innerHTML = '🤍';
+        }
+      })
+      .catch(err => console.error(err));
+    }
+    </script>
+
     <!-- User Reviews Section -->
     <h2 class="cd-section-title" style="margin-top: 50px;">💬 User Reviews</h2>
     <div class="reviews-section" style="background:#fff; padding:30px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.05); border:1px solid #f1f5f9; margin-bottom:40px;">
@@ -307,6 +400,48 @@
           Please <a href="{% url 'login' %}?next={{ request.path }}" style="color:#3b82f6; font-weight:600; text-decoration:none;">log in</a> to write a review.
         </div>
       {% endif %}
+    </div>
+
+    <!-- Enquiry Form Section -->
+    <h2 class="cd-section-title" style="margin-top: 50px;">📩 Send an Enquiry</h2>
+    <div style="background:#fff; padding:30px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.05); border:1px solid #f1f5f9; margin-bottom:50px;">
+      {% if messages %}
+        {% for m in messages %}
+          <div style="padding:12px 15px; border-radius:8px; margin-bottom:15px; {% if m.tags == 'success' %}background:#f0fdf4; border:1px solid #bbf7d0; color:#166534;{% else %}background:#fef2f2; border:1px solid #fecaca; color:#991b1b;{% endif %}">
+            {{ m }}
+          </div>
+        {% endfor %}
+      {% endif %}
+      <p style="color:#64748b; margin-bottom:25px; line-height:1.6;">Interested in the <strong>{{ car.make }} {{ car.model }}</strong>? Fill out the form below and our team will get in touch with you shortly.</p>
+      <form method="POST" action="{% url 'submit_enquiry' car.id %}">
+        {% csrf_token %}
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+          <div>
+            <label style="display:block; font-weight:600; color:#334155; margin-bottom:8px;">Your Name *</label>
+            <input type="text" name="name" required placeholder="e.g. Rahul Sharma" value="{% if user.is_authenticated %}{{ user.get_full_name }}{% endif %}"
+              style="width:100%; padding:12px; border-radius:8px; border:1px solid #cbd5e1; outline:none; font-family:inherit; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-weight:600; color:#334155; margin-bottom:8px;">Phone Number *</label>
+            <input type="tel" name="phone" required placeholder="e.g. 9876543210"
+              style="width:100%; padding:12px; border-radius:8px; border:1px solid #cbd5e1; outline:none; font-family:inherit; box-sizing:border-box;">
+          </div>
+        </div>
+        <div style="margin-bottom:20px;">
+          <label style="display:block; font-weight:600; color:#334155; margin-bottom:8px;">Email Address *</label>
+          <input type="email" name="email" required placeholder="you@example.com" value="{% if user.is_authenticated %}{{ user.email }}{% endif %}"
+            style="width:100%; padding:12px; border-radius:8px; border:1px solid #cbd5e1; outline:none; font-family:inherit; box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:25px;">
+          <label style="display:block; font-weight:600; color:#334155; margin-bottom:8px;">Message (Optional)</label>
+          <textarea name="message" rows="4" placeholder="Write any specific questions or requirements..."
+            style="width:100%; padding:12px; border-radius:8px; border:1px solid #cbd5e1; outline:none; font-family:inherit; resize:vertical; box-sizing:border-box;"></textarea>
+        </div>
+        <button type="submit" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8); color:#fff; padding:13px 28px; border:none; border-radius:10px; font-weight:700; font-size:1rem; cursor:pointer; box-shadow:0 4px 15px rgba(59,130,246,0.3); transition:all 0.2s;"
+           onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          📩 Submit Enquiry
+        </button>
+      </form>
     </div>
 
   </div>
