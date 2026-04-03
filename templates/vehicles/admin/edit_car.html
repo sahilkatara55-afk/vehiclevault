@@ -168,6 +168,22 @@
           </div>
         </div>
 
+        <h3 class="section-heading">Available Accessories</h3>
+        <div class="mc-form-row">
+          <div class="mc-form-group" style="width:100%;">
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+              {% for acc in accessories %}
+              <label class="checkbox-label" style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" name="accessories" value="{{ acc.pk }}" class="large-checkbox" {% if acc in car.accessories.all %}checked{% endif %}>
+                <span><strong>{{ acc.name }}</strong> <small style="color:#64748b;">({{ acc.category }} - ₹{{ acc.price|floatformat:0 }})</small></span>
+              </label>
+              {% empty %}
+              <span style="color:#64748b;">No accessories found.</span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
         <h3 class="section-heading">Media & Details</h3>
         <div class="mc-form-row">
           <div class="mc-form-group mc-form-group-flex2">
@@ -396,7 +412,10 @@ document.addEventListener('DOMContentLoaded', () => {
       fetch(this.action, {
         method: 'POST',
         body: formData,
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        headers: { 
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': '{{ csrf_token }}'
+        }
       })
       .then(response => {
         if(response.redirected) {

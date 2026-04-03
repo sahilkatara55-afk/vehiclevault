@@ -11,6 +11,12 @@ urlpatterns = [
     path('admin-request-pending/', views.admin_request_pending, name='admin_request_pending'),
 
     path('login/', views.userloginform, name='login'),
+    path('forgot-password/', views.forgot_password, name='forgot_password'),
+    path('reset-password/<str:uidb64>/<str:token>/', views.reset_password, name='reset_password'),
+
+    path('api/notifications/', views.user_notifications_api, name='user_notifications_api'),
+    path('api/notifications/read/<int:pk>/', views.mark_notification_read, name='mark_notification_read'),
+    path('api/notifications/delete/<int:pk>/', views.delete_notification, name='delete_notification'),
 
     path('user-dashboard/', views.user_dashboard, name='user_dashboard'),
 
@@ -52,12 +58,19 @@ urlpatterns = [
     path('logout/', views.logout_user, name='logout'),
 
     # Public Pages — Search, Brands, Compare, Details
+    path('coming-soon/', views.coming_soon, name='coming_soon'),
+    path('expert-reviews/', views.expert_reviews, name='expert_reviews'),
+    path('user-reviews/', views.user_reviews_page, name='user_reviews_page'),
     path('search/', views.search_cars, name='search_cars'),
     path('brands/', views.brands_view, name='brands'),
     path('brands/<str:make>/', views.brand_cars, name='brand_cars'),
     path('compare/', views.compare_cars, name='compare_cars'),
+    path('admin-analytics/', views.admin_analytics, name='admin_analytics'),
+    path('api/analytics/', views.analytics_data_api, name='analytics_data_api'),
+    path('admin-analytics/export/', views.export_analytics_csv, name='export_analytics_csv'),
     path('car/<int:pk>/', views.car_detail, name='car_detail'),
     path('car/<int:car_id>/review/', views.submit_review, name='submit_review'),
+    path('car/<int:car_id>/enquiry/', views.submit_enquiry, name='submit_enquiry'),
     path('review/<int:pk>/edit/', views.edit_review, name='edit_review'),
     path('admin-reviews/', views.admin_reviews, name='admin_reviews'),
     path('admin-reviews/delete/<int:pk>/', views.delete_review, name='delete_review'),
@@ -69,6 +82,7 @@ urlpatterns = [
     path('recently-viewed/', views.recently_viewed_page, name='recently_viewed'),
     path('track-view/<int:car_id>/', views.track_view, name='track_view'),
     path('accessories/', views.suggested_accessories, name='suggested_accessories'),
+    path('accessories/toggle/<int:pk>/', views.toggle_favorite_accessory, name='toggle_favorite_accessory'),
     path('documents/', views.documents_reminders, name='documents_reminders'),
     path('documents/upload/', views.upload_document, name='upload_document'),
     path('documents/delete/<int:pk>/', views.delete_document, name='delete_document'),

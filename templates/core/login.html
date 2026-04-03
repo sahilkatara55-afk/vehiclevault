@@ -35,8 +35,13 @@
         />
       </div>
 
+      <div style="text-align: right; margin-bottom: 20px; font-size: 0.9rem;">
+        <a href="{% url 'forgot_password' %}" style="color: #00adb5; text-decoration: none;">Forgot Password?</a>
+      </div>
+
       <button type="submit" class="auth-btn">Login</button>
     </form>
+
 
     <p class="auth-footer">
       Don't have an account? <a href="{% url 'signup' %}">Sign Up</a>

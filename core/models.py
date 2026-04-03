@@ -134,3 +134,53 @@ class AdminSignupRequest(models.Model):
         ordering = ['-requested_at']
         verbose_name = 'Admin Signup Request'
         verbose_name_plural = 'Admin Signup Requests'
+
+
+# NOTIFICATION MODEL
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.email} - {self.title}"
+
+
+# NOTIFICATION PREFERENCE MODEL
+
+class NotificationPreference(models.Model):
+    LANGUAGE_CHOICES = [
+        ('en', 'English'),
+        ('gu', 'Gujarati'),
+    ]
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='notification_preference')
+    email_notifications = models.BooleanField(default=True)
+    in_app_notifications = models.BooleanField(default=True)
+    marketing_emails = models.BooleanField(default=False)
+    language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default='en')
+
+    def __str__(self):
+        return f"Preferences for {self.user.email}"
+
+
+# USER DEVICE MODEL (TRACKING)
+
+class UserDevice(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='devices')
+    device_name = models.CharField(max_length=255, help_text="Browser/OS string")
+    ip_address = models.GenericIPAddressField()
+    last_login = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'device_name', 'ip_address')
+        ordering = ['-last_login']
+
+    def __str__(self):
+        return f"{self.user.email} - {self.device_name} ({self.ip_address})"

@@ -151,11 +151,20 @@
           </div>
           <!-- Recent comparisons -->
           <div class="report-block">
-            <h3>Recent Comparisons</h3>
+            <h3>Recent Comparisons <a href="{% url 'admin_analytics' %}" style="font-size: 0.8rem; font-weight: 500; color: #3b82f6; float: right; text-decoration: none;">View Full Analytics</a></h3>
             <ul class="report-list">
-              <li><span>Honda City vs Hyundai Verna</span> <span class="time-ago">2 mins ago</span></li>
-              <li><span>Tata Harrier vs MG Hector</span> <span class="time-ago">15 mins ago</span></li>
-              <li><span>Maruti Brezza vs Tata Nexon</span> <span class="time-ago">1 hr ago</span></li>
+              {% for comp in latest_comparisons_summary %}
+              <li>
+                <span>
+                  {% for car in comp.cars.all %}
+                    {{ car.make }} {{ car.model }}{% if not forloop.last %} vs {% endif %}
+                  {% endfor %}
+                </span>
+                <span class="time-ago">Logged</span>
+              </li>
+              {% empty %}
+              <li><span>No comparisons yet</span></li>
+              {% endfor %}
             </ul>
           </div>
         </div>

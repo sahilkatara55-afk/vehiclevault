@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}User Reviews | VehicleVault{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 1200px; margin: 40px auto; padding: 20px;">
+  <h1 style="font-weight: 800; margin-bottom: 30px; color: var(--vv-text);">Real User Reviews</h1>
+  <div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Dummy User Review 1 -->
+    <div style="background: var(--vv-surface); padding: 20px; border-radius: var(--vv-radius); box-shadow: var(--vv-card-shadow); border: 1px solid var(--vv-border);">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <h4 style="margin: 0; font-size: 1.1rem; color: var(--vv-text);">Ramesh Patel</h4>
+          <p style="color: var(--vv-text-muted); font-size: 0.85rem; margin-top: 4px;">Owns: Hyundai Creta (2025)</p>
+        </div>
+        <div style="color: #f59e0b; font-weight: bold;">★★★★★</div>
+      </div>
+      <p style="margin-top: 10px; color: var(--vv-text);">Absolutely love the comfort and features I got in the top model. The panoramic sunroof and ventilated seats are a blessing in the summer.</p>
+    </div>
+    <!-- Dummy User Review 2 -->
+    <div style="background: var(--vv-surface); padding: 20px; border-radius: var(--vv-radius); box-shadow: var(--vv-card-shadow); border: 1px solid var(--vv-border);">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <h4 style="margin: 0; font-size: 1.1rem; color: var(--vv-text);">Sneha Sharma</h4>
+          <p style="color: var(--vv-text-muted); font-size: 0.85rem; margin-top: 4px;">Owns: Maruti Swift ZXi</p>
+        </div>
+        <div style="color: #f59e0b; font-weight: bold;">★★★★☆</div>
+      </div>
+      <p style="margin-top: 10px; color: var(--vv-text);">Great mileage for daily office use. However, the build quality feels a bit light on highways. Very reliable engine though!</p>
+    </div>
+    <!-- Dummy User Review 3 -->
+    <div style="background: var(--vv-surface); padding: 20px; border-radius: var(--vv-radius); box-shadow: var(--vv-card-shadow); border: 1px solid var(--vv-border);">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <h4 style="margin: 0; font-size: 1.1rem; color: var(--vv-text);">Vivek Iyer</h4>
+          <p style="color: var(--vv-text-muted); font-size: 0.85rem; margin-top: 4px;">Owns: Tata Nexon EV</p>
+        </div>
+        <div style="color: #f59e0b; font-weight: bold;">★★★★☆</div>
+      </div>
+      <p style="margin-top: 10px; color: var(--vv-text);">Solid safety, instant torque is addictive. Charging network is growing, but long trips need prior planning.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -55,7 +55,7 @@
               <th>#</th>
               <th>Image</th>
               <th>Name</th>
-              <th>Compatible Car</th>
+              <th>Category</th>
               <th>Price (₹)</th>
               <th>Actions</th>
             </tr>
@@ -72,12 +72,12 @@
                 {% endif %}
               </td>
               <td><div class="mc-car-name">{{ acc.name }}</div></td>
-              <td>{{ acc.compatible_car|default:"—" }}</td>
+              <td>{{ acc.category }}</td>
               <td class="mc-price">₹{{ acc.price|floatformat:0 }}</td>
               <td>
                 <div class="mc-actions">
                   <button class="mc-btn mc-btn-edit"
-                    onclick="openEditModal({{ acc.pk }}, '{{ acc.name|escapejs }}', '{{ acc.compatible_car|escapejs }}', '{{ acc.price }}', `{{ acc.description|default:''|escapejs }}`)">
+                    onclick="openEditModal({{ acc.pk }}, '{{ acc.name|escapejs }}', '{{ acc.category|escapejs }}', '{{ acc.price }}', `{{ acc.description|default:''|escapejs }}`)">
                     ✏️ Edit
                   </button>
                   <form method="post" action="{% url 'accessory_delete' acc.pk %}" style="display:inline;"
@@ -119,8 +119,14 @@
             <input type="text" name="name" placeholder="e.g. Car Seat Cover" required>
           </div>
           <div class="mc-form-group">
-            <label>Compatible Car</label>
-            <input type="text" name="compatible_car" placeholder="e.g. Tata Nexon">
+            <label>Category</label>
+            <select name="category" required>
+              <option value="Interior">Interior</option>
+              <option value="Exterior">Exterior</option>
+              <option value="Safety">Safety</option>
+              <option value="Comfort">Comfort</option>
+              <option value="Tech">Tech</option>
+            </select>
           </div>
         </div>
         <div class="mc-form-row">
@@ -164,8 +170,14 @@
             <input type="text" name="name" id="edit_name" required>
           </div>
           <div class="mc-form-group">
-            <label>Compatible Car</label>
-            <input type="text" name="compatible_car" id="edit_compatible">
+            <label>Category</label>
+            <select name="category" id="edit_category" required>
+              <option value="Interior">Interior</option>
+              <option value="Exterior">Exterior</option>
+              <option value="Safety">Safety</option>
+              <option value="Comfort">Comfort</option>
+              <option value="Tech">Tech</option>
+            </select>
           </div>
         </div>
         <div class="mc-form-row">
@@ -195,11 +207,11 @@
 
 <script>
   function openAddModal() { document.getElementById('addModal').classList.add('active'); }
-  function openEditModal(pk, name, compatible, price, description) {
+  function openEditModal(pk, name, category, price, description) {
     const base = "{% url 'accessory_edit' 0 %}".replace('/0/', '/' + pk + '/');
     document.getElementById('editForm').action = base;
     document.getElementById('edit_name').value        = name;
-    document.getElementById('edit_compatible').value  = compatible;
+    document.getElementById('edit_category').value    = category;
     document.getElementById('edit_price').value       = price;
     document.getElementById('edit_description').value = description;
     document.getElementById('editModal').classList.add('active');

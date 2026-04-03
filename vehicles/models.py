@@ -63,6 +63,9 @@ class Car(models.Model):
     has_airbags         = models.BooleanField(default=True)
     has_abs             = models.BooleanField(default=True)
 
+    # Accessories
+    accessories         = models.ManyToManyField('Accessory', related_name='cars', blank=True)
+
     created_at   = models.DateTimeField(auto_now_add=True)
     updated_at   = models.DateTimeField(auto_now=True)
 
@@ -189,8 +192,15 @@ class Reminder(models.Model):
 
 # ── Accessory ──────────────────────────────────────────────────
 class Accessory(models.Model):
+    CATEGORY_CHOICES = [
+        ('Interior', 'Interior'),
+        ('Exterior', 'Exterior'),
+        ('Safety', 'Safety'),
+        ('Comfort', 'Comfort'),
+        ('Tech', 'Tech'),
+    ]
     name           = models.CharField(max_length=200)
-    compatible_car = models.CharField(max_length=200, blank=True)
+    category       = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='Interior')
     price          = models.DecimalField(max_digits=10, decimal_places=2)
     image          = models.ImageField(upload_to='accessories/', blank=True, null=True)
     description    = models.TextField(blank=True)
@@ -264,3 +274,46 @@ class CarImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.car.make} {self.car.model}"
+
+# ── Favorite Accessory ──────────────────────────────────────────
+class FavoriteAccessory(models.Model):
+    user      = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='favorite_accessories')
+    accessory = models.ForeignKey(Accessory, on_delete=models.CASCADE, related_name='favorited_by')
+    added_at  = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'accessory')
+        ordering = ['-added_at']
+
+    def __str__(self):
+        return f"{self.user.email} liked {self.accessory.name}"
+
+
+# ── Car Enquiry ────────────────────────────────────────────────
+class CarEnquiry(models.Model):
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='enquiries')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='enquiries', null=True, blank=True)
+    name = models.CharField(max_length=150)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    message = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Enquiry for {self.car} by {self.name}"
+
+# ── Comparison Tracking ──────────────────────────────────────────
+class Comparison(models.Model):
+    cars = models.ManyToManyField(Car, related_name='comparison_events')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Comparison'
+        verbose_name_plural = 'Comparisons'
+
+    def __str__(self):
+        return f"Comparison on {self.created_at.strftime('%d-%m-%Y %H:%M')}"
