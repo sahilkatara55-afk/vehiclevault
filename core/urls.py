@@ -65,6 +65,7 @@ urlpatterns = [
     path('brands/', views.brands_view, name='brands'),
     path('brands/<str:make>/', views.brand_cars, name='brand_cars'),
     path('compare/', views.compare_cars, name='compare_cars'),
+    path('all-accessories/', views.all_accessories_page, name='all_accessories_page'),
     path('admin-analytics/', views.admin_analytics, name='admin_analytics'),
     path('api/analytics/', views.analytics_data_api, name='analytics_data_api'),
     path('admin-analytics/export/', views.export_analytics_csv, name='export_analytics_csv'),

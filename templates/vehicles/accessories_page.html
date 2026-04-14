@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}All Accessories | VehicleVault{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/cars.css' %}?v=2" />
+{% endblock %}
+
+{% block content %}
+<div class="accessories-page-wrapper">
+    <h1 class="accessories-page-title">Car Accessories</h1>
+    <p class="accessories-page-subtitle">Explore and find the perfect accessories for your vehicle.</p>
+    
+    <div class="accessories-section">
+      
+      <!-- Category Tabs -->
+      <div class="acc-tabs">
+        <button class="acc-tab-btn active" onclick="filterAccessories(event, 'all')">All</button>
+        {% for category, items in categorized_accessories.items %}
+          {% if items %}
+          <button class="acc-tab-btn" onclick="filterAccessories(event, '{{ category|slugify }}')">{{ category }}</button>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <!-- Accessory Grid -->
+      <div class="acc-grid">
+        {% for category, items in categorized_accessories.items %}
+          {% for acc in items %}
+          <div class="acc-card acc-item-{{ category|slugify }} all-acc">
+            <div class="acc-card-img-wrap">
+              {% if acc.image %}
+              <img src="{{ acc.image.url }}">
+              {% else %}
+              <div class="acc-card-placeholder">🔧</div>
+              {% endif %}
+              
+              {% if user.is_authenticated %}
+              <button class="wishlist-btn {% if acc.pk in favorite_accessory_ids %}active{% endif %}" onclick="toggleAccWishlist(this, {{ acc.pk }})">
+                <span class="heart-icon">{% if acc.pk in favorite_accessory_ids %}❤️{% else %}🤍{% endif %}</span>
+              </button>
+              {% endif %}
+            </div>
+            
+            <div class="acc-card-body">
+              <div class="acc-card-category">{{ acc.category }}</div>
+              <h4 class="acc-card-title">{{ acc.name }}</h4>
+              <div class="acc-card-price">₹{{ acc.price|floatformat:0 }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        {% endfor %}
+      </div>
+      
+      {% if not categorized_accessories %}
+        <p class="acc-empty-state">No accessories available at the moment.</p>
+      {% endif %}
+      
+    </div>
+
+    <script>
+    function filterAccessories(event, catSlug) {
+      document.querySelectorAll('.acc-tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      document.querySelectorAll('.all-acc').forEach(card => card.style.display = 'none');
+      if (catSlug === 'all') {
+        document.querySelectorAll('.all-acc').forEach(card => card.style.display = 'block');
+      } else {
+        document.querySelectorAll('.acc-item-' + catSlug).forEach(card => card.style.display = 'block');
+      }
+    }
+    
+    function toggleAccWishlist(btn, accId) {
+      fetch(`/accessories/toggle/${accId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.status === 'added') {
+          btn.classList.add('active');
+          btn.querySelector('.heart-icon').innerHTML = '❤️';
+        } else if(data.status === 'removed') {
+          btn.classList.remove('active');
+          btn.querySelector('.heart-icon').innerHTML = '🤍';
+        }
+      })
+      .catch(err => console.error(err));
+    }
+    </script>
+</div>
+{% endblock %}

@@ -1014,3 +1014,205 @@ body.dark-mode {
   .cd-price { font-size: 1.8rem; }
   .cd-section-title { font-size: 1.6rem; }
 }
+
+/* ── Accessories Page ── */
+.accessories-page-wrapper {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+  min-height: 60vh;
+}
+
+.accessories-page-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.accessories-page-subtitle {
+  color: #64748b;
+  font-size: 1.1rem;
+  margin-bottom: 40px;
+}
+
+.accessories-section {
+  background: var(--cv-surface);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  border: 1px solid var(--cv-border);
+}
+
+.acc-tabs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.acc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.acc-card {
+  border: 1px solid var(--cv-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  background: var(--cv-surface);
+  position: relative;
+}
+
+.acc-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.acc-card-img-wrap {
+  height: 140px;
+  background: var(--cv-surface-2);
+  position: relative;
+}
+
+.acc-card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.acc-card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+}
+
+.wishlist-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: all 0.2s;
+}
+
+.acc-card-body {
+  padding: 15px;
+}
+
+.acc-card-category {
+  font-size: 0.75rem;
+  color: var(--cv-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.acc-card-title {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+  color: var(--cv-text);
+}
+
+.acc-card-price {
+  font-weight: 700;
+  color: var(--cv-blue);
+  font-size: 1.1rem;
+}
+
+.acc-empty-state {
+  color: var(--cv-text-muted);
+  text-align: center;
+  padding: 40px 0;
+}
+
+.acc-tab-btn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--cv-border);
+  background: var(--cv-surface-2);
+  color: var(--cv-text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.acc-tab-btn:hover {
+  background: var(--cv-border);
+}
+
+.acc-tab-btn.active {
+  background: var(--cv-blue);
+  color: white;
+  border-color: var(--cv-blue);
+}
+
+body.dark-mode .acc-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+body.dark-mode .acc-card-img-wrap {
+  background: #0f172a;
+}
+
+body.dark-mode .acc-card-title {
+  color: #f1f5f9;
+}
+
+body.dark-mode .acc-tab-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+body.dark-mode .acc-tab-btn:hover {
+  background: #334155;
+}
+
+body.dark-mode .acc-tab-btn.active {
+  background: #3b82f6;
+  color: white;
+}
+
+body.dark-mode .accessories-section {
+  background: #111827;
+  border-color: #1e293b;
+}
+
+body.dark-mode .accessories-page-title {
+  color: #f1f5f9;
+}
+
+body.dark-mode .accessories-page-subtitle {
+  color: #94a3b8;
+}
+
+.wishlist-btn.active .heart-icon {
+  transform: scale(1.1);
+}
+
+.wishlist-btn:hover {
+  transform: scale(1.1);
+}
+
+.wishlist-btn:active {
+  transform: scale(0.9);
+}

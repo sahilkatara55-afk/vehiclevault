@@ -1431,6 +1431,32 @@ def track_view(request, car_id):
 
 
 # ──────────────────────────────────────────────
+# All Accessories Page
+# ──────────────────────────────────────────────
+def all_accessories_page(request):
+    from vehicles.models import Accessory, FavoriteAccessory
+    accessories = Accessory.objects.all()
+    
+    categorized_accessories = {}
+    for choice in Accessory.CATEGORY_CHOICES:
+        categorized_accessories[choice[0]] = []
+    
+    for acc in accessories:
+        if acc.category in categorized_accessories:
+            categorized_accessories[acc.category].append(acc)
+            
+    favorite_accessory_ids = []
+    if request.user.is_authenticated:
+        favorite_accessory_ids = FavoriteAccessory.objects.filter(user=request.user).values_list('accessory_id', flat=True)
+
+    return render(request, 'vehicles/accessories_page.html', {
+        'categorized_accessories': categorized_accessories,
+        'favorite_accessory_ids': favorite_accessory_ids,
+        'all_accessories': accessories,
+    })
+
+
+# ──────────────────────────────────────────────
 # Suggested Accessories
 # ──────────────────────────────────────────────
 @login_required
